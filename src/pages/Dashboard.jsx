@@ -237,7 +237,7 @@ export default function Dashboard() {
           <div className="glass-panel" style={{ padding: '24px' }}>
             <div style={{ ...styles.sectionHeader, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '20px' }}>
               <Heart size={18} style={{ color: 'var(--color-danger)' }} />
-              <h3 style={styles.sectionTitle}>Ecosystem Wishlist</h3>
+              <h3 style={styles.sectionTitle}>Wishlist Item</h3>
             </div>
 
             {wishlistedItems.length === 0 ? (

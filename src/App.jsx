@@ -3,6 +3,7 @@ import { ShopContext } from './context/ShopContext';
 import Navbar from './components/Navbar';
 import CartDrawer from './components/CartDrawer';
 import Footer from './components/Footer';
+import MobileBottomNav from './components/MobileBottomNav';
 
 // Pages
 import Home from './pages/Home';
@@ -53,6 +54,9 @@ export default function App() {
 
       {/* Footer block */}
       <Footer />
+
+      {/* Sticky Mobile Bottom Navigation */}
+      <MobileBottomNav onOpenCart={() => setCartOpen(true)} />
     </div>
   );
 }

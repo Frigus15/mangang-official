@@ -854,3 +854,76 @@ a {
 .mobile-sidebar.active {
   transform: translateX(0);
 }
+
+/* Sticky Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(15px);
+  border-top: 1px solid var(--border-glass);
+  display: none; /* Hidden on desktop */
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1500;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.bottom-nav-item {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  outline: none;
+  min-width: 60px;
+}
+
+.bottom-nav-item.active {
+  color: var(--color-primary);
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.92);
+}
+
+.bottom-nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: var(--color-primary);
+  color: #03050a;
+  font-size: 8px;
+  font-weight: 800;
+  height: 14px;
+  min-width: 14px;
+  padding: 0 3px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(0, 245, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex; /* Visible on mobile */
+  }
+  /* Add padding bottom to body so content isn't cut off behind sticky nav */
+  body {
+    padding-bottom: 64px;
+  }
+}
