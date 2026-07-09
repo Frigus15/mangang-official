@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
-  const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup } = useContext(ShopContext);
+  const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser } = useContext(ShopContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Auth modal states
@@ -215,6 +215,17 @@ export default function Navbar({ onOpenCart }) {
                   <User size={16} />
                   <span>My Account</span>
                 </button>
+
+                {/* Admin Portal */}
+                {currentUser?.role === 'admin' && (
+                  <button
+                    onClick={() => handleNavClick('admin')}
+                    style={getSidebarLinkStyle('admin')}
+                  >
+                    <Shield size={16} />
+                    <span>Admin Portal</span>
+                  </button>
+                )}
 
                 {/* Logout */}
                 <button

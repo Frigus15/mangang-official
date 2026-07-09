@@ -210,9 +210,29 @@ export const ShopContextProvider = ({ children }) => {
   // Authentication State
   const [users, setUsers] = useState(() => {
     const local = localStorage.getItem('mangang_users');
-    return local ? JSON.parse(local) : [
-      { username: 'admin', email: 'admin@mangang.com', password: 'password' }
+    let loadedUsers = local ? JSON.parse(local) : [];
+    
+    // Seed default admin accounts
+    const defaultAdmins = [
+      { username: 'admin', email: 'admin@mangang.com', password: 'password', role: 'admin' },
+      { username: 'CS Agent', email: 'mangangofficialstore.cs@gmail.com', password: 'admin@123', role: 'admin' }
     ];
+
+    defaultAdmins.forEach(admin => {
+      if (!loadedUsers.some(u => u.email === admin.email)) {
+        loadedUsers.push(admin);
+      }
+    });
+
+    // Enforce admin roles
+    loadedUsers = loadedUsers.map(u => {
+      if (u.email === 'admin@mangang.com' || u.email === 'mangangofficialstore.cs@gmail.com') {
+        return { ...u, role: 'admin' };
+      }
+      return u;
+    });
+
+    return loadedUsers;
   });
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('mangang_is_logged_in') === 'true';
