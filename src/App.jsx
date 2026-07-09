@@ -14,7 +14,7 @@ import Dashboard from './pages/Dashboard';
 import AdminPortal from './pages/AdminPortal';
 
 export default function App() {
-  const { activePage, isLoggedIn, currentUser } = useContext(ShopContext);
+  const { activePage, isLoggedIn, currentUser, pageLoading } = useContext(ShopContext);
   const [cartOpen, setCartOpen] = useState(false);
 
   // Page Switcher
@@ -48,7 +48,16 @@ export default function App() {
       {/* Main Content Area */}
       <main style={styles.mainContent}>
         <div className="container">
-          {renderActivePage()}
+          {pageLoading ? (
+            <div style={styles.pageLoader} className="animate-fade-in">
+              <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
+              <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', textAlign: 'center' }}>
+                Connecting to node...
+              </p>
+            </div>
+          ) : (
+            renderActivePage()
+          )}
         </div>
       </main>
 
@@ -73,5 +82,13 @@ const styles = {
     width: '100%',
     position: 'relative',
     zIndex: 1
+  },
+  pageLoader: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '450px',
+    width: '100%'
   }
 };

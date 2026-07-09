@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
-  const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser } = useContext(ShopContext);
+  const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser, authLoading } = useContext(ShopContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Auth modal states
@@ -223,7 +223,7 @@ export default function Navbar({ onOpenCart }) {
                     style={getSidebarLinkStyle('admin')}
                   >
                     <Shield size={16} />
-                    <span>Control Hub</span>
+                    <span>Admin</span>
                   </button>
                 )}
 
@@ -288,79 +288,92 @@ export default function Navbar({ onOpenCart }) {
 
       {/* Auth Modal Overlay */}
       {authModalOpen && (
-        <div style={styles.modalOverlay} onClick={() => setAuthModalOpen(false)}>
+        <div style={styles.modalOverlay} onClick={() => !authLoading && setAuthModalOpen(false)}>
           <div style={styles.modalContent} className="glass-panel" onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
               <h3 style={styles.modalTitle}>
-                {authMode === 'login' ? 'User Decryption Access' : 'Initialize Client Core'}
+                {authMode === 'login' ? 'Log In to Mangang' : 'Create Your Account'}
               </h3>
-              <button style={styles.closeBtn} onClick={() => setAuthModalOpen(false)}>
-                <X size={18} />
-              </button>
+              {!authLoading && (
+                <button style={styles.closeBtn} onClick={() => setAuthModalOpen(false)}>
+                  <X size={18} />
+                </button>
+              )}
             </div>
             
-            <form onSubmit={handleAuthSubmit} style={styles.authForm}>
-              {authMode === 'signup' && (
-                <div className="form-group">
-                  <span className="form-label">Client Identity Name</span>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Agent Enforcer"
-                    value={authUsername}
-                    onChange={(e) => setAuthUsername(e.target.value)}
-                    className="form-input"
-                    style={styles.authInput}
-                  />
-                </div>
-              )}
-              <div className="form-group">
-                <span className="form-label">Secure Uplink Email</span>
-                <input
-                  type="email"
-                  required
-                  placeholder="name@net.com"
-                  value={authEmail}
-                  onChange={(e) => setAuthEmail(e.target.value)}
-                  className="form-input"
-                  style={styles.authInput}
-                />
+            {authLoading ? (
+              <div style={styles.modalLoading}>
+                <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
+                <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '500', textAlign: 'center' }}>
+                  {authMode === 'login' ? 'Logging in, please wait...' : 'Creating account, please wait...'}
+                </p>
               </div>
-              <div className="form-group">
-                <span className="form-label">Cryptographic Password</span>
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={authPassword}
-                  onChange={(e) => setAuthPassword(e.target.value)}
-                  className="form-input"
-                  style={styles.authInput}
-                />
-              </div>
-              
-              <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
-                {authMode === 'login' ? 'Decrypt & Establish Link' : 'Register Identity Credentials'}
-              </button>
-            </form>
+            ) : (
+              <>
+                <form onSubmit={handleAuthSubmit} style={styles.authForm}>
+                  {authMode === 'signup' && (
+                    <div className="form-group">
+                      <span className="form-label">Full Name</span>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. John Doe"
+                        value={authUsername}
+                        onChange={(e) => setAuthUsername(e.target.value)}
+                        className="form-input"
+                        style={styles.authInput}
+                      />
+                    </div>
+                  )}
+                  <div className="form-group">
+                    <span className="form-label">Email Address</span>
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@example.com"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      className="form-input"
+                      style={styles.authInput}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <span className="form-label">Password</span>
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      className="form-input"
+                      style={styles.authInput}
+                    />
+                  </div>
+                  
+                  <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
+                    {authMode === 'login' ? 'Log In' : 'Sign Up'}
+                  </button>
+                </form>
 
-            <div style={styles.modalFooter}>
-              {authMode === 'login' ? (
-                <span>
-                  No identity record?{' '}
-                  <button style={styles.switchBtn} onClick={() => setAuthMode('signup')}>
-                    Initialize profile
-                  </button>
-                </span>
-              ) : (
-                <span>
-                  Already initialized?{' '}
-                  <button style={styles.switchBtn} onClick={() => setAuthMode('login')}>
-                    Access terminal
-                  </button>
-                </span>
-              )}
-            </div>
+                <div style={styles.modalFooter}>
+                  {authMode === 'login' ? (
+                    <span>
+                      Don't have an account?{' '}
+                      <button style={styles.switchBtn} onClick={() => setAuthMode('signup')}>
+                        Sign Up
+                      </button>
+                    </span>
+                  ) : (
+                    <span>
+                      Already have an account?{' '}
+                      <button style={styles.switchBtn} onClick={() => setAuthMode('login')}>
+                        Log In
+                      </button>
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -581,7 +594,18 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.18)',
+    borderRadius: '16px',
+    border: '1px solid rgba(255, 255, 255, 0.08)'
+  },
+  modalLoading: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '30px 0',
+    width: '100%'
   },
   modalHeader: {
     display: 'flex',

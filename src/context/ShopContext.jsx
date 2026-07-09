@@ -189,11 +189,17 @@ export const ShopContextProvider = ({ children }) => {
   const [activePage, setActivePage] = useState('home');
   const [activeDashboardTab, setActiveDashboardTab] = useState('orders');
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
 
   const navigateTo = (page, productId = null) => {
-    setActivePage(page);
-    setSelectedProductId(productId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setPageLoading(true);
+    setTimeout(() => {
+      setActivePage(page);
+      setSelectedProductId(productId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setPageLoading(false);
+    }, 450);
   };
 
   // Filters State
@@ -245,13 +251,17 @@ export const ShopContextProvider = ({ children }) => {
   const login = (email, password) => {
     const user = users.find(u => u.email === email && u.password === password);
     if (!user) {
-      alert('Invalid cryptographic credentials.');
+      alert('Invalid credentials.');
       return;
     }
-    setIsLoggedIn(true);
-    setCurrentUser(user);
-    localStorage.setItem('mangang_is_logged_in', 'true');
-    localStorage.setItem('mangang_user', JSON.stringify(user));
+    setAuthLoading(true);
+    setTimeout(() => {
+      setIsLoggedIn(true);
+      setCurrentUser(user);
+      localStorage.setItem('mangang_is_logged_in', 'true');
+      localStorage.setItem('mangang_user', JSON.stringify(user));
+      setAuthLoading(false);
+    }, 1200);
   };
 
   const signup = (username, email, password) => {
@@ -265,18 +275,28 @@ export const ShopContextProvider = ({ children }) => {
     setUsers(updatedUsers);
     localStorage.setItem('mangang_users', JSON.stringify(updatedUsers));
 
-    setIsLoggedIn(true);
-    setCurrentUser(newUser);
-    localStorage.setItem('mangang_is_logged_in', 'true');
-    localStorage.setItem('mangang_user', JSON.stringify(newUser));
+    setAuthLoading(true);
+    setTimeout(() => {
+      setIsLoggedIn(true);
+      setCurrentUser(newUser);
+      localStorage.setItem('mangang_is_logged_in', 'true');
+      localStorage.setItem('mangang_user', JSON.stringify(newUser));
+      setAuthLoading(false);
+    }, 1200);
   };
 
   const logout = () => {
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    localStorage.removeItem('mangang_is_logged_in');
-    localStorage.removeItem('mangang_user');
-    navigateTo('home');
+    setPageLoading(true);
+    setTimeout(() => {
+      setIsLoggedIn(false);
+      setCurrentUser(null);
+      localStorage.removeItem('mangang_is_logged_in');
+      localStorage.removeItem('mangang_user');
+      setActivePage('home');
+      setSelectedProductId(null);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setPageLoading(false);
+    }, 500);
   };
 
   // Sync to localStorage
@@ -515,6 +535,8 @@ export const ShopContextProvider = ({ children }) => {
         logout,
         selectedProductId,
         navigateTo,
+        pageLoading,
+        authLoading,
         products,
         bannerSlides,
         addBannerSlide,
