@@ -48,16 +48,7 @@ export default function App() {
       {/* Main Content Area */}
       <main style={styles.mainContent}>
         <div className="container">
-          {pageLoading ? (
-            <div style={styles.pageLoader} className="animate-fade-in">
-              <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
-              <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', textAlign: 'center' }}>
-                Connecting to node...
-              </p>
-            </div>
-          ) : (
-            renderActivePage()
-          )}
+          {renderActivePage()}
         </div>
       </main>
 
@@ -66,6 +57,19 @@ export default function App() {
 
       {/* Sticky Mobile Bottom Navigation */}
       <MobileBottomNav onOpenCart={() => setCartOpen(true)} />
+
+      {/* Full-Screen Page Transition Overlay */}
+      {pageLoading && (
+        <div className="page-transition-overlay">
+          <div className="telemetry-spinner"></div>
+          <div className="loading-bar-container">
+            <div className="loading-bar-progress"></div>
+          </div>
+          <p style={{ marginTop: '16px', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em' }}>
+            CONNECTING TO NODE...
+          </p>
+        </div>
+      )}
     </div>
   );
 }
