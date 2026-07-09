@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import CartDrawer from './components/CartDrawer';
 import Footer from './components/Footer';
 import MobileBottomNav from './components/MobileBottomNav';
+import Loader from './components/Loader';
 
 // Pages
 import Home from './pages/Home';
@@ -61,12 +62,9 @@ export default function App() {
       {/* Full-Screen Page Transition Overlay */}
       {pageLoading && (
         <div className="page-transition-overlay">
-          <div className="telemetry-spinner"></div>
-          <div className="loading-bar-container">
-            <div className="loading-bar-progress"></div>
-          </div>
-          <p style={{ marginTop: '16px', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em' }}>
-            CONNECTING TO NODE...
+          <Loader />
+          <p style={{ marginTop: '24px', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '700', letterSpacing: '0.15em' }}>
+            DELIVERING MANGANG STORE...
           </p>
         </div>
       )}
