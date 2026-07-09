@@ -32,7 +32,7 @@ export default function Dashboard() {
   return (
     <div style={styles.container} className="animate-fade-in">
       <h1 style={styles.pageTitle}>User Dashboard</h1>
-      <p style={styles.pageSubtitle}>Every .</p>
+      <p style={styles.pageSubtitle}>Welcome to your dashboard — manage everything in one place.</p>
 
       {/* Tab Navigation Row */}
       <div style={styles.tabsRow}>

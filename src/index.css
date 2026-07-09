@@ -927,3 +927,20 @@ a {
     padding-bottom: 64px;
   }
 }
+
+/* Full Width Search Animation */
+.animate-search-expand {
+  animation: searchExpand 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  width: 100%;
+}
+
+@keyframes searchExpand {
+  from {
+    transform: scaleX(0.92) translateX(30px);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1) translateX(0);
+    opacity: 1;
+  }
+}

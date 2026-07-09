@@ -69,23 +69,13 @@ export default function Navbar({ onOpenCart }) {
   return (
     <nav className="glass-nav" style={styles.nav}>
       <div className="container" style={styles.container}>
-        {/* Logo */}
-        <div onClick={() => handleNavClick('home')} style={styles.logo}>
-          <img src="/logo.jpg" alt="Mangang Official Logo" style={styles.logoImg} />
-          <div style={styles.logoTextWrapper}>
-            <span style={styles.logoText}>MANGANG</span>
-            <span style={styles.logoSubtext}>OFFICIAL STORE</span>
-          </div>
-        </div>
-
-        {/* Action Icons */}
-        <div style={styles.actions}>
-          {/* Search Button + Expanding Input */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {searchExpanded && (
+        {searchExpanded ? (
+          <div className="animate-search-expand" style={styles.fullSearchWrapper}>
+            <div style={styles.fullSearchInputContainer}>
+              <Search size={18} style={{ color: 'var(--color-primary)' }} />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search products, brands or categories..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -94,52 +84,65 @@ export default function Navbar({ onOpenCart }) {
                   }
                 }}
                 className="form-input"
-                style={{
-                  padding: '6px 12px',
-                  fontSize: '13px',
-                  width: '180px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--border-glass)',
-                  borderRadius: '20px',
-                  color: 'var(--text-primary)',
-                  outline: 'none',
-                  transition: 'all 0.3s ease'
-                }}
+                style={styles.fullSearchInput}
                 autoFocus
-                onBlur={() => {
-                  if (searchQuery === '') setSearchExpanded(false);
-                }}
               />
-            )}
-            <button
-              onClick={() => setSearchExpanded(!searchExpanded)}
-              style={styles.actionBtn}
-              title="Search"
-            >
-              <Search size={20} style={{ color: 'var(--text-primary)' }} />
-            </button>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSearchExpanded(false);
+                }}
+                style={styles.closeSearchBtn}
+                title="Close Search"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
+        ) : (
+          <>
+            {/* Logo */}
+            <div onClick={() => handleNavClick('home')} style={styles.logo}>
+              <img src="/logo.jpg" alt="Mangang Official Logo" style={styles.logoImg} />
+              <div style={styles.logoTextWrapper}>
+                <span style={styles.logoText}>MANGANG</span>
+                <span style={styles.logoSubtext}>OFFICIAL STORE</span>
+              </div>
+            </div>
 
-          {/* Login Button (only when logged out, removed when logged in) */}
-          {!isLoggedIn && (
-            <button
-              onClick={() => { setAuthMode('login'); setAuthModalOpen(true); }}
-              style={styles.actionBtn}
-              title="Login / Sign Up"
-            >
-              <LogIn size={20} style={{ color: 'var(--color-primary)' }} />
-            </button>
-          )}
+            {/* Action Icons */}
+            <div style={styles.actions}>
+              {/* Search button */}
+              <button
+                onClick={() => setSearchExpanded(true)}
+                style={styles.actionBtn}
+                title="Search"
+              >
+                <Search size={20} style={{ color: 'var(--text-primary)' }} />
+              </button>
 
-          {/* Side Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ ...styles.mobileMenuToggle, display: 'flex' }}
-            className="mobile-menu-trigger"
-          >
-            <Menu size={20} />
-          </button>
-        </div>
+              {/* Login Button (only when logged out, removed when logged in) */}
+              {!isLoggedIn && (
+                <button
+                  onClick={() => { setAuthMode('login'); setAuthModalOpen(true); }}
+                  style={styles.actionBtn}
+                  title="Login / Sign Up"
+                >
+                  <LogIn size={20} style={{ color: 'var(--color-primary)' }} />
+                </button>
+              )}
+
+              {/* Side Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                style={{ ...styles.mobileMenuToggle, display: 'flex' }}
+                className="mobile-menu-trigger"
+              >
+                <Menu size={20} />
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Mobile Drawer (Sliding Sidebar Menu) */}
@@ -614,6 +617,43 @@ const styles = {
     cursor: 'pointer',
     padding: 0,
     textDecoration: 'underline'
+  },
+  fullSearchWrapper: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  fullSearchInputContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    width: '100%',
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid var(--border-glass)',
+    borderRadius: '24px',
+    padding: '8px 16px',
+    boxSizing: 'border-box'
+  },
+  fullSearchInput: {
+    flex: 1,
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--text-primary)',
+    fontSize: '14px',
+    outline: 'none',
+    padding: 0
+  },
+  closeSearchBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '2px',
+    transition: 'color 0.2s'
   }
 };
 

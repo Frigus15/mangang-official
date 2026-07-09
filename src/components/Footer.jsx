@@ -83,7 +83,7 @@ export default function Footer() {
 
         {/* Copyright Footer */}
         <div style={styles.copyrightRow}>
-          <p style={styles.copyrightText}>&copy; {new Date().getFullYear()} MANGANG Official Tech Store. All rights reserved.</p>
+          <p style={styles.copyrightText}>&copy; {new Date().getFullYear()} MANGANG OFFICIAL STORE. All rights reserved.</p>
         </div>
       </div>
     </footer>
