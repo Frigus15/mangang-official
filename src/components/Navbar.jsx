@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
-  const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, isLoggedIn, logout, login, signup } = useContext(ShopContext);
+  const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup } = useContext(ShopContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Auth modal states
@@ -15,6 +15,19 @@ export default function Navbar({ onOpenCart }) {
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const getSidebarLinkStyle = (pageId, tabId = null) => {
+    const isActive = tabId 
+      ? activePage === pageId && activeDashboardTab === tabId
+      : activePage === pageId;
+
+    return {
+      ...styles.sidebarLink,
+      color: isActive ? '#ffffff' : 'var(--text-primary)',
+      background: isActive ? 'rgba(99, 102, 241, 0.12)' : 'transparent',
+      borderColor: isActive ? 'var(--color-primary)' : 'transparent'
+    };
+  };
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -159,12 +172,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* Home */}
                 <button
                   onClick={() => handleNavClick('home')}
-                  style={{
-                    ...styles.sidebarLink,
-                    color: activePage === 'home' ? 'var(--color-primary)' : 'var(--text-primary)',
-                    background: activePage === 'home' ? 'rgba(0, 245, 255, 0.04)' : 'transparent',
-                    borderColor: activePage === 'home' ? 'var(--color-primary)' : 'transparent'
-                  }}
+                  style={getSidebarLinkStyle('home')}
                 >
                   <Home size={16} />
                   <span>Home</span>
@@ -173,12 +181,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* Explore Shop */}
                 <button
                   onClick={() => handleNavClick('catalog')}
-                  style={{
-                    ...styles.sidebarLink,
-                    color: activePage === 'catalog' ? 'var(--color-primary)' : 'var(--text-primary)',
-                    background: activePage === 'catalog' ? 'rgba(0, 245, 255, 0.04)' : 'transparent',
-                    borderColor: activePage === 'catalog' ? 'var(--color-primary)' : 'transparent'
-                  }}
+                  style={getSidebarLinkStyle('catalog')}
                 >
                   <Compass size={16} />
                   <span>Explore Shop</span>
@@ -187,7 +190,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* My Orders */}
                 <button
                   onClick={() => handleNavClick('orders')}
-                  style={styles.sidebarLink}
+                  style={getSidebarLinkStyle('dashboard', 'orders')}
                 >
                   <Package size={16} />
                   <span>My Orders</span>
@@ -196,7 +199,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* Recent Transactions */}
                 <button
                   onClick={() => handleNavClick('transactions')}
-                  style={styles.sidebarLink}
+                  style={getSidebarLinkStyle('dashboard', 'transactions')}
                 >
                   <History size={16} />
                   <span>Recent Transactions</span>
@@ -205,7 +208,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* My Account */}
                 <button
                   onClick={() => handleNavClick('account')}
-                  style={styles.sidebarLink}
+                  style={getSidebarLinkStyle('dashboard', 'account')}
                 >
                   <User size={16} />
                   <span>My Account</span>
@@ -228,12 +231,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* Home */}
                 <button
                   onClick={() => handleNavClick('home')}
-                  style={{
-                    ...styles.sidebarLink,
-                    color: activePage === 'home' ? 'var(--color-primary)' : 'var(--text-primary)',
-                    background: activePage === 'home' ? 'rgba(0, 245, 255, 0.04)' : 'transparent',
-                    borderColor: activePage === 'home' ? 'var(--color-primary)' : 'transparent'
-                  }}
+                  style={getSidebarLinkStyle('home')}
                 >
                   <Home size={16} />
                   <span>Home</span>
