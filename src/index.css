@@ -2,24 +2,24 @@
 
 :root {
   /* Colors */
-  --bg-dark-base: #f4f6f5;
-  --bg-dark-surface: #ffffff;
-  --bg-dark-card: #ffffff;
-  --bg-glass: rgba(255, 255, 255, 0.9);
-  --border-glass: #e5e7eb;
-  --border-glass-glow: #0b5d34;
+  --bg-dark-base: #030712;
+  --bg-dark-surface: #0b0f19;
+  --bg-dark-card: #111827;
+  --bg-glass: rgba(11, 15, 25, 0.65);
+  --border-glass: rgba(255, 255, 255, 0.07);
+  --border-glass-glow: #6366f1;
   
-  --color-primary: #0b5d34;      /* Forest Green */
-  --color-secondary: #fbd800;    /* Gold Yellow */
-  --color-accent: #0b5d34;       /* Green Accent */
+  --color-primary: #6366f1;      /* Indigo */
+  --color-secondary: #38bdf8;    /* Sky Blue */
+  --color-accent: #a855f7;       /* Royal Purple */
   --color-success: #10b981;      /* Emerald Green */
   --color-warning: #f59e0b;      /* Amber Yellow */
   --color-danger: #ef4444;       /* Ruby Red */
 
-  --text-primary: #111827;       /* Dark Charcoal */
-  --text-secondary: #4b5563;     /* Slate Gray */
-  --text-muted: #9ca3af;         /* Muted Gray */
-  --text-dark: #111827;          /* Inside light badges */
+  --text-primary: #f3f4f6;       /* Bright White */
+  --text-secondary: #9ca3af;     /* Slate Gray */
+  --text-muted: #6b7280;         /* Muted Gray */
+  --text-dark: #030712;          /* Badge text black */
 
   /* Fonts */
   --font-heading: 'Outfit', sans-serif;
@@ -33,14 +33,14 @@
   --border-radius-lg: 24px;
   
   /* Shadows & Glows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --glow-cyan: 0 0 15px rgba(11, 93, 52, 0.15);
-  --glow-indigo: 0 0 15px rgba(251, 216, 0, 0.15);
-  --glow-purple: 0 0 15px rgba(11, 93, 52, 0.15);
-  --glow-green: 0 0 15px rgba(16, 185, 129, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --glow-cyan: 0 0 15px rgba(99, 102, 241, 0.25);
+  --glow-indigo: 0 0 15px rgba(56, 189, 248, 0.25);
+  --glow-purple: 0 0 15px rgba(168, 85, 247, 0.25);
+  --glow-green: 0 0 15px rgba(16, 185, 129, 0.25);
   
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 /* Reset & Base Styles */
@@ -70,7 +70,7 @@ body {
   background: var(--bg-dark-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {

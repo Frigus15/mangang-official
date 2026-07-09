@@ -12,6 +12,7 @@ export default function Navbar({ onOpenCart }) {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
+  const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -64,96 +65,66 @@ export default function Navbar({ onOpenCart }) {
           </div>
         </div>
 
-        {/* Centered Search Bar */}
-        <div style={styles.searchContainer} className="desktop-only-links">
-          <div className="search-wrapper">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Search hardware, brands or categories..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (activePage !== 'catalog') {
-                  navigateTo('catalog');
-                }
-              }}
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        {/* Desktop Links */}
-        <div style={styles.navLinks} className="desktop-only-links">
-          {filteredNavItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              style={{
-                ...styles.link,
-                color: activePage === item.id ? 'var(--color-primary)' : 'var(--text-secondary)',
-                borderBottomColor: activePage === item.id ? 'var(--color-primary)' : 'transparent'
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
         {/* Action Icons */}
         <div style={styles.actions}>
-          {/* Auth Button */}
-          {isLoggedIn ? (
+          {/* Search Button + Expanding Input */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {searchExpanded && (
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (activePage !== 'catalog') {
+                    navigateTo('catalog');
+                  }
+                }}
+                className="form-input"
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '13px',
+                  width: '180px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: '20px',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                  transition: 'all 0.3s ease'
+                }}
+                autoFocus
+                onBlur={() => {
+                  if (searchQuery === '') setSearchExpanded(false);
+                }}
+              />
+            )}
             <button
-              onClick={logout}
+              onClick={() => setSearchExpanded(!searchExpanded)}
               style={styles.actionBtn}
-              title="Logout"
-              className="desktop-only"
+              title="Search"
             >
-              <LogOut size={18} style={{ color: 'var(--color-danger)' }} />
+              <Search size={20} style={{ color: 'var(--text-primary)' }} />
             </button>
-          ) : (
+          </div>
+
+          {/* Login Button (only when logged out, removed when logged in) */}
+          {!isLoggedIn && (
             <button
               onClick={() => { setAuthMode('login'); setAuthModalOpen(true); }}
               style={styles.actionBtn}
               title="Login / Sign Up"
-              className="desktop-only"
             >
-              <LogIn size={18} style={{ color: 'var(--color-primary)' }} />
+              <LogIn size={20} style={{ color: 'var(--color-primary)' }} />
             </button>
           )}
 
-          {/* Wishlist */}
-          <button
-            onClick={() => handleNavClick('dashboard')}
-            style={styles.actionBtn}
-            title="Wishlist"
-          >
-            <Heart size={20} style={{ color: wishlist.length > 0 ? 'var(--color-danger)' : 'var(--text-primary)' }} />
-            {wishlist.length > 0 && (
-              <span className="glow-loop" style={styles.badgeDanger}>{wishlist.length}</span>
-            )}
-          </button>
-
-          {/* Cart */}
-          <button
-            onClick={onOpenCart}
-            style={styles.actionBtn}
-            title="Shopping Cart"
-          >
-            <ShoppingCart size={20} style={styles.iconCyan} />
-            {cartCount > 0 && (
-              <span className="glow-loop" style={styles.badgeCyan}>{cartCount}</span>
-            )}
-          </button>
-
-          {/* Mobile Menu Toggle */}
+          {/* Side Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={styles.mobileMenuToggle}
+            style={{ ...styles.mobileMenuToggle, display: 'flex' }}
             className="mobile-menu-trigger"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            <Menu size={20} />
           </button>
         </div>
       </div>
