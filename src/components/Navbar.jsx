@@ -83,7 +83,6 @@ export default function Navbar({ onOpenCart }) {
                     navigateTo('catalog');
                   }
                 }}
-                className="form-input"
                 style={styles.fullSearchInput}
                 autoFocus
               />
@@ -639,10 +638,11 @@ const styles = {
     flex: 1,
     background: 'transparent',
     border: 'none',
-    color: 'var(--text-primary)',
-    fontSize: '14px',
+    color: '#ffffff',
+    fontSize: '16px',
     outline: 'none',
-    padding: 0
+    padding: '4px 0',
+    fontFamily: 'var(--font-body)'
   },
   closeSearchBtn: {
     background: 'none',
