@@ -214,7 +214,7 @@ export const ShopContextProvider = ({ children }) => {
     
     // Seed default admin accounts
     const defaultAdmins = [
-      { username: 'admin', email: 'admin@mangang.com', password: 'password', role: 'admin' },
+      { username: 'CS Manager', email: 'admin@mangang.com', password: 'password', role: 'admin' },
       { username: 'CS Agent', email: 'mangangofficialstore.cs@gmail.com', password: 'admin@123', role: 'admin' }
     ];
 

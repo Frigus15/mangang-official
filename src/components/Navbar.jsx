@@ -33,7 +33,7 @@ export default function Navbar({ onOpenCart }) {
     { id: 'home', label: 'Home' },
     { id: 'catalog', label: 'Explore Shop' },
     { id: 'dashboard', label: 'My Portal' },
-    { id: 'admin', label: 'Admin Hub' }
+    { id: 'admin', label: 'Control Hub' }
   ];
 
   const filteredNavItems = isLoggedIn
@@ -216,14 +216,14 @@ export default function Navbar({ onOpenCart }) {
                   <span>My Account</span>
                 </button>
 
-                {/* Admin Portal */}
+                {/* Control Hub */}
                 {currentUser?.role === 'admin' && (
                   <button
                     onClick={() => handleNavClick('admin')}
                     style={getSidebarLinkStyle('admin')}
                   >
                     <Shield size={16} />
-                    <span>Admin Portal</span>
+                    <span>Control Hub</span>
                   </button>
                 )}
 

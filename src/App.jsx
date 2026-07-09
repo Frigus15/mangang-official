@@ -14,7 +14,7 @@ import Dashboard from './pages/Dashboard';
 import AdminPortal from './pages/AdminPortal';
 
 export default function App() {
-  const { activePage } = useContext(ShopContext);
+  const { activePage, isLoggedIn, currentUser } = useContext(ShopContext);
   const [cartOpen, setCartOpen] = useState(false);
 
   // Page Switcher
@@ -31,7 +31,7 @@ export default function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'admin':
-        return <AdminPortal />;
+        return isLoggedIn && currentUser?.role === 'admin' ? <AdminPortal /> : <Home />;
       default:
         return <Home />;
     }
