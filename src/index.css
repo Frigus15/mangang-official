@@ -1115,3 +1115,75 @@ a {
     transform: translateX(-350px);
   }
 }
+
+/* ─── ADMIN PANEL RESPONSIVE ─────────────────────────────────────────────── */
+
+/* Desktop: show sidebar, hide mobile header */
+.admin-desktop-sidebar { display: flex; flex-direction: column; }
+.admin-mobile-header   { display: none; }
+
+/* Mobile: hide sidebar, show mobile header */
+@media (max-width: 768px) {
+  .admin-desktop-sidebar {
+    display: none !important;
+  }
+  .admin-mobile-header {
+    display: flex !important;
+  }
+
+  /* Reduce tab content padding on mobile */
+  .admin-tab-content {
+    padding: 16px 14px 80px !important;
+    gap: 16px !important;
+  }
+
+  /* Collapse 2-column grids inside admin to single column */
+  .admin-tab-content > div[style*="grid-template-columns: 1.2fr"],
+  .admin-tab-content > div[style*="grid-template-columns: 1fr 1fr"],
+  .admin-tab-content > div[style*="grid-template-columns: 1fr 0.8fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* KPI grid: 2 per row on mobile */
+  .admin-tab-content > div[style*="auto-fit"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Smaller KPI cards on mobile */
+  .admin-tab-content .glass-panel[style*="padding: '20px'"] {
+    padding: 14px !important;
+  }
+
+  /* Admin tab title smaller on mobile */
+  .admin-tab-content h2 {
+    font-size: 20px !important;
+  }
+
+  /* Table: allow horizontal scroll */
+  .admin-tab-content .glass-panel {
+    overflow-x: auto;
+  }
+
+  /* Summary banner in refund/payments: wrap on mobile */
+  .admin-wrapper > main {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+  .admin-tab-content {
+    padding: 12px 10px 80px !important;
+  }
+  .admin-tab-content > div[style*="auto-fit"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Sidebar hover effects */
+.admin-wrapper .admin-desktop-sidebar button:hover {
+  background: rgba(255,255,255,0.05) !important;
+  color: #fff !important;
+}

@@ -168,7 +168,7 @@ export default function AdminPortal() {
       // ── DASHBOARD ─────────────────────────────────────────────────
       case 'dashboard':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Dashboard</h2>
               <p style={styles.tabSubtitle}>Overview of store performance and key metrics.</p>
@@ -236,7 +236,7 @@ export default function AdminPortal() {
       // ── ORDERS ────────────────────────────────────────────────────
       case 'orders':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Orders</h2>
               <p style={styles.tabSubtitle}>All customer orders placed through the store.</p>
@@ -286,7 +286,7 @@ export default function AdminPortal() {
       // ── PAYMENTS ──────────────────────────────────────────────────
       case 'payments':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Payments</h2>
               <p style={styles.tabSubtitle}>Financial transaction history and revenue summary.</p>
@@ -344,7 +344,7 @@ export default function AdminPortal() {
       // ── PRODUCTS ──────────────────────────────────────────────────
       case 'products':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Products</h2>
               <p style={styles.tabSubtitle}>Manage catalog listings, stock levels, and add new products.</p>
@@ -453,7 +453,7 @@ export default function AdminPortal() {
       // ── BANNERS ───────────────────────────────────────────────────
       case 'banners':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Banners</h2>
               <p style={styles.tabSubtitle}>Manage homepage hero slideshow banners.</p>
@@ -516,7 +516,7 @@ export default function AdminPortal() {
       // ── CATEGORY ──────────────────────────────────────────────────
       case 'category':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Category</h2>
               <p style={styles.tabSubtitle}>Manage product categories used across the store.</p>
@@ -562,7 +562,7 @@ export default function AdminPortal() {
       // ── WEBSITE ON/OFF ────────────────────────────────────────────
       case 'website':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Website On/Off</h2>
               <p style={styles.tabSubtitle}>Control website visibility and maintenance mode.</p>
@@ -609,7 +609,7 @@ export default function AdminPortal() {
       // ── CUSTOMERS ─────────────────────────────────────────────────
       case 'customers':
         return (
-          <div style={styles.tabContent}>
+          <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Customers</h2>
               <p style={styles.tabSubtitle}>Registered user accounts and customer details.</p>
@@ -664,9 +664,9 @@ export default function AdminPortal() {
 
   // ── Main Render ──────────────────────────────────────────────────────
   return (
-    <div style={styles.adminWrapper}>
+    <div style={styles.adminWrapper} className="admin-wrapper">
       {/* Mobile header */}
-      <div style={styles.mobileHeader}>
+      <div style={styles.mobileHeader} className="admin-mobile-header">
         <button onClick={() => setSidebarOpen(true)} style={styles.mobileMenuBtn}>
           <Menu size={20} />
         </button>
@@ -691,7 +691,7 @@ export default function AdminPortal() {
       )}
 
       {/* Desktop Sidebar */}
-      <div style={styles.desktopSidebar}>
+      <div style={styles.desktopSidebar} className="admin-desktop-sidebar">
         <Sidebar />
       </div>
 
@@ -817,6 +817,7 @@ const styles = {
     flexDirection: 'column',
     gap: '24px',
   },
+  // NOTE: mobile overrides handled via .admin-tab-content class in index.css
   tabHeader: {
     borderBottom: '1px solid var(--border-glass)',
     paddingBottom: '16px',
@@ -1066,7 +1067,7 @@ const styles = {
   },
   // Mobile
   mobileHeader: {
-    display: 'none',
+    display: 'none', /* shown via .admin-mobile-header media query in index.css */
     position: 'sticky',
     top: 'var(--nav-height)',
     zIndex: 200,
@@ -1108,46 +1109,12 @@ const styles = {
   },
 };
 
-// Inject responsive CSS for admin layout
+// Row hover: lightweight injection (only behaviour, not layout)
 if (typeof document !== 'undefined') {
   const adminCSS = document.createElement('style');
-  adminCSS.innerHTML = `
-    /* Hide default navbar sidebar items in admin mode */
-    .admin-active .mobile-sidebar .sidebar-nav-item { display: none !important; }
-
-    /* Admin layout responsive */
-    @media (max-width: 768px) {
-      [data-admin-sidebar] { display: none !important; }
-      [data-admin-mobile-header] { display: flex !important; }
-    }
-    @media (max-width: 768px) {
-      [style*="adminWrapper"] > [style*="desktopSidebar"] {
-        display: none !important;
-      }
-    }
-
-    /* Show mobile header on small screens */
-    @media (max-width: 768px) {
-      div[style*="mobileHeader"] {
-        display: flex !important;
-      }
-      div[style*="desktopSidebar"] {
-        display: none !important;
-      }
-      div[style*="tabContent"] {
-        padding: 20px 16px 60px !important;
-      }
-    }
-    tbody tr:hover {
-      background: rgba(255,255,255,0.02) !important;
-    }
-    [style*="backToBasicBtn"]:hover {
-      background: rgba(239,68,68,0.15) !important;
-    }
-    [style*="sidebarItem"]:hover {
-      background: rgba(255,255,255,0.04) !important;
-      color: #fff !important;
-    }
-  `;
-  document.head.appendChild(adminCSS);
+  adminCSS.id = 'admin-portal-styles';
+  if (!document.getElementById('admin-portal-styles')) {
+    adminCSS.innerHTML = `tbody tr:hover { background: rgba(255,255,255,0.02) !important; }`;
+    document.head.appendChild(adminCSS);
+  }
 }
