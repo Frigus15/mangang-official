@@ -665,7 +665,8 @@ export default function AdminPortal() {
   // ── Main Render ──────────────────────────────────────────────────────
   return (
     <div style={styles.adminWrapper} className="admin-wrapper">
-      {/* Mobile header */}
+
+      {/* Mobile top header bar — full width, shown only on mobile */}
       <div style={styles.mobileHeader} className="admin-mobile-header">
         <button onClick={() => setSidebarOpen(true)} style={styles.mobileMenuBtn}>
           <Menu size={20} />
@@ -678,7 +679,7 @@ export default function AdminPortal() {
         </button>
       </div>
 
-      {/* Mobile overlay */}
+      {/* Mobile slide-out overlay */}
       {sidebarOpen && (
         <div style={styles.mobileOverlay} onClick={() => setSidebarOpen(false)}>
           <div style={styles.mobileSidebar} onClick={e => e.stopPropagation()}>
@@ -690,15 +691,19 @@ export default function AdminPortal() {
         </div>
       )}
 
-      {/* Desktop Sidebar */}
-      <div style={styles.desktopSidebar} className="admin-desktop-sidebar">
-        <Sidebar />
+      {/* Inner body row: sidebar + main content side by side */}
+      <div style={styles.adminBody}>
+        {/* Desktop Sidebar — hidden on mobile via CSS */}
+        <div style={styles.desktopSidebar} className="admin-desktop-sidebar">
+          <Sidebar />
+        </div>
+
+        {/* Main Content */}
+        <main style={styles.mainContent}>
+          {renderContent()}
+        </main>
       </div>
 
-      {/* Main Content */}
-      <main style={styles.mainContent}>
-        {renderContent()}
-      </main>
     </div>
   );
 }
@@ -707,9 +712,13 @@ export default function AdminPortal() {
 const styles = {
   adminWrapper: {
     display: 'flex',
+    flexDirection: 'column',      /* column so mobile header stacks above body */
     minHeight: 'calc(100vh - var(--nav-height))',
     background: 'var(--bg-dark-base)',
-    position: 'relative',
+  },
+  adminBody: {
+    display: 'flex',
+    flex: 1,
   },
   desktopSidebar: {
     width: '240px',
