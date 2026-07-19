@@ -55,18 +55,22 @@ export default function App() {
       {/* Slide-out Cart Sidebar */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
 
-      {/* Main Content Area */}
+      {/* Main Content Area — admin gets full width, no container constraint */}
       <main style={styles.mainContent}>
-        <div className="container">
-          {renderActivePage()}
-        </div>
+        {activePage === 'admin' ? (
+          renderActivePage()
+        ) : (
+          <div className="container">
+            {renderActivePage()}
+          </div>
+        )}
       </main>
 
-      {/* Footer block */}
-      <Footer />
+      {/* Footer — hidden in admin mode */}
+      {activePage !== 'admin' && <Footer />}
 
-      {/* Sticky Mobile Bottom Navigation */}
-      <MobileBottomNav onOpenCart={() => setCartOpen(true)} />
+      {/* Sticky Mobile Bottom Navigation — hidden in admin mode */}
+      {activePage !== 'admin' && <MobileBottomNav onOpenCart={() => setCartOpen(true)} />}
 
       {/* Full-Screen Page Transition Overlay */}
       {pageLoading && (

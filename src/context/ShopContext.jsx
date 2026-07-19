@@ -568,7 +568,8 @@ export const ShopContextProvider = ({ children }) => {
         applyPromoCode,
         placeOrder,
         addNewProduct,
-        updateProductStock
+        updateProductStock,
+        users
       }}
     >
       {children}

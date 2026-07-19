@@ -131,20 +131,23 @@ export default function Navbar({ onOpenCart }) {
                 </button>
               )}
 
-              {/* Side Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                style={{ ...styles.mobileMenuToggle, display: 'flex' }}
-                className="mobile-menu-trigger"
-              >
-                <Menu size={20} />
-              </button>
+              {/* Side Menu Button — hidden in admin mode (admin has its own sidebar) */}
+              {activePage !== 'admin' && (
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  style={{ ...styles.mobileMenuToggle, display: 'flex' }}
+                  className="mobile-menu-trigger"
+                >
+                  <Menu size={20} />
+                </button>
+              )}
             </div>
           </>
         )}
       </div>
 
-      {/* Mobile Drawer (Sliding Sidebar Menu) */}
+      {/* Mobile Drawer — hidden in admin mode */}
+      {activePage !== 'admin' && (
       <div 
         className={`mobile-drawer-overlay ${mobileMenuOpen ? 'active' : ''}`} 
         onClick={() => setMobileMenuOpen(false)}
@@ -285,6 +288,7 @@ export default function Navbar({ onOpenCart }) {
           </div>
         </div>
       </div>
+      )}
 
       {/* Auth Modal Overlay */}
       {authModalOpen && (
