@@ -246,7 +246,11 @@ export const ShopContextProvider = ({ children }) => {
   });
   const [currentUser, setCurrentUser] = useState(() => {
     const local = localStorage.getItem('mangang_user');
-    return local ? JSON.parse(local) : null;
+    if (!local) return null;
+    const user = JSON.parse(local);
+    const adminEmails = ['admin@mangang.com', 'mangangofficialstore.cs@gmail.com', 'admin@gmail.com'];
+    if (adminEmails.includes(user.email)) return { ...user, role: 'admin' };
+    return user;
   });
 
   const login = (email, password) => {
