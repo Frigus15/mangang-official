@@ -13,6 +13,9 @@ import ProductDetails from './pages/ProductDetails';
 import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import AdminPortal from './pages/AdminPortal';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import RefundPolicy from './pages/RefundPolicy';
 
 export default function App() {
   const { activePage, isLoggedIn, currentUser, pageLoading } = useContext(ShopContext);
@@ -33,6 +36,12 @@ export default function App() {
         return <Dashboard />;
       case 'admin':
         return isLoggedIn && currentUser?.role === 'admin' ? <AdminPortal /> : <Home />;
+      case 'terms':
+        return <TermsAndConditions />;
+      case 'privacy-policy':
+        return <PrivacyPolicy />;
+      case 'refund-policy':
+        return <RefundPolicy />;
       default:
         return <Home />;
     }

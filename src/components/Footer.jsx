@@ -59,21 +59,21 @@ export default function Footer() {
               <button 
                 style={styles.boxBtn} 
                 className="footer-action-btn"
-                onClick={() => alert('Terms of Service Protocol loaded.')}
+                onClick={() => navigateTo('terms')}
               >
                 Terms and Condition
               </button>
               <button 
                 style={styles.boxBtn} 
                 className="footer-action-btn"
-                onClick={() => alert('Privacy Cryptography Protocol active.')}
+                onClick={() => navigateTo('privacy-policy')}
               >
                 Privacy Policy
               </button>
               <button 
                 style={styles.boxBtn} 
                 className="footer-action-btn"
-                onClick={() => alert('Refund Guarantee Term details: 30 days hardware return window.')}
+                onClick={() => navigateTo('refund-policy')}
               >
                 Refund Policy
               </button>
