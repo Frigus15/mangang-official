@@ -221,7 +221,8 @@ export const ShopContextProvider = ({ children }) => {
     // Seed default admin accounts
     const defaultAdmins = [
       { username: 'CS Manager', email: 'admin@mangang.com', password: 'password', role: 'admin' },
-      { username: 'CS Agent', email: 'mangangofficialstore.cs@gmail.com', password: 'admin@123', role: 'admin' }
+      { username: 'CS Agent', email: 'mangangofficialstore.cs@gmail.com', password: 'admin@123', role: 'admin' },
+      { username: 'Admin', email: 'admin@gmail.com', password: 'admin@123', role: 'admin' }
     ];
 
     defaultAdmins.forEach(admin => {
@@ -232,7 +233,7 @@ export const ShopContextProvider = ({ children }) => {
 
     // Enforce admin roles
     loadedUsers = loadedUsers.map(u => {
-      if (u.email === 'admin@mangang.com' || u.email === 'mangangofficialstore.cs@gmail.com') {
+      if (u.email === 'admin@mangang.com' || u.email === 'mangangofficialstore.cs@gmail.com' || u.email === 'admin@gmail.com') {
         return { ...u, role: 'admin' };
       }
       return u;
