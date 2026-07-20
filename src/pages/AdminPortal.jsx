@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import {
   LayoutDashboard, ShoppingBag, CreditCard, Package, Image,
   Tag, Power, Users, ArrowLeftCircle, Plus, Check, Trash,
-  DollarSign, Layers, AlertTriangle, Menu, X, ChevronRight, Upload
+  DollarSign, Layers, AlertTriangle, Menu, X, ChevronRight, Upload, User
 } from 'lucide-react';
 
 // ─── Sidebar menu config ───────────────────────────────────────────────
@@ -22,7 +22,7 @@ export default function AdminPortal() {
   const {
     products, orders, addNewProduct, updateProductStock,
     bannerSlides, addBannerSlide, removeBannerSlide,
-    navigateTo, users
+    navigateTo, users, currentUser
   } = useContext(ShopContext);
 
   const [activeTab, setActiveTab]   = useState('dashboard');
@@ -754,18 +754,39 @@ export default function AdminPortal() {
   return (
     <div style={styles.adminWrapper} className="admin-wrapper">
 
-      {/* Mobile top header bar — full width, shown only on mobile */}
-      <div style={styles.mobileHeader} className="admin-mobile-header">
-        <button onClick={() => setSidebarOpen(true)} style={styles.mobileMenuBtn}>
-          <Menu size={20} />
-        </button>
-        <span style={styles.mobileHeaderTitle}>
-          {MENU_ITEMS.find(m => m.id === activeTab)?.label || 'Admin'}
-        </span>
-        <button onClick={() => navigateTo('home')} style={{ ...styles.mobileMenuBtn, color: 'var(--color-danger)' }}>
-          <ArrowLeftCircle size={20} />
-        </button>
-      </div>
+      {/* Dedicated Top Admin Navbar */}
+      <header style={styles.topAdminNav} className="glass-nav admin-top-nav">
+        <div style={styles.topNavLeft}>
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            style={styles.mobileMenuBtn} 
+            className="admin-mobile-menu-btn"
+            title="Toggle Sidebar Menu"
+          >
+            <Menu size={20} />
+          </button>
+
+          <div style={styles.topNavLogo} onClick={() => navigateTo('home')}>
+            <img src="/logo.jpg" alt="Mangang Official Logo" style={styles.logoImg} />
+            <div style={styles.logoTextWrapper}>
+              <span style={styles.logoText}>MANGANG</span>
+              <span style={styles.logoSubtext}>ADMIN CONTROL HUB</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.topNavRight}>
+          <div style={styles.adminUserChip} className="desktop-admin-chip">
+            <User size={14} color="var(--color-primary)" />
+            <span>{currentUser?.email || 'admin@gmail.com'}</span>
+          </div>
+
+          <button onClick={() => navigateTo('home')} style={styles.topBackBtn} title="Back to Store">
+            <ArrowLeftCircle size={16} />
+            <span>Back to Basic</span>
+          </button>
+        </div>
+      </header>
 
       {/* Mobile slide-out overlay with smooth CSS transitions */}
       <div 
@@ -805,9 +826,95 @@ export default function AdminPortal() {
 const styles = {
   adminWrapper: {
     display: 'flex',
-    flexDirection: 'column',      /* column so mobile header stacks above body */
-    minHeight: 'calc(100vh - var(--nav-height))',
+    flexDirection: 'column',
+    minHeight: '100vh',
     background: 'var(--bg-dark-base)',
+  },
+  topAdminNav: {
+    height: 'var(--nav-height)',
+    width: '100%',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+    background: 'var(--bg-glass)',
+    backdropFilter: 'blur(20px)',
+    borderBottom: '1px solid var(--border-glass)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0 24px',
+    boxSizing: 'border-box',
+  },
+  topNavLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+  topNavRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '14px',
+  },
+  topNavLogo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    cursor: 'pointer',
+  },
+  logoImg: {
+    height: '34px',
+    width: 'auto',
+    borderRadius: '4px',
+    border: '1px solid rgba(255,255,255,0.08)',
+  },
+  logoTextWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    textAlign: 'left',
+  },
+  logoText: {
+    fontFamily: 'var(--font-heading)',
+    fontWeight: 800,
+    fontSize: '15px',
+    letterSpacing: '0.05em',
+    color: 'var(--text-primary)',
+    lineHeight: '1',
+  },
+  logoSubtext: {
+    fontFamily: 'var(--font-heading)',
+    fontWeight: 700,
+    fontSize: '8px',
+    letterSpacing: '0.06em',
+    color: 'var(--color-primary)',
+    lineHeight: '1',
+    marginTop: '2px',
+  },
+  adminUserChip: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '6px 14px',
+    borderRadius: '20px',
+    background: 'rgba(99,102,241,0.1)',
+    border: '1px solid rgba(99,102,241,0.2)',
+    fontSize: '12px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+  },
+  topBackBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 14px',
+    borderRadius: '8px',
+    border: '1px solid rgba(239,68,68,0.25)',
+    background: 'rgba(239,68,68,0.08)',
+    color: 'var(--color-danger)',
+    cursor: 'pointer',
+    fontFamily: 'var(--font-heading)',
+    fontWeight: '700',
+    fontSize: '13px',
+    transition: 'all 0.2s ease',
   },
   adminBody: {
     display: 'flex',

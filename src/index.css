@@ -1118,17 +1118,20 @@ a {
 
 /* ─── ADMIN PANEL RESPONSIVE ─────────────────────────────────────────────── */
 
-/* Desktop: show sidebar, hide mobile header */
+/* Desktop: show sidebar, hide mobile menu btn */
 .admin-desktop-sidebar { display: flex; flex-direction: column; }
-.admin-mobile-header   { display: none; }
+.admin-mobile-menu-btn { display: none !important; }
 
-/* Mobile: hide sidebar, show mobile header */
+/* Mobile: hide desktop sidebar & user chip, show mobile menu btn */
 @media (max-width: 768px) {
   .admin-desktop-sidebar {
     display: none !important;
   }
-  .admin-mobile-header {
+  .admin-mobile-menu-btn {
     display: flex !important;
+  }
+  .desktop-admin-chip {
+    display: none !important;
   }
 
   /* Reduce tab content padding on mobile */
