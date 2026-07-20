@@ -1,290 +1,124 @@
 import React, { useContext } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { Package, Heart, History, Trash2, ShoppingCart, ArrowRight, User } from 'lucide-react';
+import { Package, CreditCard, User, ShoppingBag, Heart } from 'lucide-react';
 
 export default function Dashboard() {
-  const { wishlist, products, orders, toggleWishlist, addToCart, navigateTo, activeDashboardTab, setActiveDashboardTab, currentUser } = useContext(ShopContext);
+  const { wishlist, products, orders, navigateTo, currentUser } = useContext(ShopContext);
 
-  const wishlistedItems = products.filter((p) => wishlist.includes(p.id));
-
-  const handleRemoveWishlist = (id, e) => {
-    e.stopPropagation();
-    toggleWishlist(id);
-  };
-
-  const handleWishlistAddToCart = (item, e) => {
-    e.stopPropagation();
-    if (item.stock <= 0) return;
-    
-    const defaultOptions = {};
-    if (item.options) {
-      if (item.options.colors && item.options.colors.length > 0) {
-        defaultOptions.color = item.options.colors[0];
-      }
-      if (item.options.storage && item.options.storage.length > 0) {
-        defaultOptions.storage = item.options.storage[0];
-      }
-    }
-
-    addToCart(item, 1, defaultOptions);
-  };
+  const totalOrdersCount = orders.length;
+  const totalAmountSpent = orders.reduce((sum, o) => sum + (o.pricing?.total || 0), 0);
 
   return (
     <div style={styles.container} className="animate-fade-in">
-      <h1 style={styles.pageTitle}>User Dashboard</h1>
-      <p style={styles.pageSubtitle}>Welcome to your dashboard — manage everything in one place.</p>
-
-      {/* Tab Navigation Row */}
-      <div style={styles.tabsRow}>
-        <button
-          onClick={() => setActiveDashboardTab('orders')}
-          style={{
-            ...styles.tabBtn,
-            color: activeDashboardTab === 'orders' ? 'var(--color-primary)' : 'var(--text-secondary)',
-            borderBottomColor: activeDashboardTab === 'orders' ? 'var(--color-primary)' : 'transparent',
-            fontWeight: activeDashboardTab === 'orders' ? '700' : '600'
-          }}
-        >
-          <Package size={15} />
-          <span>My Orders</span>
-        </button>
-        <button
-          onClick={() => setActiveDashboardTab('transactions')}
-          style={{
-            ...styles.tabBtn,
-            color: activeDashboardTab === 'transactions' ? 'var(--color-primary)' : 'var(--text-secondary)',
-            borderBottomColor: activeDashboardTab === 'transactions' ? 'var(--color-primary)' : 'transparent',
-            fontWeight: activeDashboardTab === 'transactions' ? '700' : '600'
-          }}
-        >
-          <History size={15} />
-          <span>Recent Transactions</span>
-        </button>
-        <button
-          onClick={() => setActiveDashboardTab('account')}
-          style={{
-            ...styles.tabBtn,
-            color: activeDashboardTab === 'account' ? 'var(--color-primary)' : 'var(--text-secondary)',
-            borderBottomColor: activeDashboardTab === 'account' ? 'var(--color-primary)' : 'transparent',
-            fontWeight: activeDashboardTab === 'account' ? '700' : '600'
-          }}
-        >
-          <User size={15} />
-          <span>My Account</span>
-        </button>
+      {/* Header */}
+      <div style={styles.header}>
+        <h1 style={styles.pageTitle}>Account Overview</h1>
+        <p style={styles.pageSubtitle}>Manage your profile details and summary of orders.</p>
       </div>
 
-      <div style={styles.layoutGrid} className="responsive-grid">
-        {/* LEFT COLUMN: ACTIVE TAB PANEL */}
-        <div style={styles.leftCol}>
-          
-          {/* TAB 1: MY ORDERS */}
-          {activeDashboardTab === 'orders' && (
-            <>
-              <div style={styles.sectionHeader}>
-                <Package size={18} style={{ color: 'var(--color-primary)' }} />
-                <h3 style={styles.sectionTitle}>Procurement Log History</h3>
-              </div>
-
-              {orders.length === 0 ? (
-                <div style={styles.emptyCard} className="glass-panel">
-                  <History size={36} style={{ color: 'var(--text-muted)', marginBottom: '12px' }} />
-                  <h4 style={{ color: '#fff' }}>No Active Logs</h4>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px', marginBottom: '15px' }}>
-                    You have not checked out any hardware nodes yet.
-                  </p>
-                  <button className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => navigateTo('catalog')}>
-                    Deploy Products
-                  </button>
-                </div>
-              ) : (
-                <div style={styles.ordersList}>
-                  {orders.map((order) => (
-                    <div key={order.orderId} style={styles.orderCard} className="glass-panel">
-                      <div style={styles.orderHeader}>
-                        <div>
-                          <span style={styles.orderIdLabel}>ORDER LOG</span>
-                          <h4 style={styles.orderIdText}>{order.orderId}</h4>
-                        </div>
-                        <div style={styles.statusCol}>
-                          <span style={styles.orderDate}>{order.date}</span>
-                          <span className="badge badge-cyan" style={styles.statusBadge}>
-                            {order.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div style={styles.orderItems}>
-                        {order.items.map((item, idx) => (
-                          <div key={idx} style={styles.orderItemRow}>
-                            <div style={styles.orderItemDetails}>
-                              <span style={styles.itemTitle}>{item.product.title}</span>
-                              {item.options && (item.options.color || item.options.storage) && (
-                                <span style={styles.itemOptionsText}>
-                                  [{item.options.color || ''} {item.options.storage || ''}]
-                                </span>
-                              )}
-                            </div>
-                            <span style={styles.itemQty}>x{item.quantity}</span>
-                            <span style={styles.itemPrice}>${(item.product.price * item.quantity).toLocaleString()}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div style={styles.orderTotalRow}>
-                        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Payment: {order.paymentDetails.cardNumber}</span>
-                        <div style={styles.totalBlock}>
-                          <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Total Billed:</span>
-                          <strong style={styles.totalPrice}>${order.pricing.total.toLocaleString()}</strong>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* TAB 2: RECENT TRANSACTIONS */}
-          {activeDashboardTab === 'transactions' && (
-            <>
-              <div style={styles.sectionHeader}>
-                <History size={18} style={{ color: 'var(--color-primary)' }} />
-                <h3 style={styles.sectionTitle}>Recent Payments Ledger</h3>
-              </div>
-
-              {orders.length === 0 ? (
-                <div style={styles.emptyCard} className="glass-panel">
-                  <History size={36} style={{ color: 'var(--text-muted)', marginBottom: '12px' }} />
-                  <h4 style={{ color: '#fff' }}>No Transactions Yet</h4>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px', marginBottom: '15px' }}>
-                    There are no recorded transaction events on this profile.
-                  </p>
-                  <button className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => navigateTo('catalog')}>
-                    Explore Shop
-                  </button>
-                </div>
-              ) : (
-                <div className="glass-panel" style={{ padding: '24px', overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-primary)', minWidth: '400px' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid var(--border-glass)', textAlign: 'left', fontSize: '11px', color: 'var(--text-muted)' }}>
-                        <th style={{ padding: '10px 8px' }}>TXN HASH</th>
-                        <th style={{ padding: '10px 8px' }}>DATE</th>
-                        <th style={{ padding: '10px 8px' }}>BILLING ACCOUNT</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>AMOUNT</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order) => (
-                        <tr key={order.orderId} style={{ borderBottom: '1px solid var(--border-glass)', fontSize: '13px' }}>
-                          <td style={{ padding: '12px 8px', fontFamily: 'monospace', color: 'var(--color-primary)' }}>txn_{order.orderId.substring(4)}</td>
-                          <td style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>{order.date}</td>
-                          <td style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>{order.paymentDetails.cardNumber}</td>
-                          <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '700' }}>${order.pricing.total.toLocaleString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* TAB 3: MY ACCOUNT */}
-          {activeDashboardTab === 'account' && (
-            <>
-              <div style={styles.sectionHeader}>
-                <User size={18} style={{ color: 'var(--color-primary)' }} />
-                <h3 style={styles.sectionTitle}>Identity Profile</h3>
-              </div>
-
-              <div className="glass-panel" style={{ padding: '24px' }}>
-                <div style={styles.accountCard}>
-                  <div style={styles.accountRow}>
-                    <span style={styles.accountLabel}>Name:</span>
-                    <span style={styles.accountValue}>{currentUser?.name || currentUser?.username || 'Client Enforcer'}</span>
-                  </div>
-                  <div style={styles.accountRow}>
-                    <span style={styles.accountLabel}>Client ID:</span>
-                    <span style={styles.accountValue}>{currentUser?.clientId || `usr_db_${currentUser?.email?.split('@')[0] || '9381'}`}</span>
-                  </div>
-                  <div style={styles.accountRow}>
-                    <span style={styles.accountLabel}>Address:</span>
-                    <span style={styles.accountValue}>{currentUser?.address || 'No address set up yet.'}</span>
-                  </div>
-                  <div style={styles.accountRow}>
-                    <span style={styles.accountLabel}>Phone Number:</span>
-                    <span style={styles.accountValue}>{currentUser?.phone || 'No phone number set up yet.'}</span>
-                  </div>
-                  <div style={styles.accountRow}>
-                    <span style={styles.accountLabel}>Email Address:</span>
-                    <span style={styles.accountValue}>{currentUser?.email || 'guest@mangang.com'}</span>
-                  </div>
-                  <div style={styles.accountRow}>
-                    <span style={styles.accountLabel}>Payment Mode:</span>
-                    <span style={styles.accountValue}>{currentUser?.paymentMode || 'No payment mode set up yet.'}</span>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
+      {/* KPI Metrics: Total Orders & Total Amount Spent */}
+      <div style={styles.metricsGrid}>
+        <div className="glass-panel" style={styles.metricCard}>
+          <div style={styles.metricHeader}>
+            <span style={styles.metricLabel}>TOTAL ORDERS</span>
+            <Package size={20} color="var(--color-primary)" />
+          </div>
+          <h2 style={{ ...styles.metricValue, color: 'var(--color-primary)' }}>{totalOrdersCount}</h2>
+          <p style={styles.metricSub}>Completed order purchases</p>
         </div>
 
-        {/* RIGHT COLUMN: ECOSYSTEM WISHLIST */}
-        <div style={styles.rightCol}>
-          <div className="glass-panel" style={{ padding: '24px' }}>
-            <div style={{ ...styles.sectionHeader, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '20px' }}>
-              <Heart size={18} style={{ color: 'var(--color-danger)' }} />
-              <h3 style={styles.sectionTitle}>Wishlist Item</h3>
-            </div>
+        <div className="glass-panel" style={styles.metricCard}>
+          <div style={styles.metricHeader}>
+            <span style={styles.metricLabel}>TOTAL AMOUNT SPENT</span>
+            <CreditCard size={20} color="var(--color-success)" />
+          </div>
+          <h2 style={{ ...styles.metricValue, color: 'var(--color-success)' }}>
+            ${totalAmountSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </h2>
+          <p style={styles.metricSub}>Total spending to date</p>
+        </div>
+      </div>
 
-            {wishlistedItems.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-                <Heart size={24} style={{ color: 'var(--text-muted)', marginBottom: '10px' }} />
-                <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Your wishlist catalog is empty.</p>
-              </div>
-            ) : (
-              <div style={styles.wishlistItems}>
-                {wishlistedItems.map((item) => (
-                  <div
-                    key={item.id}
-                    style={styles.wishItem}
-                    onClick={() => navigateTo('product-details', item.id)}
-                  >
-                    <img src={item.image} alt={item.title} style={styles.wishImg} />
-                    <div style={styles.wishInfo}>
-                      <h4 style={styles.wishTitle}>{item.title}</h4>
-                      <span style={styles.wishPrice}>${item.price.toLocaleString()}</span>
-                    </div>
-                    
-                    <div style={styles.wishActions}>
-                      <button
-                        onClick={(e) => handleWishlistAddToCart(item, e)}
-                        disabled={item.stock <= 0}
-                        style={{
-                          ...styles.wishActionBtn,
-                          background: item.stock > 0 ? 'rgba(0, 245, 255, 0.08)' : 'rgba(255,255,255,0.02)'
-                        }}
-                        title={item.stock > 0 ? 'Quick Add to Cart' : 'Out of Stock'}
-                      >
-                        <ShoppingCart size={14} style={{ color: item.stock > 0 ? 'var(--color-primary)' : 'var(--text-muted)' }} />
-                      </button>
-                      <button
-                        onClick={(e) => handleRemoveWishlist(item.id, e)}
-                        style={{ ...styles.wishActionBtn, background: 'rgba(239, 68, 68, 0.08)' }}
-                        title="Remove from Wishlist"
-                      >
-                        <Trash2 size={14} style={{ color: 'var(--color-danger)' }} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+      {/* Account Details Panel */}
+      <div className="glass-panel" style={styles.sectionCard}>
+        <div style={styles.sectionTitleRow}>
+          <User size={18} color="var(--color-primary)" />
+          <h3 style={styles.sectionTitle}>Account Details</h3>
+        </div>
+
+        <div style={styles.accountGrid}>
+          <div style={styles.detailBox}>
+            <span style={styles.detailLabel}>Full Name</span>
+            <strong style={styles.detailValue}>{currentUser?.name || currentUser?.username || 'Customer'}</strong>
+          </div>
+
+          <div style={styles.detailBox}>
+            <span style={styles.detailLabel}>Email Address</span>
+            <strong style={styles.detailValue}>{currentUser?.email || 'guest@mangang.com'}</strong>
+          </div>
+
+          <div style={styles.detailBox}>
+            <span style={styles.detailLabel}>Phone Number</span>
+            <strong style={styles.detailValue}>{currentUser?.phone || 'Not provided'}</strong>
+          </div>
+
+          <div style={styles.detailBox}>
+            <span style={styles.detailLabel}>Shipping Address</span>
+            <strong style={styles.detailValue}>{currentUser?.address || 'No shipping address configured'}</strong>
+          </div>
+
+          <div style={styles.detailBox}>
+            <span style={styles.detailLabel}>Payment Mode</span>
+            <strong style={styles.detailValue}>{currentUser?.paymentMode || 'Credit Card / UPI'}</strong>
           </div>
         </div>
+      </div>
+
+      {/* Orders List Section */}
+      <div className="glass-panel" style={styles.sectionCard}>
+        <div style={styles.sectionTitleRow}>
+          <ShoppingBag size={18} color="var(--color-primary)" />
+          <h3 style={styles.sectionTitle}>My Orders ({orders.length})</h3>
+        </div>
+
+        {orders.length === 0 ? (
+          <div style={styles.emptyOrders}>
+            <Package size={32} style={{ color: 'var(--text-muted)', marginBottom: '8px' }} />
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 12px 0' }}>No orders placed yet.</p>
+            <button 
+              className="btn btn-primary" 
+              style={{ fontSize: '13px', padding: '8px 18px' }}
+              onClick={() => navigateTo('catalog')}
+            >
+              Explore Products
+            </button>
+          </div>
+        ) : (
+          <div style={styles.ordersTableWrapper}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.tableHeaderRow}>
+                  <th style={styles.th}>Order ID</th>
+                  <th style={styles.th}>Date</th>
+                  <th style={styles.th}>Items Purchased</th>
+                  <th style={styles.th}>Total Billed</th>
+                  <th style={styles.th}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((o) => (
+                  <tr key={o.orderId} style={styles.tr}>
+                    <td style={styles.td}><span style={{ color: 'var(--color-primary)', fontWeight: '700' }}>{o.orderId}</span></td>
+                    <td style={styles.td}><span style={{ color: 'var(--text-secondary)' }}>{o.date}</span></td>
+                    <td style={styles.td}><span>{o.items.reduce((s, i) => s + i.quantity, 0)} item(s)</span></td>
+                    <td style={styles.td}><span style={{ color: 'var(--color-success)', fontWeight: '700' }}>${o.pricing.total.toFixed(2)}</span></td>
+                    <td style={styles.td}><span className="badge badge-green" style={{ fontSize: '10px' }}>{o.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -292,269 +126,141 @@ export default function Dashboard() {
 
 const styles = {
   container: {
-    padding: '40px 0 80px 0',
+    padding: '30px 0 80px 0',
     textAlign: 'left',
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px'
+    gap: '24px'
+  },
+  header: {
+    borderBottom: '1px solid var(--border-glass)',
+    paddingBottom: '14px'
   },
   pageTitle: {
-    fontSize: '32px',
-    fontWeight: '800'
+    fontSize: '28px',
+    fontWeight: '800',
+    fontFamily: 'var(--font-heading)',
+    color: 'var(--text-primary)',
+    margin: '0 0 4px 0'
   },
   pageSubtitle: {
-    fontSize: '14px',
+    fontSize: '13.5px',
     color: 'var(--text-secondary)',
-    marginBottom: '35px'
+    margin: 0
   },
-  layoutGrid: {
+  metricsGrid: {
     display: 'grid',
-    gridTemplateColumns: '1.2fr 0.8fr',
-    gap: '30px',
-    alignItems: 'start'
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '16px'
   },
-  leftCol: {
+  metricCard: {
+    padding: '20px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px'
+    gap: '8px'
   },
-  rightCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  tabsRow: {
-    display: 'flex',
-    gap: '15px',
-    borderBottom: '1px solid var(--border-glass)',
-    paddingBottom: '0px',
-    marginBottom: '25px',
-    flexWrap: 'wrap'
-  },
-  tabBtn: {
-    background: 'none',
-    border: 'none',
-    borderBottom: '2px solid transparent',
-    padding: '8px 4px',
-    fontFamily: 'var(--font-heading)',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    outline: 'none'
-  },
-  accountCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    marginTop: '5px'
-  },
-  accountRow: {
+  metricHeader: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    fontSize: '13px',
-    borderBottom: '1px solid var(--border-glass)',
-    paddingBottom: '8px'
-  },
-  accountLabel: {
-    color: 'var(--text-muted)',
-    fontWeight: '500'
-  },
-  accountValue: {
-    color: 'var(--text-primary)',
-    fontWeight: '600'
-  },
-  sectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    marginBottom: '15px'
-  },
-  sectionTitle: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  emptyCard: {
-    padding: '40px 20px',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center'
   },
-  ordersList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  orderCard: {
-    padding: '24px'
-  },
-  orderHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    borderBottom: '1px solid var(--border-glass)',
-    paddingBottom: '15px',
-    marginBottom: '15px'
-  },
-  orderIdLabel: {
+  metricLabel: {
     fontSize: '10px',
     fontWeight: '700',
     color: 'var(--text-muted)',
-    letterSpacing: '0.05em'
+    letterSpacing: '0.07em'
   },
-  orderIdText: {
+  metricValue: {
+    fontSize: '28px',
+    fontWeight: '800',
+    fontFamily: 'var(--font-heading)',
+    margin: 0
+  },
+  metricSub: {
+    fontSize: '11px',
+    color: 'var(--text-muted)',
+    margin: 0
+  },
+  sectionCard: {
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px'
+  },
+  sectionTitleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    borderBottom: '1px solid var(--border-glass)',
+    paddingBottom: '12px'
+  },
+  sectionTitle: {
     fontSize: '16px',
     fontWeight: '800',
-    color: 'var(--text-primary)'
-  },
-  statusCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    gap: '4px'
-  },
-  orderDate: {
-    fontSize: '12px',
-    color: 'var(--text-secondary)'
-  },
-  statusBadge: {
-    fontSize: '9px',
-    padding: '3px 8px'
-  },
-  orderItems: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    borderBottom: '1px solid var(--border-glass)',
-    paddingBottom: '15px',
-    marginBottom: '15px'
-  },
-  orderItemRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    fontSize: '13px'
-  },
-  orderItemDetails: {
-    flex: 1,
-    display: 'flex',
-    gap: '6px',
-    alignItems: 'center'
-  },
-  itemTitle: {
-    fontWeight: '600',
-    color: 'var(--text-primary)'
-  },
-  itemOptionsText: {
-    fontSize: '11px',
-    color: 'var(--text-muted)'
-  },
-  itemQty: {
-    color: 'var(--text-secondary)',
-    width: '40px',
-    textAlign: 'center'
-  },
-  itemPrice: {
-    fontWeight: '600',
+    fontFamily: 'var(--font-heading)',
     color: 'var(--text-primary)',
-    width: '70px',
-    textAlign: 'right'
+    margin: 0
   },
-  orderTotalRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+  accountGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '16px'
   },
-  totalBlock: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  totalPrice: {
-    fontSize: '18px',
-    fontWeight: '800',
-    color: 'var(--color-primary)',
-    fontFamily: 'var(--font-heading)'
-  },
-  wishlistItems: {
+  detailBox: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px'
-  },
-  wishItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-    padding: '10px',
-    background: '#ffffff',
-    border: '1px solid var(--border-glass)',
+    gap: '4px',
+    padding: '12px 14px',
     borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    ':hover': {
-      borderColor: 'var(--color-primary)'
-    }
+    background: 'rgba(255,255,255,0.02)',
+    border: '1px solid var(--border-glass)'
   },
-  wishImg: {
-    width: '45px',
-    height: '45px',
-    borderRadius: '4px',
-    objectFit: 'contain',
-    padding: '2px',
-    boxSizing: 'border-box',
-    background: '#f9fafb'
+  detailLabel: {
+    fontSize: '11px',
+    fontWeight: '700',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em'
   },
-  wishInfo: {
-    flex: 1,
+  detailValue: {
+    fontSize: '13.5px',
+    color: 'var(--text-primary)',
+    fontWeight: '600'
+  },
+  emptyOrders: {
+    textAlign: 'center',
+    padding: '30px 10px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  ordersTableWrapper: {
+    width: '100%',
+    overflowX: 'auto'
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
     textAlign: 'left'
   },
-  wishTitle: {
+  tableHeaderRow: {
+    borderBottom: '1px solid var(--border-glass)'
+  },
+  th: {
+    padding: '10px 10px',
+    fontSize: '11px',
+    fontWeight: '700',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    whiteSpace: 'nowrap'
+  },
+  tr: {
+    borderBottom: '1px solid var(--border-glass)'
+  },
+  td: {
+    padding: '12px 10px',
     fontSize: '13px',
-    fontWeight: '600',
-    color: 'var(--text-primary)'
-  },
-  wishPrice: {
-    fontSize: '12px',
-    color: 'var(--color-primary)',
-    fontWeight: '700'
-  },
-  wishActions: {
-    display: 'flex',
-    gap: '6px'
-  },
-  wishActionBtn: {
-    width: '28px',
-    height: '28px',
-    borderRadius: '6px',
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    transition: 'opacity 0.2s',
-    ':hover': {
-      opacity: 0.9
-    }
+    verticalAlign: 'middle'
   }
 };
-
-// Add layout adjust style tag
-if (typeof document !== 'undefined') {
-  const dashStyle = document.createElement('style');
-  dashStyle.innerHTML = `
-    @media (max-width: 992px) {
-      div[style*="layoutGrid"] {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    div[style*="wishItem"]:hover {
-      border-color: var(--color-primary) !important;
-    }
-  `;
-  document.head.appendChild(dashStyle);
-}
