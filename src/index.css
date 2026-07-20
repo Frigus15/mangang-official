@@ -1116,34 +1116,47 @@ a {
   }
 }
 
-/* ─── ADMIN PANEL RESPONSIVE ─────────────────────────────────────────────── */
+/* ─── ADMIN & MOBILE RESPONSIVE OPTIMIZATIONS ───────────────────────── */
 
-/* Desktop: show sidebar, hide mobile menu btn */
+/* Desktop: show sidebar, hide mobile toggle */
 .admin-desktop-sidebar { display: flex; flex-direction: column; }
-.admin-mobile-menu-btn { display: none !important; }
+.admin-mobile-toggle { display: none !important; }
 
-/* Mobile: hide desktop sidebar & user chip, show mobile menu btn */
+/* Responsive split containers collapse to 1 column on tablet/mobile */
+@media (max-width: 992px) {
+  .responsive-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile adjustments (< 768px) */
 @media (max-width: 768px) {
   .admin-desktop-sidebar {
     display: none !important;
   }
-  .admin-mobile-menu-btn {
+  .admin-mobile-toggle {
     display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
   .desktop-admin-chip {
     display: none !important;
   }
 
+  /* Admin main content padding */
+  .admin-wrapper > main {
+    padding: 16px 12px 90px !important;
+  }
+
   /* Reduce tab content padding on mobile */
   .admin-tab-content {
-    padding: 16px 14px 80px !important;
+    padding: 12px 10px 80px !important;
     gap: 16px !important;
   }
 
-  /* Collapse 2-column grids inside admin to single column */
-  .admin-tab-content > div[style*="grid-template-columns: 1.2fr"],
-  .admin-tab-content > div[style*="grid-template-columns: 1fr 1fr"],
-  .admin-tab-content > div[style*="grid-template-columns: 1fr 0.8fr"] {
+  /* Collapse all multi-column layouts inside admin to 1 column */
+  .admin-tab-content > div[style*="grid-template-columns"],
+  .responsive-split {
     grid-template-columns: 1fr !important;
   }
 
@@ -1154,7 +1167,8 @@ a {
   }
 
   /* Smaller KPI cards on mobile */
-  .admin-tab-content .glass-panel[style*="padding: '20px'"] {
+  .admin-tab-content .glass-panel[style*="padding: '20px'"],
+  .admin-tab-content .glass-panel {
     padding: 14px !important;
   }
 
@@ -1163,32 +1177,45 @@ a {
     font-size: 20px !important;
   }
 
-  /* Table: allow horizontal scroll */
+  /* Table: allow horizontal touch scroll */
+  .admin-tab-content .tableWrapper,
   .admin-tab-content .glass-panel {
-    overflow-x: auto;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* Summary banner in refund/payments: wrap on mobile */
-  .admin-wrapper > main {
-    min-width: 0;
-    overflow-x: hidden;
+  /* Catalog Control Bar on Mobile */
+  div[style*="controlBar"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 14px !important;
   }
-}
+  div[style*="controlLeft"] {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
 
-/* Extra small screens */
-@media (max-width: 400px) {
-  .admin-tab-content {
-    padding: 12px 10px 80px !important;
-  }
-  .admin-tab-content > div[style*="auto-fit"] {
+  /* Dashboard Metrics Grid on Mobile */
+  div[style*="metricsGrid"],
+  div[style*="accountGrid"] {
     grid-template-columns: 1fr !important;
   }
 }
 
-/* Sidebar hover effects */
-.admin-wrapper .admin-desktop-sidebar button:hover {
-  background: rgba(255,255,255,0.05) !important;
-  color: #fff !important;
+/* Extra small screens (< 480px) */
+@media (max-width: 480px) {
+  .admin-tab-content > div[style*="auto-fit"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-top-navbar {
+    padding: 0 12px !important;
+  }
+
+  .navBrandText {
+    font-size: 12px !important;
+  }
 }
 
 /* Custom Dropdown Animation */
