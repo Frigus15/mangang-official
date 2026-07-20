@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { api } from '../services/api';
 
 export const ShopContext = createContext();
 
@@ -111,10 +112,14 @@ const DEFAULT_SLIDES = [
 ];
 
 export const ShopContextProvider = ({ children }) => {
-  // Load state from localStorage if it exists, otherwise use defaults
   const [products, setProducts] = useState(() => {
     const local = localStorage.getItem('mangang_products');
     return local ? JSON.parse(local) : DEFAULT_PRODUCTS;
+  });
+
+  const [categories, setCategories] = useState(() => {
+    const local = localStorage.getItem('mangang_categories');
+    return local ? JSON.parse(local) : DEFAULT_CATEGORIES;
   });
 
   const [bannerSlides, setBannerSlides] = useState(() => {
@@ -137,12 +142,79 @@ export const ShopContextProvider = ({ children }) => {
     return local ? JSON.parse(local) : [];
   });
 
+  const [users, setUsers] = useState(() => {
+    const local = localStorage.getItem('mangang_users');
+    let loadedUsers = local ? JSON.parse(local) : [];
+    const defaultAdmin = { username: 'Admin Manager', email: 'admin@gmail.com', password: 'admin', role: 'admin' };
+    if (!loadedUsers.some(u => u.email === defaultAdmin.email)) {
+      loadedUsers.push(defaultAdmin);
+    }
+    return loadedUsers;
+  });
+
   // Navigation State
   const [activePage, setActivePage] = useState('home');
   const [activeDashboardTab, setActiveDashboardTab] = useState('orders');
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [pageLoading, setPageLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+
+  // Search, Filter & Sort State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [priceRange, setPriceRange] = useState(100000);
+  const [sortOption, setSortOption] = useState('featured');
+
+  // Discount Code State
+  const [discountCode, setDiscountCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [discountMessage, setDiscountMessage] = useState('');
+
+  // Authentication State
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('mangang_is_logged_in') === 'true';
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    const local = localStorage.getItem('mangang_user');
+    if (!local) return null;
+    const user = JSON.parse(local);
+    if (user.email === 'admin@gmail.com' || user.email === 'admin@mangang.com') return { ...user, role: 'admin' };
+    return user;
+  });
+
+  // ── Sync with MongoDB Express Backend ──────────────────────────────────
+  useEffect(() => {
+    const syncWithMongoDB = async () => {
+      try {
+        const [mProducts, mCategories, mBanners, mOrders, mUsers] = await Promise.all([
+          api.getProducts(),
+          api.getCategories(),
+          api.getBanners(),
+          api.getOrders(),
+          api.getUsers()
+        ]);
+
+        if (mProducts && Array.isArray(mProducts) && mProducts.length > 0) {
+          setProducts(mProducts.map(p => ({ ...p, id: p._id || p.id })));
+        }
+        if (mCategories && Array.isArray(mCategories) && mCategories.length > 0) {
+          setCategories(mCategories.map(c => ({ ...c, id: c._id || c.id })));
+        }
+        if (mBanners && Array.isArray(mBanners) && mBanners.length > 0) {
+          setBannerSlides(mBanners.map(b => ({ ...b, id: b._id || b.id })));
+        }
+        if (mOrders && Array.isArray(mOrders) && mOrders.length > 0) {
+          setOrders(mOrders);
+        }
+        if (mUsers && Array.isArray(mUsers) && mUsers.length > 0) {
+          setUsers(mUsers);
+        }
+      } catch (err) {
+        console.log('[MongoDB Sync] Local state active.');
+      }
+    };
+    syncWithMongoDB();
+  }, []);
 
   const navigateTo = (page, productId = null) => {
     setPageLoading(true);
@@ -151,95 +223,41 @@ export const ShopContextProvider = ({ children }) => {
       setSelectedProductId(productId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setPageLoading(false);
-    }, 450);
+    }, 400);
   };
 
-  // Filters State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [priceRange, setPriceRange] = useState(1000); // Max Price Limit
-  const [sortOption, setSortOption] = useState('featured');
-
-  // Discount Code State
-  const [discountCode, setDiscountCode] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState(0); // percentage (e.g. 20 for 20%)
-  const [discountMessage, setDiscountMessage] = useState('');
-
-  // Authentication State
-  const [users, setUsers] = useState(() => {
-    const local = localStorage.getItem('mangang_users');
-    let loadedUsers = local ? JSON.parse(local) : [];
+  const login = async (email, password) => {
+    setAuthLoading(true);
+    const mongoRes = await api.login(email, password);
+    const user = (mongoRes && mongoRes.user) || users.find(u => u.email === email && u.password === password);
     
-    // Seed default admin accounts
-    const defaultAdmins = [
-      { username: 'CS Manager', email: 'admin@mangang.com', password: 'password', role: 'admin' },
-      { username: 'CS Agent', email: 'mangangofficialstore.cs@gmail.com', password: 'admin@123', role: 'admin' },
-      { username: 'Admin', email: 'admin@gmail.com', password: 'admin@123', role: 'admin' }
-    ];
-
-    defaultAdmins.forEach(admin => {
-      if (!loadedUsers.some(u => u.email === admin.email)) {
-        loadedUsers.push(admin);
-      }
-    });
-
-    // Enforce admin roles
-    loadedUsers = loadedUsers.map(u => {
-      if (u.email === 'admin@mangang.com' || u.email === 'mangangofficialstore.cs@gmail.com' || u.email === 'admin@gmail.com') {
-        return { ...u, role: 'admin' };
-      }
-      return u;
-    });
-
-    return loadedUsers;
-  });
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('mangang_is_logged_in') === 'true';
-  });
-  const [currentUser, setCurrentUser] = useState(() => {
-    const local = localStorage.getItem('mangang_user');
-    if (!local) return null;
-    const user = JSON.parse(local);
-    const adminEmails = ['admin@mangang.com', 'mangangofficialstore.cs@gmail.com', 'admin@gmail.com'];
-    if (adminEmails.includes(user.email)) return { ...user, role: 'admin' };
-    return user;
-  });
-
-  const login = (email, password) => {
-    const user = users.find(u => u.email === email && u.password === password);
     if (!user) {
       alert('Invalid credentials.');
+      setAuthLoading(false);
       return;
     }
-    setAuthLoading(true);
-    setTimeout(() => {
-      setIsLoggedIn(true);
-      setCurrentUser(user);
-      localStorage.setItem('mangang_is_logged_in', 'true');
-      localStorage.setItem('mangang_user', JSON.stringify(user));
-      setAuthLoading(false);
-    }, 1200);
+    
+    setIsLoggedIn(true);
+    setCurrentUser(user);
+    localStorage.setItem('mangang_is_logged_in', 'true');
+    localStorage.setItem('mangang_user', JSON.stringify(user));
+    setAuthLoading(false);
   };
 
-  const signup = (username, email, password) => {
-    const exists = users.find(u => u.email === email);
-    if (exists) {
-      alert('Email already registered.');
-      return;
-    }
-    const newUser = { username, email, password };
+  const signup = async (username, email, password) => {
+    setAuthLoading(true);
+    const mongoRes = await api.signup(username, email, password);
+    const newUser = (mongoRes && mongoRes.user) || { username, name: username, email, password };
+    
     const updatedUsers = [...users, newUser];
     setUsers(updatedUsers);
     localStorage.setItem('mangang_users', JSON.stringify(updatedUsers));
 
-    setAuthLoading(true);
-    setTimeout(() => {
-      setIsLoggedIn(true);
-      setCurrentUser(newUser);
-      localStorage.setItem('mangang_is_logged_in', 'true');
-      localStorage.setItem('mangang_user', JSON.stringify(newUser));
-      setAuthLoading(false);
-    }, 1200);
+    setIsLoggedIn(true);
+    setCurrentUser(newUser);
+    localStorage.setItem('mangang_is_logged_in', 'true');
+    localStorage.setItem('mangang_user', JSON.stringify(newUser));
+    setAuthLoading(false);
   };
 
   const logout = () => {
@@ -253,18 +271,17 @@ export const ShopContextProvider = ({ children }) => {
       setSelectedProductId(null);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setPageLoading(false);
-    }, 500);
+    }, 400);
   };
 
-  // Update user profile function (supports self-update or admin update by targetEmail)
-  const updateUserProfile = (updatedFields, targetEmail = null) => {
+  const updateUserProfile = async (updatedFields, targetEmail = null) => {
     const emailToUpdate = targetEmail || currentUser?.email;
     if (!emailToUpdate) return;
 
+    await api.updateUserProfile(emailToUpdate, updatedFields);
+
     const updatedUsers = users.map((u) => {
-      if (u.email === emailToUpdate) {
-        return { ...u, ...updatedFields };
-      }
+      if (u.email === emailToUpdate) return { ...u, ...updatedFields };
       return u;
     });
 
@@ -278,63 +295,11 @@ export const ShopContextProvider = ({ children }) => {
     }
   };
 
-  // Sync to localStorage
-  useEffect(() => {
-    localStorage.setItem('mangang_products', JSON.stringify(products));
-  }, [products]);
+  const toggleBlockUser = async (userEmail) => {
+    await api.toggleBlockUser(userEmail);
 
-  useEffect(() => {
-    localStorage.setItem('mangang_users', JSON.stringify(users));
-  }, [users]);
-
-  useEffect(() => {
-    localStorage.setItem('mangang_cart', JSON.stringify(cart));
-  }, [cart]);
-
-  useEffect(() => {
-    localStorage.setItem('mangang_wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
-
-  useEffect(() => {
-    localStorage.setItem('mangang_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('mangang_slides', JSON.stringify(bannerSlides));
-  }, [bannerSlides]);
-
-  // Categories state
-  const [categories, setCategories] = useState(() => {
-    const local = localStorage.getItem('mangang_categories');
-    return local ? JSON.parse(local) : DEFAULT_CATEGORIES;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('mangang_categories', JSON.stringify(categories));
-  }, [categories]);
-
-  const addCategory = (name, image) => {
-    const newCat = {
-      id: `cat-${Date.now()}`,
-      name,
-      image: image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=400&q=80'
-    };
-    setCategories((prev) => [...prev, newCat]);
-  };
-
-  const deleteCategory = (catId) => {
-    setCategories((prev) => prev.filter((c) => c.id !== catId && c.name !== catId));
-  };
-
-  const deleteProduct = (productId) => {
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
-  };
-
-  const toggleBlockUser = (userEmail) => {
     const updatedUsers = users.map((u) => {
-      if (u.email === userEmail) {
-        return { ...u, isBlocked: !u.isBlocked };
-      }
+      if (u.email === userEmail) return { ...u, isBlocked: !u.isBlocked };
       return u;
     });
     setUsers(updatedUsers);
@@ -347,7 +312,72 @@ export const ShopContextProvider = ({ children }) => {
     }
   };
 
-  // Cart operations
+  // Sync state to LocalStorage
+  useEffect(() => { localStorage.setItem('mangang_products', JSON.stringify(products)); }, [products]);
+  useEffect(() => { localStorage.setItem('mangang_categories', JSON.stringify(categories)); }, [categories]);
+  useEffect(() => { localStorage.setItem('mangang_cart', JSON.stringify(cart)); }, [cart]);
+  useEffect(() => { localStorage.setItem('mangang_wishlist', JSON.stringify(wishlist)); }, [wishlist]);
+  useEffect(() => { localStorage.setItem('mangang_orders', JSON.stringify(orders)); }, [orders]);
+  useEffect(() => { localStorage.setItem('mangang_slides', JSON.stringify(bannerSlides)); }, [bannerSlides]);
+
+  const addCategory = async (name, image) => {
+    const imgUrl = image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=400&q=80';
+    const res = await api.addCategory(name, imgUrl);
+    const newCat = (res && res.category) ? { ...res.category, id: res.category._id } : { id: `cat-${Date.now()}`, name, image: imgUrl };
+    setCategories((prev) => [...prev, newCat]);
+  };
+
+  const deleteCategory = async (catId) => {
+    await api.deleteCategory(catId);
+    setCategories((prev) => prev.filter((c) => c.id !== catId && c._id !== catId && c.name !== catId));
+  };
+
+  const addNewProduct = async (productData) => {
+    const sp = Number(productData.price);
+    const cp = Number(productData.costPrice || (sp * 0.7));
+    const formattedProduct = {
+      title: productData.title,
+      category: productData.category || 'Audio',
+      price: sp,
+      costPrice: cp,
+      stock: Number(productData.stock || 10),
+      rating: 5.0,
+      image: productData.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+      description: productData.description || '',
+      options: {
+        colors: productData.colors ? productData.colors.split(',').map((c) => c.trim()) : ['Default'],
+        storage: productData.storage ? productData.storage.split(',').map((s) => s.trim()) : ['Standard']
+      }
+    };
+
+    const res = await api.addProduct(formattedProduct);
+    const newProductObj = (res && res.product) ? { ...res.product, id: res.product._id } : { id: `prod-${Date.now()}`, ...formattedProduct };
+    setProducts((prev) => [newProductObj, ...prev]);
+  };
+
+  const updateProductStock = async (productId, newStock) => {
+    await api.updateStock(productId, newStock);
+    setProducts((prev) =>
+      prev.map((p) => (p.id === productId || p._id === productId ? { ...p, stock: Math.max(0, Number(newStock)) } : p))
+    );
+  };
+
+  const deleteProduct = async (productId) => {
+    await api.deleteProduct(productId);
+    setProducts((prev) => prev.filter((p) => p.id !== productId && p._id !== productId));
+  };
+
+  const addBannerSlide = async (slideData) => {
+    const res = await api.addBanner(slideData);
+    const newSlide = (res && res.banner) ? { ...res.banner, id: res.banner._id } : { id: `slide-${Date.now()}`, ...slideData };
+    setBannerSlides((prev) => [...prev, newSlide]);
+  };
+
+  const removeBannerSlide = async (slideId) => {
+    await api.deleteBanner(slideId);
+    setBannerSlides((prev) => prev.filter((s) => s.id !== slideId && s._id !== slideId));
+  };
+
   const addToCart = (product, quantity = 1, options = {}) => {
     if (currentUser?.isBlocked) {
       alert('Your account has been blocked by administrator. You cannot make any purchases.');
@@ -355,12 +385,8 @@ export const ShopContextProvider = ({ children }) => {
     }
     setCart((prevCart) => {
       const existingItemIndex = prevCart.findIndex(
-        (item) =>
-          item.product.id === product.id &&
-          item.options?.color === options.color &&
-          item.options?.storage === options.storage
+        (item) => item.product.id === product.id && item.options?.color === options.color && item.options?.storage === options.storage
       );
-
       if (existingItemIndex > -1) {
         const newCart = [...prevCart];
         newCart[existingItemIndex].quantity += quantity;
@@ -381,9 +407,7 @@ export const ShopContextProvider = ({ children }) => {
       removeFromCart(cartId);
       return;
     }
-    setCart((prevCart) =>
-      prevCart.map((item) => (item.cartId === cartId ? { ...item, quantity: qty } : item))
-    );
+    setCart((prevCart) => prevCart.map((item) => (item.cartId === cartId ? { ...item, quantity: qty } : item)));
   };
 
   const clearCart = () => {
@@ -393,18 +417,12 @@ export const ShopContextProvider = ({ children }) => {
     setDiscountMessage('');
   };
 
-  // Wishlist toggle
   const toggleWishlist = (productId) => {
-    setWishlist((prevWishlist) => {
-      if (prevWishlist.includes(productId)) {
-        return prevWishlist.filter((id) => id !== productId);
-      } else {
-        return [...prevWishlist, productId];
-      }
-    });
+    setWishlist((prevWishlist) =>
+      prevWishlist.includes(productId) ? prevWishlist.filter((id) => id !== productId) : [...prevWishlist, productId]
+    );
   };
 
-  // Promotion/Discount Checker
   const applyPromoCode = (code) => {
     const formattedCode = code.trim().toUpperCase();
     if (formattedCode === 'MANGANG20') {
@@ -423,8 +441,7 @@ export const ShopContextProvider = ({ children }) => {
     }
   };
 
-  // Checkout order submission
-  const placeOrder = (shippingDetails, paymentDetails) => {
+  const placeOrder = async (shippingDetails, paymentDetails) => {
     if (currentUser?.isBlocked) {
       alert('Your account has been blocked by administrator. You cannot place orders.');
       return null;
@@ -439,109 +456,41 @@ export const ShopContextProvider = ({ children }) => {
 
     const newOrder = {
       orderId,
+      userEmail: currentUser?.email || shippingDetails.email,
       items: [...cart],
       shippingDetails,
       paymentDetails: {
         cardHolder: paymentDetails?.cardHolder || 'UPI Customer',
         cardNumber: paymentDetails?.cardNumber ? `**** **** **** ${paymentDetails.cardNumber.replace(/\s/g, '').slice(-4)}` : 'QR Payment'
       },
-      pricing: {
-        subtotal,
-        discount,
-        shipping,
-        tax,
-        total
-      },
+      pricing: { subtotal, discount, shipping, tax, total },
       status: 'Processing',
       date: new Date().toLocaleDateString('en-IN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       })
     };
 
-    // Update stock levels
+    await api.placeOrder(newOrder);
+
+    // Update product stocks in DB & state
     setProducts((prevProducts) =>
       prevProducts.map((p) => {
         const cartItemsForProduct = cart.filter((item) => item.product.id === p.id);
         const totalPurchased = cartItemsForProduct.reduce((sum, item) => sum + item.quantity, 0);
         if (totalPurchased > 0) {
-          return { ...p, stock: Math.max(0, p.stock - totalPurchased) };
+          const newStock = Math.max(0, p.stock - totalPurchased);
+          api.updateStock(p.id, newStock);
+          return { ...p, stock: newStock };
         }
         return p;
       })
     );
-
-    // Update current user info with checkout details
-    if (isLoggedIn && currentUser) {
-      const updatedUser = {
-        ...currentUser,
-        name: shippingDetails.name,
-        address: `${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.zip}`,
-        phone: shippingDetails.phone || ''
-      };
-      setCurrentUser(updatedUser);
-      localStorage.setItem('mangang_user', JSON.stringify(updatedUser));
-
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.email === currentUser.email ? updatedUser : u))
-      );
-    }
 
     setOrders((prevOrders) => [newOrder, ...prevOrders]);
     clearCart();
     return orderId;
   };
 
-  // Admin add products (simplified without specifications/features, device image upload)
-  const addNewProduct = (productData) => {
-    const id = `prod-${Date.now()}`;
-    const formattedProduct = {
-      id,
-      title: productData.title,
-      category: productData.category || 'Audio',
-      price: Number(productData.price),
-      costPrice: Number(productData.costPrice || (Number(productData.price) * 0.7)),
-      stock: Number(productData.stock || 10),
-      rating: 5.0,
-      image: productData.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-      description: productData.description || '',
-      options: {
-        colors: productData.colors ? productData.colors.split(',').map((c) => c.trim()) : ['Default'],
-        storage: productData.storage ? productData.storage.split(',').map((s) => s.trim()) : ['Standard']
-      }
-    };
-
-    setProducts((prevProducts) => [...prevProducts, formattedProduct]);
-  };
-
-  // Admin adjust stock level
-  const updateProductStock = (productId, newStock) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((p) => (p.id === productId ? { ...p, stock: Math.max(0, Number(newStock)) } : p))
-    );
-  };
-
-  // Admin banner slides management
-  const addBannerSlide = (slideData) => {
-    const id = `slide-${Date.now()}`;
-    const newSlide = {
-      id,
-      title: slideData.title,
-      subtitle: slideData.subtitle,
-      image: slideData.image || 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1200&q=80',
-      productId: slideData.productId || 'prod-1'
-    };
-    setBannerSlides((prev) => [...prev, newSlide]);
-  };
-
-  const removeBannerSlide = (slideId) => {
-    setBannerSlides((prev) => prev.filter((s) => s.id !== slideId));
-  };
-
-  // Calculate pricing
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const discountAmount = (subtotal * appliedDiscount) / 100;
   const shippingAmount = subtotal === 0 ? 0 : (subtotal > 2000 ? 0 : 150);
