@@ -304,6 +304,28 @@ export const ShopContextProvider = ({ children }) => {
     }, 500);
   };
 
+  // Update user profile function (supports self-update or admin update by targetEmail)
+  const updateUserProfile = (updatedFields, targetEmail = null) => {
+    const emailToUpdate = targetEmail || currentUser?.email;
+    if (!emailToUpdate) return;
+
+    const updatedUsers = users.map((u) => {
+      if (u.email === emailToUpdate) {
+        return { ...u, ...updatedFields };
+      }
+      return u;
+    });
+
+    setUsers(updatedUsers);
+    localStorage.setItem('mangang_users', JSON.stringify(updatedUsers));
+
+    if (currentUser && currentUser.email === emailToUpdate) {
+      const updatedUserObj = { ...currentUser, ...updatedFields };
+      setCurrentUser(updatedUserObj);
+      localStorage.setItem('mangang_user', JSON.stringify(updatedUserObj));
+    }
+  };
+
   // Sync to localStorage
   useEffect(() => {
     localStorage.setItem('mangang_products', JSON.stringify(products));
@@ -575,7 +597,8 @@ export const ShopContextProvider = ({ children }) => {
         placeOrder,
         addNewProduct,
         updateProductStock,
-        users
+        users,
+        updateUserProfile
       }}
     >
       {children}

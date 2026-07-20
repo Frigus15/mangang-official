@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import {
   LayoutDashboard, ShoppingBag, CreditCard, Package, Image,
   Tag, Power, Users, ArrowLeftCircle, Plus, Check, Trash,
-  DollarSign, Layers, AlertTriangle, Menu, X, ChevronRight, Upload, User
+  DollarSign, Layers, AlertTriangle, Menu, X, ChevronRight, Upload, User, Edit
 } from 'lucide-react';
 
 // ─── Sidebar menu config ───────────────────────────────────────────────
@@ -22,11 +22,18 @@ export default function AdminPortal() {
   const {
     products, orders, addNewProduct, updateProductStock,
     bannerSlides, addBannerSlide, removeBannerSlide,
-    navigateTo, users, currentUser
+    navigateTo, users, currentUser, updateUserProfile
   } = useContext(ShopContext);
 
   const [activeTab, setActiveTab]   = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ── Admin Edit User modal state ────────────────────────────────────
+  const [editingUser, setEditingUser]   = useState(null);
+  const [editUsername, setEditUsername] = useState('');
+  const [editEmail, setEditEmail]       = useState('');
+  const [editPhone, setEditPhone]       = useState('');
+  const [editRole, setEditRole]         = useState('customer');
 
   // ── Product form state ──────────────────────────────────────────────
   const [newTitle, setNewTitle]       = useState('');
@@ -129,6 +136,30 @@ export default function AdminPortal() {
 
   const handleDeleteCategory = (cat) => {
     setCategories(prev => prev.filter(c => c !== cat));
+  };
+
+  const handleOpenUserEdit = (u) => {
+    setEditingUser(u);
+    setEditUsername(u.username || u.name || '');
+    setEditEmail(u.email || '');
+    setEditPhone(u.phone || '');
+    setEditRole(u.role || 'customer');
+  };
+
+  const handleSaveUserByAdmin = (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    updateUserProfile(
+      {
+        username: editUsername,
+        name: editUsername,
+        email: editEmail,
+        phone: editPhone,
+        role: editRole
+      },
+      editingUser.email
+    );
+    setEditingUser(null);
   };
 
   // ── Sidebar ──────────────────────────────────────────────────────────
@@ -699,41 +730,69 @@ export default function AdminPortal() {
         return (
           <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
-              <h2 style={styles.tabTitle}>Customers</h2>
-              <p style={styles.tabSubtitle}>Registered user accounts and customer details.</p>
+              <h2 style={styles.tabTitle}>Customers & User Management</h2>
+              <p style={styles.tabSubtitle}>Manage registered customer profiles, edit user details (including email & phone), and assign roles.</p>
             </div>
             <div className="glass-panel" style={styles.panelCard}>
-              <h3 style={styles.panelTitle}>All Customers ({(users || []).filter(u => u.role !== 'admin').length})</h3>
-              {(users || []).filter(u => u.role !== 'admin').length === 0 ? (
+              <h3 style={styles.panelTitle}>All Registered Accounts ({(users || []).length})</h3>
+              {(users || []).length === 0 ? (
                 <p style={styles.emptyState}>No customer accounts registered yet.</p>
               ) : (
                 <div style={styles.tableWrapper}>
                   <table style={styles.table}>
                     <thead>
                       <tr style={styles.tableHeaderRow}>
-                        <th style={styles.th}>Name</th>
-                        <th style={styles.th}>Email</th>
+                        <th style={styles.th}>User / Name</th>
+                        <th style={styles.th}>Email Address</th>
+                        <th style={styles.th}>Phone Number</th>
                         <th style={styles.th}>Role</th>
                         <th style={styles.th}>Orders</th>
+                        <th style={{ ...styles.th, textAlign: 'center' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(users || []).filter(u => u.role !== 'admin').map((u, i) => (
+                      {(users || []).map((u, i) => (
                         <tr key={i} style={styles.tr}>
                           <td style={styles.td}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                               <div style={styles.avatarCircle}>
-                                {(u.username || u.email)[0].toUpperCase()}
+                                {(u.username || u.name || u.email)[0].toUpperCase()}
                               </div>
-                              <span style={{ fontSize: '13px', fontWeight: '600' }}>{u.username || '—'}</span>
+                              <span style={{ fontSize: '13px', fontWeight: '600' }}>{u.username || u.name || '—'}</span>
                             </div>
                           </td>
                           <td style={styles.td}><span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{u.email}</span></td>
-                          <td style={styles.td}><span className="badge badge-cyan" style={{ fontSize: '10px' }}>{u.role || 'customer'}</span></td>
+                          <td style={styles.td}><span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{u.phone || '—'}</span></td>
+                          <td style={styles.td}>
+                            <span className={u.role === 'admin' ? "badge badge-green" : "badge badge-cyan"} style={{ fontSize: '10px' }}>
+                              {u.role || 'customer'}
+                            </span>
+                          </td>
                           <td style={styles.td}>
                             <span style={{ fontSize: '13px' }}>
                               {orders.filter(o => o.shippingDetails?.email === u.email).length}
                             </span>
+                          </td>
+                          <td style={{ ...styles.td, textAlign: 'center' }}>
+                            <button 
+                              onClick={() => handleOpenUserEdit(u)}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid rgba(99,102,241,0.3)',
+                                background: 'rgba(99,102,241,0.1)',
+                                color: 'var(--color-primary)',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: '600'
+                              }}
+                              title="Edit User Profile"
+                            >
+                              <Edit size={12} /> Edit
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -742,6 +801,111 @@ export default function AdminPortal() {
                 </div>
               )}
             </div>
+
+            {/* Admin Edit User Modal */}
+            {editingUser && (
+              <div 
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.7)',
+                  backdropFilter: 'blur(6px)',
+                  zIndex: 2500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '20px'
+                }}
+                onClick={() => setEditingUser(null)}
+              >
+                <div 
+                  className="glass-panel"
+                  style={{
+                    width: '100%',
+                    maxWidth: '480px',
+                    padding: '24px',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                  }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)', paddingBottom: '12px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>Admin: Edit Customer Profile</h3>
+                    <button onClick={() => setEditingUser(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveUserByAdmin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div className="form-group">
+                      <span className="form-label">Full Name / Username</span>
+                      <input 
+                        type="text" 
+                        required 
+                        value={editUsername} 
+                        onChange={e => setEditUsername(e.target.value)} 
+                        className="form-input" 
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <span className="form-label">Email Address (Admin Editable)</span>
+                      <input 
+                        type="email" 
+                        required 
+                        value={editEmail} 
+                        onChange={e => setEditEmail(e.target.value)} 
+                        className="form-input" 
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <span className="form-label">Phone Number (Admin Editable)</span>
+                      <input 
+                        type="tel" 
+                        value={editPhone} 
+                        onChange={e => setEditPhone(e.target.value)} 
+                        className="form-input" 
+                        placeholder="+91 9876543210"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <span className="form-label">User Role</span>
+                      <select 
+                        value={editRole} 
+                        onChange={e => setEditRole(e.target.value)} 
+                        className="form-input"
+                        style={{ background: 'rgba(11,17,32,0.95)', cursor: 'pointer' }}
+                      >
+                        <option value="customer">Customer</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '10px' }}>
+                      <button 
+                        type="button" 
+                        onClick={() => setEditingUser(null)} 
+                        className="btn btn-outline"
+                        style={{ padding: '8px 16px', fontSize: '13px' }}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="btn btn-primary"
+                        style={{ padding: '8px 20px', fontSize: '13px' }}
+                      >
+                        Save User Details
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         );
 

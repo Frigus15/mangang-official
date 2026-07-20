@@ -1,9 +1,39 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { Package, CreditCard, User, ShoppingBag, Heart } from 'lucide-react';
+import { Package, CreditCard, User, ShoppingBag, Edit, Lock, Check, X } from 'lucide-react';
 
 export default function Dashboard() {
-  const { wishlist, products, orders, navigateTo, currentUser } = useContext(ShopContext);
+  const { wishlist, products, orders, navigateTo, currentUser, updateUserProfile } = useContext(ShopContext);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [paymentMode, setPaymentMode] = useState('');
+  const [phone, setPhone] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      setName(currentUser.name || currentUser.username || '');
+      setAddress(currentUser.address || '');
+      setPaymentMode(currentUser.paymentMode || 'Credit Card / UPI');
+      setPhone(currentUser.phone || '');
+    }
+  }, [currentUser]);
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    updateUserProfile({
+      name,
+      username: name,
+      address,
+      paymentMode,
+      phone
+    });
+    setIsEditing(false);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const totalOrdersCount = orders.length;
   const totalAmountSpent = orders.reduce((sum, o) => sum + (o.pricing?.total || 0), 0);
@@ -44,34 +74,165 @@ export default function Dashboard() {
         <div style={styles.sectionTitleRow}>
           <User size={18} color="var(--color-primary)" />
           <h3 style={styles.sectionTitle}>Account Details</h3>
+          
+          {!isEditing ? (
+            <button 
+              onClick={() => setIsEditing(true)} 
+              style={styles.editBtn}
+              title="Edit Profile"
+            >
+              <Edit size={14} />
+              <span>Edit Profile</span>
+            </button>
+          ) : (
+            <button 
+              onClick={() => setIsEditing(false)} 
+              style={{ ...styles.editBtn, background: 'rgba(239,68,68,0.1)', color: 'var(--color-danger)', borderColor: 'rgba(239,68,68,0.25)' }}
+            >
+              <X size={14} />
+              <span>Cancel</span>
+            </button>
+          )}
         </div>
 
-        <div style={styles.accountGrid}>
-          <div style={styles.detailBox}>
-            <span style={styles.detailLabel}>Full Name</span>
-            <strong style={styles.detailValue}>{currentUser?.name || currentUser?.username || 'Customer'}</strong>
+        {saveSuccess && (
+          <div className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px', fontSize: '12px' }}>
+            <Check size={14} /> Profile details updated successfully!
           </div>
+        )}
 
-          <div style={styles.detailBox}>
-            <span style={styles.detailLabel}>Email Address</span>
-            <strong style={styles.detailValue}>{currentUser?.email || 'guest@mangang.com'}</strong>
-          </div>
+        {!isEditing ? (
+          /* View Mode */
+          <div style={styles.accountGrid}>
+            <div style={styles.detailBox}>
+              <span style={styles.detailLabel}>Full Name</span>
+              <strong style={styles.detailValue}>{currentUser?.name || currentUser?.username || 'Customer'}</strong>
+            </div>
 
-          <div style={styles.detailBox}>
-            <span style={styles.detailLabel}>Phone Number</span>
-            <strong style={styles.detailValue}>{currentUser?.phone || 'Not provided'}</strong>
-          </div>
+            <div style={styles.detailBox}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={styles.detailLabel}>Email Address</span>
+                <span style={styles.lockTag}><Lock size={10} /> Locked</span>
+              </div>
+              <strong style={styles.detailValue}>{currentUser?.email || 'guest@mangang.com'}</strong>
+            </div>
 
-          <div style={styles.detailBox}>
-            <span style={styles.detailLabel}>Shipping Address</span>
-            <strong style={styles.detailValue}>{currentUser?.address || 'No shipping address configured'}</strong>
-          </div>
+            <div style={styles.detailBox}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={styles.detailLabel}>Phone Number</span>
+                {currentUser?.phone && <span style={styles.lockTag}><Lock size={10} /> Locked</span>}
+              </div>
+              <strong style={styles.detailValue}>{currentUser?.phone || 'Not provided'}</strong>
+            </div>
 
-          <div style={styles.detailBox}>
-            <span style={styles.detailLabel}>Payment Mode</span>
-            <strong style={styles.detailValue}>{currentUser?.paymentMode || 'Credit Card / UPI'}</strong>
+            <div style={styles.detailBox}>
+              <span style={styles.detailLabel}>Shipping Address</span>
+              <strong style={styles.detailValue}>{currentUser?.address || 'No shipping address configured'}</strong>
+            </div>
+
+            <div style={styles.detailBox}>
+              <span style={styles.detailLabel}>Payment Mode</span>
+              <strong style={styles.detailValue}>{currentUser?.paymentMode || 'Credit Card / UPI'}</strong>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Edit Form Mode */
+          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+              
+              {/* Full Name */}
+              <div className="form-group">
+                <span className="form-label">Full Name</span>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="form-input"
+                  placeholder="Enter full name..."
+                />
+              </div>
+
+              {/* Email Address (LOCKED) */}
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="form-label">Email Address</span>
+                  <span style={styles.lockNotice}><Lock size={11} /> Cannot be edited</span>
+                </div>
+                <input
+                  type="email"
+                  value={currentUser?.email || ''}
+                  disabled
+                  className="form-input"
+                  style={{ opacity: 0.6, cursor: 'not-allowed', background: 'rgba(0,0,0,0.2)' }}
+                />
+              </div>
+
+              {/* Phone Number (LOCKED if set) */}
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="form-label">Phone Number</span>
+                  {currentUser?.phone ? (
+                    <span style={styles.lockNotice}><Lock size={11} /> Locked</span>
+                  ) : (
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Set once</span>
+                  )}
+                </div>
+                <input
+                  type="tel"
+                  value={phone}
+                  disabled={Boolean(currentUser?.phone)}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="form-input"
+                  placeholder="e.g. +91 9876543210"
+                  style={currentUser?.phone ? { opacity: 0.6, cursor: 'not-allowed', background: 'rgba(0,0,0,0.2)' } : {}}
+                />
+              </div>
+
+              {/* Payment Mode */}
+              <div className="form-group">
+                <span className="form-label">Default Payment Mode</span>
+                <input
+                  type="text"
+                  value={paymentMode}
+                  onChange={(e) => setPaymentMode(e.target.value)}
+                  className="form-input"
+                  placeholder="e.g. UPI / Credit Card"
+                />
+              </div>
+            </div>
+
+            {/* Shipping Address */}
+            <div className="form-group">
+              <span className="form-label">Shipping Address</span>
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="form-input"
+                style={{ height: '70px', resize: 'vertical' }}
+                placeholder="Enter full shipping address..."
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '6px' }}>
+              <button 
+                type="button" 
+                onClick={() => setIsEditing(false)}
+                className="btn btn-outline"
+                style={{ padding: '10px 18px', fontSize: '13px' }}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                style={{ padding: '10px 22px', fontSize: '13px' }}
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        )}
       </div>
 
       {/* Orders List Section */}
@@ -190,7 +351,7 @@ const styles = {
   sectionTitleRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    justifyContent: 'space-between',
     borderBottom: '1px solid var(--border-glass)',
     paddingBottom: '12px'
   },
@@ -199,7 +360,25 @@ const styles = {
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
     color: 'var(--text-primary)',
-    margin: 0
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  },
+  editBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
+    borderRadius: '6px',
+    border: '1px solid rgba(99,102,241,0.3)',
+    background: 'rgba(99,102,241,0.1)',
+    color: 'var(--color-primary)',
+    cursor: 'pointer',
+    fontFamily: 'var(--font-heading)',
+    fontWeight: '700',
+    fontSize: '12.5px',
+    transition: 'all 0.2s ease',
   },
   accountGrid: {
     display: 'grid',
@@ -225,6 +404,22 @@ const styles = {
   detailValue: {
     fontSize: '13.5px',
     color: 'var(--text-primary)',
+    fontWeight: '600'
+  },
+  lockTag: {
+    fontSize: '10px',
+    color: 'var(--color-warning)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '3px',
+    fontWeight: '600'
+  },
+  lockNotice: {
+    fontSize: '10.5px',
+    color: 'var(--color-warning)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
     fontWeight: '600'
   },
   emptyOrders: {
