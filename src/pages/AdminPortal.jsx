@@ -929,15 +929,15 @@ export default function AdminPortal() {
             <Menu size={20} />
           </button>
           <img src="/logo.jpg" alt="Logo" style={styles.navLogoImg} />
-          <span style={styles.navBrandText}>MANGANG CONTROL HUB</span>
+          <span style={styles.navBrandText} className="nav-brand-text">MANGANG ADMIN</span>
         </div>
 
         <div style={styles.topRight}>
-          <div style={styles.adminBadge}>
+          <div style={styles.adminBadge} className="desktop-admin-chip">
             <User size={13} color="var(--color-primary)" />
             <span>{currentUser?.email || 'admin@gmail.com'}</span>
           </div>
-          <button style={styles.backBasicNavBtn} onClick={() => navigateTo('home')}>
+          <button style={styles.backBasicNavBtn} className="back-basic-nav-btn" onClick={() => navigateTo('home')}>
             <ArrowLeftCircle size={14} />
             <span>Back to Basic</span>
           </button>
