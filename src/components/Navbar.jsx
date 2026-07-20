@@ -109,6 +109,57 @@ export default function Navbar({ onOpenCart }) {
               </div>
             </div>
 
+            {/* Desktop Navigation Links */}
+            <div className="desktop-only-links" style={styles.navLinks}>
+              <button
+                onClick={() => handleNavClick('home')}
+                style={{
+                  ...styles.link,
+                  color: activePage === 'home' ? 'var(--color-primary)' : 'var(--text-primary)',
+                  borderBottomColor: activePage === 'home' ? 'var(--color-primary)' : 'transparent'
+                }}
+              >
+                Home
+              </button>
+
+              <button
+                onClick={() => handleNavClick('catalog')}
+                style={{
+                  ...styles.link,
+                  color: activePage === 'catalog' ? 'var(--color-primary)' : 'var(--text-primary)',
+                  borderBottomColor: activePage === 'catalog' ? 'var(--color-primary)' : 'transparent'
+                }}
+              >
+                Explore Shop
+              </button>
+
+              {isLoggedIn && (
+                <button
+                  onClick={() => handleNavClick('dashboard')}
+                  style={{
+                    ...styles.link,
+                    color: activePage === 'dashboard' ? 'var(--color-primary)' : 'var(--text-primary)',
+                    borderBottomColor: activePage === 'dashboard' ? 'var(--color-primary)' : 'transparent'
+                  }}
+                >
+                  My Portal
+                </button>
+              )}
+
+              {isLoggedIn && currentUser?.role === 'admin' && (
+                <button
+                  onClick={() => handleNavClick('admin')}
+                  style={{
+                    ...styles.link,
+                    color: activePage === 'admin' ? 'var(--color-primary)' : 'var(--text-primary)',
+                    borderBottomColor: activePage === 'admin' ? 'var(--color-primary)' : 'transparent'
+                  }}
+                >
+                  Control Hub
+                </button>
+              )}
+            </div>
+
             {/* Action Icons */}
             <div style={styles.actions}>
               {/* Search button */}
@@ -117,26 +168,59 @@ export default function Navbar({ onOpenCart }) {
                 style={styles.actionBtn}
                 title="Search"
               >
-                <Search size={20} style={{ color: 'var(--text-primary)' }} />
+                <Search size={18} style={{ color: 'var(--text-primary)' }} />
               </button>
 
-              {/* Login Button (only when logged out, removed when logged in) */}
-              {!isLoggedIn && (
+              {/* Wishlist Button */}
+              <button
+                onClick={() => handleNavClick('catalog')}
+                style={styles.actionBtn}
+                title="Wishlist"
+              >
+                <Heart size={18} style={{ color: wishlist.length > 0 ? 'var(--color-danger)' : 'var(--text-primary)' }} />
+                {wishlist.length > 0 && (
+                  <span style={styles.badgeDanger}>{wishlist.length}</span>
+                )}
+              </button>
+
+              {/* Cart Button */}
+              <button
+                onClick={onOpenCart}
+                style={styles.actionBtn}
+                title="Shopping Cart"
+              >
+                <ShoppingCart size={18} style={{ color: cartCount > 0 ? 'var(--color-primary)' : 'var(--text-primary)' }} />
+                {cartCount > 0 && (
+                  <span style={styles.badgeCyan}>{cartCount}</span>
+                )}
+              </button>
+
+              {/* Profile / Auth Button */}
+              {isLoggedIn ? (
+                <button
+                  onClick={() => handleNavClick('dashboard')}
+                  style={styles.actionBtn}
+                  title={currentUser?.username || currentUser?.email || 'User Account'}
+                >
+                  <User size={18} style={{ color: 'var(--color-primary)' }} />
+                </button>
+              ) : (
                 <button
                   onClick={() => { setAuthMode('login'); setAuthModalOpen(true); }}
                   style={styles.actionBtn}
                   title="Login / Sign Up"
                 >
-                  <LogIn size={20} style={{ color: 'var(--color-primary)' }} />
+                  <LogIn size={18} style={{ color: 'var(--color-primary)' }} />
                 </button>
               )}
 
-              {/* Side Menu Button — hidden in admin mode (admin has its own sidebar) */}
+              {/* Side Menu Button — hidden on desktop, shown on mobile */}
               {activePage !== 'admin' && (
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  style={{ ...styles.mobileMenuToggle, display: 'flex' }}
+                  style={styles.mobileMenuToggle}
                   className="mobile-menu-trigger"
+                  title="Menu"
                 >
                   <Menu size={20} />
                 </button>
