@@ -39,6 +39,7 @@ export default function AdminPortal() {
   // ── Product form state ──────────────────────────────────────────────
   const [newTitle, setNewTitle]       = useState('');
   const [newCategory, setNewCategory] = useState('Audio');
+  const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [newPrice, setNewPrice]       = useState('');
   const [newCostPrice, setNewCostPrice] = useState('');
   const [newStock, setNewStock]       = useState('');
@@ -494,28 +495,99 @@ export default function AdminPortal() {
                     <input type="text" required placeholder="Product title..." value={newTitle} onChange={e => setNewTitle(e.target.value)} className="form-input" />
                   </div>
 
-                  {/* Category Dropdown Design */}
-                  <div className="form-group">
+                  {/* Custom Animated Category Dropdown Design */}
+                  <div className="form-group" style={{ position: 'relative' }}>
                     <span className="form-label">Category *</span>
-                    <select 
-                      value={newCategory} 
-                      onChange={e => setNewCategory(e.target.value)} 
-                      className="form-input" 
+                    <button
+                      type="button"
+                      onClick={() => setCatDropdownOpen(!catDropdownOpen)}
                       style={{
-                        background: 'rgba(11,17,32,0.95)', 
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--color-primary)',
-                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
                         padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--color-primary)',
+                        background: 'rgba(99, 102, 241, 0.08)',
+                        color: '#ffffff',
+                        fontWeight: '600',
+                        fontSize: '13px',
                         cursor: 'pointer',
-                        fontWeight: '600'
+                        outline: 'none',
+                        transition: 'all 0.2s ease'
                       }}
                     >
-                      {categories.map(c => {
-                        const catName = typeof c === 'object' ? c.name : c;
-                        return <option key={catName} value={catName}>{catName}</option>;
-                      })}
-                    </select>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Tag size={15} color="var(--color-primary)" />
+                        <span>{newCategory}</span>
+                      </div>
+                      <ChevronRight 
+                        size={15} 
+                        style={{ 
+                          transform: catDropdownOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.3s ease',
+                          color: 'var(--color-primary)'
+                        }} 
+                      />
+                    </button>
+
+                    {catDropdownOpen && (
+                      <div 
+                        className="glass-panel animate-dropdown"
+                        style={{
+                          position: 'absolute',
+                          top: 'calc(100% + 6px)',
+                          left: 0,
+                          right: 0,
+                          zIndex: 100,
+                          padding: '6px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                          borderRadius: '10px',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
+                          background: 'rgba(11, 17, 32, 0.98)'
+                        }}
+                      >
+                        {categories.map(c => {
+                          const catName = typeof c === 'object' ? c.name : c;
+                          const catImg = typeof c === 'object' ? c.image : null;
+                          const isSelected = newCategory === catName;
+                          return (
+                            <button
+                              key={catName}
+                              type="button"
+                              onClick={() => {
+                                setNewCategory(catName);
+                                setCatDropdownOpen(false);
+                              }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '10px 12px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: isSelected ? 'rgba(99,102,241,0.18)' : 'transparent',
+                                color: isSelected ? 'var(--color-primary)' : 'var(--text-primary)',
+                                fontWeight: isSelected ? '700' : '500',
+                                fontSize: '13px',
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                transition: 'all 0.15s ease'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {catImg && <img src={catImg} alt="" style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover' }} />}
+                                <span>{catName}</span>
+                              </div>
+                              {isSelected && <Check size={14} color="var(--color-primary)" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', gap: '12px' }}>
@@ -949,13 +1021,17 @@ export default function AdminPortal() {
           <Sidebar />
         </div>
 
-        {sidebarOpen && (
-          <div style={styles.drawerOverlay} onClick={() => setSidebarOpen(false)}>
-            <div style={styles.drawerContent} onClick={e => e.stopPropagation()}>
-              <Sidebar />
-            </div>
+        <div 
+          className={`admin-drawer-overlay ${sidebarOpen ? 'active' : ''}`} 
+          onClick={() => setSidebarOpen(false)}
+        >
+          <div 
+            className={`admin-drawer-sidebar ${sidebarOpen ? 'active' : ''}`} 
+            onClick={e => e.stopPropagation()}
+          >
+            <Sidebar />
           </div>
-        )}
+        </div>
 
         <main style={styles.mainContainer}>
           {renderContent()}
