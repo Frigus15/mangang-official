@@ -49,8 +49,8 @@ export default function App() {
 
   return (
     <div style={styles.appWrapper}>
-      {/* Navigation Bar */}
-      <Navbar onOpenCart={() => setCartOpen(true)} />
+      {/* Navigation Bar — hidden in admin mode until user clicks Back to Basic */}
+      {activePage !== 'admin' && <Navbar onOpenCart={() => setCartOpen(true)} />}
 
       {/* Slide-out Cart Sidebar */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />

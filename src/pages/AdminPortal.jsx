@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import {
   LayoutDashboard, ShoppingBag, CreditCard, Package, Image,
   Tag, Power, Users, ArrowLeftCircle, Plus, Check, Trash,
-  DollarSign, Layers, AlertTriangle, Menu, X, ChevronRight
+  DollarSign, Layers, AlertTriangle, Menu, X, ChevronRight, Upload
 } from 'lucide-react';
 
 // ─── Sidebar menu config ───────────────────────────────────────────────
@@ -32,6 +32,7 @@ export default function AdminPortal() {
   const [newTitle, setNewTitle]       = useState('');
   const [newCategory, setNewCategory] = useState('Audio');
   const [newPrice, setNewPrice]       = useState('');
+  const [newCostPrice, setNewCostPrice] = useState('');
   const [newStock, setNewStock]       = useState('');
   const [newImage, setNewImage]       = useState('');
   const [newDesc, setNewDesc]         = useState('');
@@ -43,9 +44,8 @@ export default function AdminPortal() {
   const [formSuccess, setFormSuccess] = useState(false);
 
   // ── Banner form state ───────────────────────────────────────────────
-  const [slideImage, setSlideImage]         = useState('');
-  const [slideProductId, setSlideProductId] = useState('');
-  const [slideSuccess, setSlideSuccess]     = useState(false);
+  const [slideImage, setSlideImage]     = useState('');
+  const [slideSuccess, setSlideSuccess] = useState(false);
 
   // ── Website toggle state ────────────────────────────────────────────
   const [siteEnabled, setSiteEnabled] = useState(true);
@@ -60,6 +60,16 @@ export default function AdminPortal() {
   const totalRevOrders = orders.length;
   const totalCustomers = (users || []).filter(u => u.role !== 'admin').length;
 
+  // Calculate Profit across all orders
+  const totalProfit = orders.reduce((accProfit, order) => {
+    const orderNetRevenue = (order.pricing.subtotal || 0) - (order.pricing.discount || 0);
+    const orderCostPrice = (order.items || []).reduce((accCost, item) => {
+      const cp = item.product.costPrice ?? (item.product.price * 0.7);
+      return accCost + (cp * item.quantity);
+    }, 0);
+    return accProfit + (orderNetRevenue - orderCostPrice);
+  }, 0);
+
   // ── Handlers ────────────────────────────────────────────────────────
   const handleAddProduct = (e) => {
     e.preventDefault();
@@ -71,27 +81,40 @@ export default function AdminPortal() {
     if (specKey1 && specVal1) specs[specKey1] = specVal1;
     if (specKey2 && specVal2) specs[specKey2] = specVal2;
 
+    const sp = Number(newPrice);
+    const cp = Number(newCostPrice || (sp * 0.7));
+
     addNewProduct({
       title: newTitle, category: newCategory,
-      price: Number(newPrice), stock: Number(newStock), rating: 5.0,
+      price: sp, costPrice: cp, stock: Number(newStock), rating: 5.0,
       image: newImage || 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80',
       description: newDesc, features: newFeatures,
       specifications: specs, colors: 'Black, White, Gray', storage: 'Standard Edition'
     });
-    setNewTitle(''); setNewPrice(''); setNewStock(''); setNewImage('');
+    setNewTitle(''); setNewPrice(''); setNewCostPrice(''); setNewStock(''); setNewImage('');
     setNewDesc(''); setNewFeatures(''); setSpecVal1(''); setSpecVal2('');
     setFormSuccess(true);
     setTimeout(() => setFormSuccess(false), 3000);
   };
 
+  const handleBannerFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        setSlideImage(uploadEvent.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddSlide = (e) => {
     e.preventDefault();
-    if (!slideImage) { alert('Please enter a banner image URL.'); return; }
+    if (!slideImage) { alert('Please choose an image file or enter an image URL.'); return; }
     addBannerSlide({
-      title: 'Banner Slide', subtitle: '', image: slideImage,
-      productId: slideProductId || (products[0]?.id || 'prod-1')
+      title: 'Banner Slide', subtitle: '', image: slideImage
     });
-    setSlideImage(''); setSlideProductId('');
+    setSlideImage('');
     setSlideSuccess(true);
     setTimeout(() => setSlideSuccess(false), 3000);
   };
@@ -288,55 +311,49 @@ export default function AdminPortal() {
         return (
           <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
-              <h2 style={styles.tabTitle}>Payments</h2>
-              <p style={styles.tabSubtitle}>Financial transaction history and revenue summary.</p>
+              <h2 style={styles.tabTitle}>Payments & Financial Summary</h2>
+              <p style={styles.tabSubtitle}>Overview of total sales, total orders, and net profit calculated from item Cost Price (CP) and Selling Price (SP).</p>
             </div>
-            {/* Revenue Summary */}
+            {/* Revenue & Profit Metrics */}
             <div style={styles.kpiGrid}>
-              {[
-                { label: 'GROSS REVENUE', value: `$${totalRevenue.toFixed(2)}`, color: 'var(--color-success)' },
-                { label: 'TOTAL ORDERS', value: orders.length, color: 'var(--color-primary)' },
-                { label: 'AVG ORDER VALUE', value: orders.length > 0 ? `$${(totalRevenue / orders.length).toFixed(2)}` : '$0.00', color: 'var(--color-secondary)' },
-                { label: 'TOTAL TAX COLLECTED', value: `$${orders.reduce((s, o) => s + o.pricing.tax, 0).toFixed(2)}`, color: 'var(--color-warning)' },
-              ].map((stat, i) => (
-                <div key={i} className="glass-panel" style={styles.kpiCard}>
-                  <span style={styles.kpiLabel}>{stat.label}</span>
-                  <h2 style={{ ...styles.kpiValue, color: stat.color }}>{stat.value}</h2>
-                </div>
-              ))}
+              <div className="glass-panel" style={styles.kpiCard}>
+                <span style={styles.kpiLabel}>TOTAL SALES</span>
+                <h2 style={{ ...styles.kpiValue, color: 'var(--color-primary)' }}>
+                  ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </h2>
+                <p style={styles.kpiSubText}>Gross sales from all completed orders</p>
+              </div>
+
+              <div className="glass-panel" style={styles.kpiCard}>
+                <span style={styles.kpiLabel}>TOTAL ORDERS</span>
+                <h2 style={{ ...styles.kpiValue, color: 'var(--color-secondary)' }}>
+                  {totalRevOrders}
+                </h2>
+                <p style={styles.kpiSubText}>Telemetry transaction records</p>
+              </div>
+
+              <div className="glass-panel" style={styles.kpiCard}>
+                <span style={styles.kpiLabel}>TOTAL PROFIT</span>
+                <h2 style={{ ...styles.kpiValue, color: totalProfit >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                  ${totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </h2>
+                <p style={styles.kpiSubText}>Calculated as (Selling Price − Cost Price) × sold quantity</p>
+              </div>
             </div>
-            <div className="glass-panel" style={styles.panelCard}>
-              <h3 style={styles.panelTitle}>Payment Records</h3>
-              {orders.length === 0 ? (
-                <p style={styles.emptyState}>No payment records found.</p>
-              ) : (
-                <div style={styles.tableWrapper}>
-                  <table style={styles.table}>
-                    <thead>
-                      <tr style={styles.tableHeaderRow}>
-                        <th style={styles.th}>Order ID</th>
-                        <th style={styles.th}>Date</th>
-                        <th style={styles.th}>Card Holder</th>
-                        <th style={styles.th}>Card</th>
-                        <th style={styles.th}>Discount</th>
-                        <th style={styles.th}>Total Paid</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map(o => (
-                        <tr key={o.orderId} style={styles.tr}>
-                          <td style={styles.td}><span style={{ color: 'var(--color-primary)', fontWeight: '700', fontSize: '12px' }}>{o.orderId}</span></td>
-                          <td style={styles.td}><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{o.date}</span></td>
-                          <td style={styles.td}><span style={{ fontSize: '12px' }}>{o.paymentDetails?.cardHolder || '—'}</span></td>
-                          <td style={styles.td}><span style={{ fontSize: '12px', fontFamily: 'monospace' }}>{o.paymentDetails?.cardNumber || '—'}</span></td>
-                          <td style={styles.td}><span style={{ fontSize: '12px', color: 'var(--color-warning)' }}>-${o.pricing.discount.toFixed(2)}</span></td>
-                          <td style={styles.td}><span style={{ color: 'var(--color-success)', fontWeight: '700' }}>${o.pricing.total.toFixed(2)}</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+
+            <div className="glass-panel" style={{ ...styles.panelCard, marginTop: '10px' }}>
+              <h3 style={styles.panelTitle}>Profit Calculation Formula</h3>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.7' }}>
+                <p style={{ marginBottom: '8px' }}>
+                  <strong>How Net Profit is Computed:</strong>
+                </p>
+                <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <li><strong>Selling Price (SP)</strong> & <strong>Cost Price (CP)</strong> are configured per hardware item in the Products section.</li>
+                  <li><strong>Order Net Revenue</strong> = Item SP × Quantity minus applied promo discount.</li>
+                  <li><strong>Order Cost</strong> = Item CP × Quantity.</li>
+                  <li><strong>Total Profit</strong> = <code>Net Revenue − Total Item Cost</code> across all orders.</li>
+                </ul>
+              </div>
             </div>
           </div>
         );
@@ -347,7 +364,7 @@ export default function AdminPortal() {
           <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Products</h2>
-              <p style={styles.tabSubtitle}>Manage catalog listings, stock levels, and add new products.</p>
+              <p style={styles.tabSubtitle}>Manage catalog listings, stock levels, and set Selling Price (SP) & Cost Price (CP).</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '24px', alignItems: 'start' }} className="responsive-split">
               {/* Stock Table */}
@@ -359,30 +376,38 @@ export default function AdminPortal() {
                       <tr style={styles.tableHeaderRow}>
                         <th style={styles.th}>Product</th>
                         <th style={styles.th}>Category</th>
-                        <th style={styles.th}>Price</th>
+                        <th style={styles.th}>SP ($)</th>
+                        <th style={styles.th}>CP ($)</th>
+                        <th style={styles.th}>Profit/Unit</th>
                         <th style={{ ...styles.th, textAlign: 'center' }}>Stock</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {products.map(p => (
-                        <tr key={p.id} style={styles.tr}>
-                          <td style={styles.td}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <img src={p.image} alt={p.title} style={styles.prodThumb} />
-                              <strong style={{ fontSize: '13px' }}>{p.title}</strong>
-                            </div>
-                          </td>
-                          <td style={styles.td}><span className="badge badge-cyan" style={{ fontSize: '10px' }}>{p.category}</span></td>
-                          <td style={styles.td}><span style={{ color: 'var(--color-primary)', fontWeight: '700' }}>${p.price}</span></td>
-                          <td style={{ ...styles.td, textAlign: 'center' }}>
-                            <div style={styles.stockAdjuster}>
-                              <button style={styles.adjustBtn} onClick={() => updateProductStock(p.id, p.stock - 1)}>−</button>
-                              <span style={{ ...styles.stockDisplay, color: p.stock < 5 ? 'var(--color-warning)' : '#fff', fontWeight: '700' }}>{p.stock}</span>
-                              <button style={styles.adjustBtn} onClick={() => updateProductStock(p.id, p.stock + 1)}>+</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {products.map(p => {
+                        const cp = p.costPrice ?? (p.price * 0.7);
+                        const margin = p.price - cp;
+                        return (
+                          <tr key={p.id} style={styles.tr}>
+                            <td style={styles.td}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img src={p.image} alt={p.title} style={styles.prodThumb} />
+                                <strong style={{ fontSize: '13px' }}>{p.title}</strong>
+                              </div>
+                            </td>
+                            <td style={styles.td}><span className="badge badge-cyan" style={{ fontSize: '10px' }}>{p.category}</span></td>
+                            <td style={styles.td}><span style={{ color: 'var(--color-primary)', fontWeight: '700' }}>${p.price}</span></td>
+                            <td style={styles.td}><span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>${cp.toFixed(2)}</span></td>
+                            <td style={styles.td}><span style={{ color: 'var(--color-success)', fontWeight: '700' }}>+${margin.toFixed(2)}</span></td>
+                            <td style={{ ...styles.td, textAlign: 'center' }}>
+                              <div style={styles.stockAdjuster}>
+                                <button style={styles.adjustBtn} onClick={() => updateProductStock(p.id, p.stock - 1)}>−</button>
+                                <span style={{ ...styles.stockDisplay, color: p.stock < 5 ? 'var(--color-warning)' : '#fff', fontWeight: '700' }}>{p.stock}</span>
+                                <button style={styles.adjustBtn} onClick={() => updateProductStock(p.id, p.stock + 1)}>+</button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -400,16 +425,20 @@ export default function AdminPortal() {
                     <span className="form-label">Product Name *</span>
                     <input type="text" required placeholder="e.g., Mangang Soundbar-X" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="form-input" />
                   </div>
+                  <div className="form-group">
+                    <span className="form-label">Category</span>
+                    <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="form-input" style={{ background: 'rgba(11,17,32,0.95)', cursor: 'pointer' }}>
+                      {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <span className="form-label">Category</span>
-                      <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="form-input" style={{ background: 'rgba(11,17,32,0.95)', cursor: 'pointer' }}>
-                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
+                      <span className="form-label">Selling Price ($ SP) *</span>
+                      <input type="number" required placeholder="249" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="form-input" />
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <span className="form-label">Price ($) *</span>
-                      <input type="number" required placeholder="249" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="form-input" />
+                      <span className="form-label">Cost Price ($ CP) *</span>
+                      <input type="number" placeholder="e.g. 150" value={newCostPrice} onChange={e => setNewCostPrice(e.target.value)} className="form-input" />
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '12px' }}>
@@ -456,12 +485,12 @@ export default function AdminPortal() {
           <div style={styles.tabContent} className="admin-tab-content">
             <div style={styles.tabHeader}>
               <h2 style={styles.tabTitle}>Banners</h2>
-              <p style={styles.tabSubtitle}>Manage homepage hero slideshow banners.</p>
+              <p style={styles.tabSubtitle}>Upload spotlight images directly from gallery to display in the homepage hero banner.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }} className="responsive-split">
               {/* Active Slides */}
               <div className="glass-panel" style={styles.panelCard}>
-                <h3 style={styles.panelTitle}>Active Slides ({bannerSlides.length})</h3>
+                <h3 style={styles.panelTitle}>Active Spotlight Banners ({bannerSlides.length})</h3>
                 {bannerSlides.length === 0 ? (
                   <p style={styles.emptyState}>No banner slides added yet.</p>
                 ) : (
@@ -470,8 +499,8 @@ export default function AdminPortal() {
                       <div key={slide.id} style={styles.slideCard} className="glass-panel">
                         <img src={slide.image} alt="Slide" style={styles.slideThumb} />
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: '12px', fontWeight: '700', color: '#fff', marginBottom: '3px' }}>ID: {slide.id}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>→ Product: {slide.productId}</div>
+                          <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff', marginBottom: '2px' }}>Spotlight Banner</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {slide.id}</div>
                         </div>
                         <button onClick={() => removeBannerSlide(slide.id)} style={styles.deleteBannerBtn}>
                           <Trash size={13} />
@@ -483,29 +512,88 @@ export default function AdminPortal() {
               </div>
               {/* Add Slide Form */}
               <div className="glass-panel" style={styles.panelCard}>
-                <h3 style={styles.panelTitle}>Add New Banner</h3>
+                <h3 style={styles.panelTitle}>Upload New Banner</h3>
                 {slideSuccess && (
                   <div className="badge badge-green" style={{ ...styles.successMsg, marginBottom: '16px' }}>
-                    <Check size={13} /> Banner slide added!
+                    <Check size={13} /> Banner slide uploaded & published!
                   </div>
                 )}
                 <form onSubmit={handleAddSlide} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  
+                  {/* File Upload Button */}
                   <div className="form-group">
-                    <span className="form-label">Banner Image URL *</span>
-                    <input type="text" required placeholder="https://images.unsplash.com/..." value={slideImage} onChange={e => setSlideImage(e.target.value)} className="form-input" />
+                    <span className="form-label">Upload Image from Device Gallery</span>
+                    <label 
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '14px',
+                        borderRadius: '10px',
+                        border: '2px dashed var(--color-primary)',
+                        background: 'rgba(99, 102, 241, 0.08)',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <Upload size={18} color="var(--color-primary)" />
+                      <span>Choose Image from Gallery</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleBannerFileUpload} 
+                        style={{ display: 'none' }} 
+                      />
+                    </label>
                   </div>
+
+                  <div className="form-group">
+                    <span className="form-label">Or Paste Image Web URL</span>
+                    <input 
+                      type="text" 
+                      placeholder="https://images.unsplash.com/..." 
+                      value={slideImage} 
+                      onChange={e => setSlideImage(e.target.value)} 
+                      className="form-input" 
+                    />
+                  </div>
+
                   {slideImage && (
-                    <img src={slideImage} alt="Preview" style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-glass)' }} onError={e => e.target.style.display = 'none'} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <span className="form-label" style={{ color: 'var(--color-success)' }}>Image Preview:</span>
+                      <div style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
+                        <img src={slideImage} alt="Preview" style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />
+                        <button 
+                          type="button" 
+                          onClick={() => setSlideImage('')} 
+                          style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            background: 'rgba(0,0,0,0.75)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '26px',
+                            height: '26px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
                   )}
-                  <div className="form-group">
-                    <span className="form-label">Link to Product</span>
-                    <select value={slideProductId} onChange={e => setSlideProductId(e.target.value)} className="form-input" style={{ background: 'rgba(11,17,32,0.95)', cursor: 'pointer' }}>
-                      <option value="">Select product...</option>
-                      {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                    </select>
-                  </div>
-                  <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                    <Plus size={15} /> Deploy Banner Slide
+
+                  <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '6px' }}>
+                    <Plus size={15} /> Publish Banner
                   </button>
                 </form>
               </div>
@@ -679,17 +767,22 @@ export default function AdminPortal() {
         </button>
       </div>
 
-      {/* Mobile slide-out overlay */}
-      {sidebarOpen && (
-        <div style={styles.mobileOverlay} onClick={() => setSidebarOpen(false)}>
-          <div style={styles.mobileSidebar} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
-              <button onClick={() => setSidebarOpen(false)} style={styles.mobileMenuBtn}><X size={20} /></button>
-            </div>
-            <Sidebar />
+      {/* Mobile slide-out overlay with smooth CSS transitions */}
+      <div 
+        className={`mobile-drawer-overlay ${sidebarOpen ? 'active' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+      >
+        <div 
+          className={`mobile-sidebar glass-panel ${sidebarOpen ? 'active' : ''}`}
+          style={{ width: '280px', padding: '20px 16px' }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+            <button onClick={() => setSidebarOpen(false)} style={styles.mobileMenuBtn}><X size={20} /></button>
           </div>
+          <Sidebar />
         </div>
-      )}
+      </div>
 
       {/* Inner body row: sidebar + main content side by side */}
       <div style={styles.adminBody}>

@@ -479,6 +479,7 @@ export const ShopContextProvider = ({ children }) => {
       id,
       ...productData,
       price: Number(productData.price),
+      costPrice: Number(productData.costPrice || (Number(productData.price) * 0.7)),
       stock: Number(productData.stock),
       rating: Number(productData.rating || 5.0),
       features: Array.isArray(productData.features)
