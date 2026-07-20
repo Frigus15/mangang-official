@@ -80,9 +80,9 @@ export default function ProductCard({ product }) {
         <p style={styles.desc}>{product.description}</p>
 
         <div style={styles.priceRow}>
-          <span style={styles.originalPrice}>${originalPrice.toLocaleString()}</span>
-          <span style={styles.price}>${product.price.toLocaleString()}</span>
-          <span style={styles.profitPercent}>{profitPercent}% Profit</span>
+          <span style={styles.originalPrice}>₹{originalPrice.toLocaleString()}</span>
+          <span style={styles.price}>₹{product.price.toLocaleString()}</span>
+          <span style={styles.profitPercent}>{profitPercent}% Off</span>
         </div>
 
         <div style={styles.deliveryTime}>

@@ -69,7 +69,7 @@ export default function Dashboard() {
             <CreditCard size={20} color="var(--color-success)" />
           </div>
           <h2 style={{ ...styles.metricValue, color: 'var(--color-success)' }}>
-            ${totalAmountSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ₹{totalAmountSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </h2>
           <div style={styles.metricFooter}>
             <span style={styles.metricSub}>Total spending to date</span>

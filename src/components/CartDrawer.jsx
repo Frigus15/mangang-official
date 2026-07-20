@@ -105,7 +105,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                       </button>
                     </div>
                     <span style={styles.itemPrice}>
-                      ${(item.product.price * item.quantity).toLocaleString()}
+                      ₹{(item.product.price * item.quantity).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -150,25 +150,25 @@ export default function CartDrawer({ isOpen, onClose }) {
             <div style={styles.breakdown}>
               <div style={styles.priceRow}>
                 <span>Subtotal</span>
-                <span>${subtotal.toLocaleString()}</span>
+                <span>₹{subtotal.toLocaleString()}</span>
               </div>
               {appliedDiscount > 0 && (
                 <div style={{ ...styles.priceRow, color: 'var(--color-success)' }}>
                   <span>Discount ({appliedDiscount}%)</span>
-                  <span>-${discountAmount.toLocaleString()}</span>
+                  <span>-₹{discountAmount.toLocaleString()}</span>
                 </div>
               )}
               <div style={styles.priceRow}>
                 <span>Shipping</span>
-                <span>{shippingAmount === 0 ? 'FREE' : `$${shippingAmount}`}</span>
+                <span>{shippingAmount === 0 ? 'FREE' : `₹${shippingAmount}`}</span>
               </div>
               <div style={styles.priceRow}>
-                <span>Est. Tax (8%)</span>
-                <span>${taxAmount.toLocaleString()}</span>
+                <span>Est. GST (18%)</span>
+                <span>₹{taxAmount.toLocaleString()}</span>
               </div>
               <div style={styles.totalRow}>
                 <span>Total</span>
-                <span style={styles.totalVal}>${orderTotal.toLocaleString()}</span>
+                <span style={styles.totalVal}>₹{orderTotal.toLocaleString()}</span>
               </div>
             </div>
 

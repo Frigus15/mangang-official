@@ -39,7 +39,7 @@ const MLBB_SKINS = [
 ];
 
 export default function Home() {
-  const { products, navigateTo, setSelectedCategory, bannerSlides } = useContext(ShopContext);
+  const { products, navigateTo, setSelectedCategory, bannerSlides, categories } = useContext(ShopContext);
   const [timeLeft, setTimeLeft] = useState(7200); // 2 hours in seconds
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
   const [disableTransition, setDisableTransition] = useState(false);
@@ -48,8 +48,14 @@ export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleCardClick = (skin) => {
-    setSelectedCategory(skin.category);
+  const displayCategories = (categories || []).map((cat, idx) => {
+    const name = typeof cat === 'object' ? cat.name : cat;
+    const image = typeof cat === 'object' ? cat.image : 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=300&q=80';
+    return { id: `cat-${idx}`, name, image };
+  });
+
+  const handleCategoryClick = (catName) => {
+    setSelectedCategory(catName);
     navigateTo('catalog');
   };
 
@@ -253,43 +259,41 @@ export default function Home() {
         >
           <div className="marquee-track-scroll">
             <div className="marquee-group">
-              {MLBB_SKINS.map((skin) => (
+              {displayCategories.map((cat) => (
                 <div
-                  key={skin.id}
+                  key={cat.id}
                   className="slot-card"
-                  onClick={() => handleCardClick(skin)}
+                  onClick={() => handleCategoryClick(cat.name)}
                 >
                   <div className="slot-image-container">
-                    <img src={skin.image} alt={skin.heroName} className="slot-image" />
+                    <img src={cat.image} alt={cat.name} className="slot-image" />
                     <div className="slot-badge">
-                      <span>LEGEND</span>
-                      {skin.badgeSub && <span className="slot-badge-sub">{skin.badgeSub}</span>}
+                      <span>CATEGORY</span>
                     </div>
                   </div>
                   <div className="slot-info">
-                    <h4 className="slot-hero-name">{skin.heroName}</h4>
-                    <p className="slot-skin-name">{skin.skinName}</p>
+                    <h4 className="slot-hero-name">{cat.name}</h4>
+                    <p className="slot-skin-name">Explore Products</p>
                   </div>
                 </div>
               ))}
             </div>
             <div className="marquee-group">
-              {MLBB_SKINS.map((skin) => (
+              {displayCategories.map((cat) => (
                 <div
-                  key={`${skin.id}-clone`}
+                  key={`${cat.id}-clone`}
                   className="slot-card"
-                  onClick={() => handleCardClick(skin)}
+                  onClick={() => handleCategoryClick(cat.name)}
                 >
                   <div className="slot-image-container">
-                    <img src={skin.image} alt={skin.heroName} className="slot-image" />
+                    <img src={cat.image} alt={cat.name} className="slot-image" />
                     <div className="slot-badge">
-                      <span>LEGEND</span>
-                      {skin.badgeSub && <span className="slot-badge-sub">{skin.badgeSub}</span>}
+                      <span>CATEGORY</span>
                     </div>
                   </div>
                   <div className="slot-info">
-                    <h4 className="slot-hero-name">{skin.heroName}</h4>
-                    <p className="slot-skin-name">{skin.skinName}</p>
+                    <h4 className="slot-hero-name">{cat.name}</h4>
+                    <p className="slot-skin-name">Explore Products</p>
                   </div>
                 </div>
               ))}

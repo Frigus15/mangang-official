@@ -128,7 +128,7 @@ export default function Checkout() {
             <div style={{ ...styles.receiptRow, borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '10px', marginTop: '10px' }}>
               <span>Charged Total</span>
               <strong style={{ color: 'var(--color-primary)', fontSize: '18px' }}>
-                ${orderTotal.toLocaleString()}
+                ₹{orderTotal.toLocaleString()}
               </strong>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function Checkout() {
                 type="tel"
                 required
                 className="form-input"
-                placeholder="+1 (555) 000-0000"
+                placeholder="+91 9876543210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
@@ -205,7 +205,7 @@ export default function Checkout() {
                 type="text"
                 required
                 className="form-input"
-                placeholder="100 Cyberpunk Lane"
+                placeholder="100 MG Road"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
@@ -216,18 +216,18 @@ export default function Checkout() {
                 type="text"
                 required
                 className="form-input"
-                placeholder="Neo City"
+                placeholder="Mumbai"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
             </div>
             <div className="form-group">
-              <span className="form-label">ZIP / Postal Code</span>
+              <span className="form-label">Postal / Zip Code</span>
               <input
                 type="text"
                 required
                 className="form-input"
-                placeholder="94016"
+                placeholder="400001"
                 value={zip}
                 onChange={(e) => setZip(e.target.value)}
               />
@@ -306,7 +306,7 @@ export default function Checkout() {
                   <span style={styles.sumQty}>Qty: {item.quantity}</span>
                 </div>
                 <span style={styles.sumPrice}>
-                  ${(item.product.price * item.quantity).toLocaleString()}
+                  ₹{(item.product.price * item.quantity).toLocaleString()}
                 </span>
               </div>
             ))}
@@ -315,26 +315,26 @@ export default function Checkout() {
           {/* Pricing calculations details */}
           <div style={styles.breakdown}>
             <div style={styles.calcRow}>
-              <span>Hardware Subtotal</span>
-              <span>${subtotal.toLocaleString()}</span>
+              <span>Subtotal</span>
+              <span>₹{subtotal.toLocaleString()}</span>
             </div>
             {appliedDiscount > 0 && (
               <div style={{ ...styles.calcRow, color: 'var(--color-success)' }}>
                 <span>Discount Deduction</span>
-                <span>-${discountAmount.toLocaleString()}</span>
+                <span>-₹{discountAmount.toLocaleString()}</span>
               </div>
             )}
             <div style={styles.calcRow}>
               <span>Delivery Cost</span>
-              <span>{shippingAmount === 0 ? 'FREE' : `$${shippingAmount}`}</span>
+              <span>{shippingAmount === 0 ? 'FREE' : `₹${shippingAmount}`}</span>
             </div>
             <div style={styles.calcRow}>
-              <span>State Tax (8%)</span>
-              <span>${taxAmount.toLocaleString()}</span>
+              <span>GST (18%)</span>
+              <span>₹{taxAmount.toLocaleString()}</span>
             </div>
             <div style={styles.totalRow}>
               <span>Estimated Total</span>
-              <span style={styles.totalPrice}>${orderTotal.toLocaleString()}</span>
+              <span style={styles.totalPrice}>₹{orderTotal.toLocaleString()}</span>
             </div>
           </div>
 

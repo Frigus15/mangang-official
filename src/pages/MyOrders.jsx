@@ -52,7 +52,7 @@ export default function MyOrders() {
                       )}
                     </div>
                     <span style={styles.itemQty}>x{item.quantity}</span>
-                    <span style={styles.itemPrice}>${(item.product.price * item.quantity).toLocaleString()}</span>
+                    <span style={styles.itemPrice}>₹{(item.product.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -61,7 +61,7 @@ export default function MyOrders() {
                 <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Payment: QR Code Verification</span>
                 <div style={styles.totalBlock}>
                   <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Total Paid:</span>
-                  <strong style={styles.totalPrice}>${order.pricing.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                  <strong style={styles.totalPrice}>₹{order.pricing.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
                 </div>
               </div>
             </div>

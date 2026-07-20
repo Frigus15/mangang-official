@@ -140,17 +140,19 @@ export default function ProductDetails() {
           </div>
 
           <h1 style={styles.title}>{product.title}</h1>
-          <p style={styles.price}>${product.price.toLocaleString()}</p>
+          <p style={styles.price}>₹{product.price.toLocaleString()}</p>
           <p style={styles.description}>{product.description}</p>
 
           {/* Key bullets */}
-          <ul style={styles.featuresList}>
-            {product.features.map((feat, idx) => (
-              <li key={idx} style={styles.featureItem}>
-                <span style={styles.bulletCyan}>✦</span> {feat}
-              </li>
-            ))}
-          </ul>
+          {product.features && product.features.length > 0 && (
+            <ul style={styles.featuresList}>
+              {product.features.map((feat, idx) => (
+                <li key={idx} style={styles.featureItem}>
+                  <span style={styles.bulletCyan}>✦</span> {feat}
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Options Configurator */}
           <div style={styles.configurator}>

@@ -2,28 +2,17 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const ShopContext = createContext();
 
-// Seed default products
+// Seed default products in INR (₹)
 const DEFAULT_PRODUCTS = [
   {
     id: 'prod-1',
     title: 'Mangang Vision Pro VR',
     category: 'Wearables',
-    price: 899,
+    price: 69999,
+    costPrice: 45000,
     rating: 4.8,
     image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=600&q=80',
-    description: 'Next-generation standalone VR headset offering absolute immersion. Featuring micro-OLED 4K display panels per eye, custom spatial audio, and high-precision hand/eye tracking cameras.',
-    features: [
-      'Dual Micro-OLED 4K Displays',
-      '120Hz Hyper-Smooth Refresh Rate',
-      'True Spatial Audio Engineering',
-      'Zero-Latency Eye and Hand Tracking'
-    ],
-    specifications: {
-      'Resolution': '3840 x 2160 per eye',
-      'Battery Life': 'Up to 3 hours active',
-      'Weight': '450g ultra-lightweight',
-      'Storage Capacity': '256GB / 512GB Options'
-    },
+    description: 'Next-generation standalone VR headset offering absolute immersion with micro-OLED 4K displays and spatial audio.',
     options: {
       colors: ['Space Gray', 'Neon Cyan', 'Cyber Purple'],
       storage: ['256GB', '512GB']
@@ -35,22 +24,11 @@ const DEFAULT_PRODUCTS = [
     id: 'prod-2',
     title: 'Mangang Wave-9 ANC',
     category: 'Audio',
-    price: 299,
+    price: 19999,
+    costPrice: 12000,
     rating: 4.9,
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-    description: 'Professional wireless noise-canceling headphones featuring custom 40mm beryllium drivers, high-resolution wireless audio codec support, and ultra-plush premium memory foam earcups.',
-    features: [
-      '40mm Precision Beryllium Drivers',
-      'Hybrid Active Noise Cancelling (45dB)',
-      '60-Hour Intelligent Battery Life',
-      'LDAC & aptX Adaptive Bluetooth Codec'
-    ],
-    specifications: {
-      'Driver Unit': '40mm Beryllium Dome',
-      'Bluetooth Version': 'v5.3 Low Energy',
-      'Playback Time': 'Up to 60 Hours (ANC Off)',
-      'Frequency Response': '4Hz - 45kHz'
-    },
+    description: 'Professional wireless noise-canceling headphones with 40mm beryllium drivers and 60-hour battery life.',
     options: {
       colors: ['Carbon Black', 'Platinum Silver', 'Electric Indigo'],
       storage: ['Standard Edition']
@@ -62,22 +40,11 @@ const DEFAULT_PRODUCTS = [
     id: 'prod-3',
     title: 'Mangang Chronos Smartwatch',
     category: 'Wearables',
-    price: 249,
+    price: 14999,
+    costPrice: 9000,
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
-    description: 'Advanced titanium-body sports watch built for extreme durability. Tracks multi-system GPS, biosensing vitals, electrocardiograms, and blood oxygen levels in real time.',
-    features: [
-      'Grade 5 Titanium Armor Case',
-      'Continuous ECG & SpO2 Sensing',
-      'Always-on Sapphire AMOLED Screen',
-      '50m (5 ATM) Water Resistance'
-    ],
-    specifications: {
-      'Display Screen': '1.43" AMOLED (466x466 px)',
-      'Case Diameter': '46mm Rugged Alloy',
-      'Sensor Suite': 'BioTracker 4.0 PPG Sensor',
-      'Standby Battery': 'Up to 10 days standard'
-    },
+    description: 'Titanium-body sports smartwatch with continuous ECG, SpO2 sensing, and sapphire AMOLED screen.',
     options: {
       colors: ['Titanium Steel', 'Volt Orange', 'Obsidian Black'],
       storage: ['Standard Size']
@@ -89,22 +56,11 @@ const DEFAULT_PRODUCTS = [
     id: 'prod-4',
     title: 'Mangang Key-V1 Mechanical',
     category: 'Computers',
-    price: 179,
+    price: 8999,
+    costPrice: 5500,
     rating: 4.6,
     image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
-    description: 'Hot-swappable optical mechanical keyboard with premium double-shot PBT keycaps, pre-lubed linear silent cyan switches, and custom gasket mounting layers.',
-    features: [
-      'Hot-Swappable Linear Switches',
-      'Acoustic Dampening Gasket Design',
-      'Per-Key Programmable Neon RGB',
-      'Premium Coiled Type-C Cable'
-    ],
-    specifications: {
-      'Layout Factor': '75% Compact ANSI',
-      'Switch Brand': 'Mangang Custom Silent Linear',
-      'Connectivity': 'Tri-Mode (Wired/2.4G/BT5)',
-      'Keycap Profile': 'Cherry Profile PBT'
-    },
+    description: 'Hot-swappable optical mechanical keyboard with pre-lubed silent switches and RGB lighting.',
     options: {
       colors: ['Classic Dark', 'Retro Cyan', 'Synth Violet'],
       storage: ['Linear Switches', 'Tactile Switches']
@@ -116,22 +72,11 @@ const DEFAULT_PRODUCTS = [
     id: 'prod-5',
     title: 'Mangang Aura AI Speaker',
     category: 'Smart Home',
-    price: 129,
+    price: 5999,
+    costPrice: 3500,
     rating: 4.5,
     image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=600&q=80',
-    description: 'Voice-controlled smart hub speaker delivering 360-degree high-fidelity room-filling audio. Dynamic smart lighting ring coordinates with music frequencies and ambient status notifications.',
-    features: [
-      '360-Degree Spatial Soundstage',
-      'Local Edge AI Assistant Built-in',
-      'Reactive Rainbow LED Light Aura',
-      'Universal Zigbee Smart Hub Protocol'
-    ],
-    specifications: {
-      'Max Power Output': '40W RMS',
-      'Voice Assistant': 'Mangang Edge AI offline',
-      'Wireless Specs': 'Wi-Fi 6 Dual-Band & BT 5.2',
-      'Device Diameter': '110mm x 180mm Cylinder'
-    },
+    description: 'Voice-controlled smart hub speaker delivering 360-degree high-fidelity audio and reactive LED aura.',
     options: {
       colors: ['Charcoal Black', 'Aurora White'],
       storage: ['Standard Model']
@@ -139,6 +84,13 @@ const DEFAULT_PRODUCTS = [
     stock: 30,
     trending: true
   }
+];
+
+const DEFAULT_CATEGORIES = [
+  { id: 'cat-1', name: 'Audio', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-2', name: 'Wearables', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-3', name: 'Computers', image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-4', name: 'Smart Home', image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80' }
 ];
 
 const DEFAULT_SLIDES = [
@@ -351,15 +303,62 @@ export const ShopContextProvider = ({ children }) => {
     localStorage.setItem('mangang_slides', JSON.stringify(bannerSlides));
   }, [bannerSlides]);
 
+  // Categories state
+  const [categories, setCategories] = useState(() => {
+    const local = localStorage.getItem('mangang_categories');
+    return local ? JSON.parse(local) : DEFAULT_CATEGORIES;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('mangang_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  const addCategory = (name, image) => {
+    const newCat = {
+      id: `cat-${Date.now()}`,
+      name,
+      image: image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=400&q=80'
+    };
+    setCategories((prev) => [...prev, newCat]);
+  };
+
+  const deleteCategory = (catId) => {
+    setCategories((prev) => prev.filter((c) => c.id !== catId && c.name !== catId));
+  };
+
+  const deleteProduct = (productId) => {
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+  };
+
+  const toggleBlockUser = (userEmail) => {
+    const updatedUsers = users.map((u) => {
+      if (u.email === userEmail) {
+        return { ...u, isBlocked: !u.isBlocked };
+      }
+      return u;
+    });
+    setUsers(updatedUsers);
+    localStorage.setItem('mangang_users', JSON.stringify(updatedUsers));
+
+    if (currentUser && currentUser.email === userEmail) {
+      const updatedUser = { ...currentUser, isBlocked: !currentUser.isBlocked };
+      setCurrentUser(updatedUser);
+      localStorage.setItem('mangang_user', JSON.stringify(updatedUser));
+    }
+  };
+
   // Cart operations
   const addToCart = (product, quantity = 1, options = {}) => {
+    if (currentUser?.isBlocked) {
+      alert('Your account has been blocked by administrator. You cannot make any purchases.');
+      return;
+    }
     setCart((prevCart) => {
-      // Find if item with same ID and specs already exists
       const existingItemIndex = prevCart.findIndex(
         (item) =>
           item.product.id === product.id &&
-          item.options.color === options.color &&
-          item.options.storage === options.storage
+          item.options?.color === options.color &&
+          item.options?.storage === options.storage
       );
 
       if (existingItemIndex > -1) {
@@ -414,7 +413,7 @@ export const ShopContextProvider = ({ children }) => {
       setDiscountMessage('Promo code MANGANG20 applied: 20% discount!');
       return true;
     } else if (formattedCode === 'FREESHIP') {
-      setAppliedDiscount(10); // Assume 10% or custom rules, let's make it 10%
+      setAppliedDiscount(10);
       setDiscountCode('FREESHIP');
       setDiscountMessage('Promo code FREESHIP applied: 10% discount!');
       return true;
@@ -426,10 +425,14 @@ export const ShopContextProvider = ({ children }) => {
 
   // Checkout order submission
   const placeOrder = (shippingDetails, paymentDetails) => {
+    if (currentUser?.isBlocked) {
+      alert('Your account has been blocked by administrator. You cannot place orders.');
+      return null;
+    }
     const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
     const discount = (subtotal * appliedDiscount) / 100;
-    const shipping = subtotal > 500 ? 0 : 25;
-    const tax = subtotal * 0.08;
+    const shipping = subtotal > 2000 ? 0 : 150;
+    const tax = subtotal * 0.18;
     const total = subtotal - discount + shipping + tax;
 
     const orderId = `MG-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -439,8 +442,8 @@ export const ShopContextProvider = ({ children }) => {
       items: [...cart],
       shippingDetails,
       paymentDetails: {
-        cardHolder: paymentDetails.cardHolder,
-        cardNumber: `**** **** **** ${paymentDetails.cardNumber.replace(/\s/g, '').slice(-4)}`
+        cardHolder: paymentDetails?.cardHolder || 'UPI Customer',
+        cardNumber: paymentDetails?.cardNumber ? `**** **** **** ${paymentDetails.cardNumber.replace(/\s/g, '').slice(-4)}` : 'QR Payment'
       },
       pricing: {
         subtotal,
@@ -450,7 +453,7 @@ export const ShopContextProvider = ({ children }) => {
         total
       },
       status: 'Processing',
-      date: new Date().toLocaleDateString('en-US', {
+      date: new Date().toLocaleDateString('en-IN', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -477,13 +480,11 @@ export const ShopContextProvider = ({ children }) => {
         ...currentUser,
         name: shippingDetails.name,
         address: `${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.zip}`,
-        phone: shippingDetails.phone || '',
-        paymentMode: `Credit Card (**** **** **** ${paymentDetails.cardNumber.replace(/\s/g, '').slice(-4)})`
+        phone: shippingDetails.phone || ''
       };
       setCurrentUser(updatedUser);
       localStorage.setItem('mangang_user', JSON.stringify(updatedUser));
 
-      // Also update in users list state
       setUsers((prevUsers) =>
         prevUsers.map((u) => (u.email === currentUser.email ? updatedUser : u))
       );
@@ -494,22 +495,19 @@ export const ShopContextProvider = ({ children }) => {
     return orderId;
   };
 
-  // Admin add products
+  // Admin add products (simplified without specifications/features, device image upload)
   const addNewProduct = (productData) => {
     const id = `prod-${Date.now()}`;
     const formattedProduct = {
       id,
-      ...productData,
+      title: productData.title,
+      category: productData.category || 'Audio',
       price: Number(productData.price),
       costPrice: Number(productData.costPrice || (Number(productData.price) * 0.7)),
-      stock: Number(productData.stock),
-      rating: Number(productData.rating || 5.0),
-      features: Array.isArray(productData.features)
-        ? productData.features
-        : productData.features.split('\n').filter((f) => f.trim().length > 0),
-      specifications: typeof productData.specifications === 'object'
-        ? productData.specifications
-        : {},
+      stock: Number(productData.stock || 10),
+      rating: 5.0,
+      image: productData.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+      description: productData.description || '',
       options: {
         colors: productData.colors ? productData.colors.split(',').map((c) => c.trim()) : ['Default'],
         storage: productData.storage ? productData.storage.split(',').map((s) => s.trim()) : ['Standard']
@@ -546,8 +544,8 @@ export const ShopContextProvider = ({ children }) => {
   // Calculate pricing
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const discountAmount = (subtotal * appliedDiscount) / 100;
-  const shippingAmount = subtotal === 0 ? 0 : (subtotal > 500 ? 0 : 25);
-  const taxAmount = subtotal * 0.08;
+  const shippingAmount = subtotal === 0 ? 0 : (subtotal > 2000 ? 0 : 150);
+  const taxAmount = subtotal * 0.18;
   const orderTotal = subtotal - discountAmount + shippingAmount + taxAmount;
 
   return (
@@ -597,8 +595,13 @@ export const ShopContextProvider = ({ children }) => {
         placeOrder,
         addNewProduct,
         updateProductStock,
+        deleteProduct,
+        categories,
+        addCategory,
+        deleteCategory,
         users,
-        updateUserProfile
+        updateUserProfile,
+        toggleBlockUser
       }}
     >
       {children}

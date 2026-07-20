@@ -47,7 +47,7 @@ export default function Transactions() {
                     <span className="badge badge-green" style={{ fontSize: '10px' }}>Verified</span>
                   </td>
                   <td style={{ padding: '14px 10px', textAlign: 'right', fontWeight: '800', color: 'var(--color-success)', fontFamily: 'var(--font-heading)' }}>
-                    ${order.pricing.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    ₹{order.pricing.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
               ))}

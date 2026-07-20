@@ -14,12 +14,13 @@ export default function Catalog() {
     setPriceRange,
     sortOption,
     setSortOption,
+    categories
   } = useContext(ShopContext);
 
   const [showFilters, setShowFilters] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
-  const categoriesList = ['All', 'Audio', 'Wearables', 'Computers', 'Smart Home'];
+  const categoriesList = ['All', ...(categories || []).map(c => typeof c === 'object' ? c.name : c)];
 
   const sortLabels = {
     'featured': 'Featured Drop',
@@ -31,7 +32,7 @@ export default function Catalog() {
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('All');
-    setPriceRange(1000);
+    setPriceRange(100000);
     setSortOption('featured');
   };
 
@@ -181,20 +182,20 @@ export default function Catalog() {
             <div style={styles.filterGroup}>
               <div style={styles.priceLabelRow}>
                 <span className="form-label">Max Price Limit</span>
-                <span style={styles.priceLimit}>${priceRange}</span>
+                <span style={styles.priceLimit}>₹{priceRange.toLocaleString()}</span>
               </div>
               <input
                 type="range"
-                min="50"
-                max="1000"
-                step="25"
+                min="1000"
+                max="100000"
+                step="1000"
                 value={priceRange}
                 onChange={(e) => setPriceRange(Number(e.target.value))}
                 className="range-slider"
               />
               <div style={styles.rangeLabels}>
-                <span>$50</span>
-                <span>$1000</span>
+                <span>₹1,000</span>
+                <span>₹1,00,000</span>
               </div>
             </div>
           </div>
