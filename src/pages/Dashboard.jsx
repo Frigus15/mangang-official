@@ -1,14 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { Package, CreditCard, User, ShoppingBag, Edit, Lock, Check, X } from 'lucide-react';
+import { Package, CreditCard, User, Edit, Lock, Check, X, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
-  const { wishlist, products, orders, navigateTo, currentUser, updateUserProfile } = useContext(ShopContext);
+  const { orders, navigateTo, currentUser, updateUserProfile } = useContext(ShopContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [paymentMode, setPaymentMode] = useState('');
   const [phone, setPhone] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -16,7 +15,6 @@ export default function Dashboard() {
     if (currentUser) {
       setName(currentUser.name || currentUser.username || '');
       setAddress(currentUser.address || '');
-      setPaymentMode(currentUser.paymentMode || 'Credit Card / UPI');
       setPhone(currentUser.phone || '');
     }
   }, [currentUser]);
@@ -27,7 +25,6 @@ export default function Dashboard() {
       name,
       username: name,
       address,
-      paymentMode,
       phone
     });
     setIsEditing(false);
@@ -43,7 +40,7 @@ export default function Dashboard() {
       {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.pageTitle}>Account Overview</h1>
-        <p style={styles.pageSubtitle}>Manage your profile details and summary of orders.</p>
+        <p style={styles.pageSubtitle}>Manage your personal account profile details and summary statistics.</p>
       </div>
 
       {/* KPI Metrics: Total Orders & Total Amount Spent */}
@@ -54,7 +51,16 @@ export default function Dashboard() {
             <Package size={20} color="var(--color-primary)" />
           </div>
           <h2 style={{ ...styles.metricValue, color: 'var(--color-primary)' }}>{totalOrdersCount}</h2>
-          <p style={styles.metricSub}>Completed order purchases</p>
+          <div style={styles.metricFooter}>
+            <span style={styles.metricSub}>Completed purchases</span>
+            <button 
+              onClick={() => navigateTo('orders')} 
+              style={styles.navLinkBtn}
+            >
+              <span>View Orders</span>
+              <ArrowRight size={13} />
+            </button>
+          </div>
         </div>
 
         <div className="glass-panel" style={styles.metricCard}>
@@ -65,15 +71,26 @@ export default function Dashboard() {
           <h2 style={{ ...styles.metricValue, color: 'var(--color-success)' }}>
             ${totalAmountSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </h2>
-          <p style={styles.metricSub}>Total spending to date</p>
+          <div style={styles.metricFooter}>
+            <span style={styles.metricSub}>Total spending to date</span>
+            <button 
+              onClick={() => navigateTo('transactions')} 
+              style={styles.navLinkBtn}
+            >
+              <span>View Ledger</span>
+              <ArrowRight size={13} />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Account Details Panel */}
       <div className="glass-panel" style={styles.sectionCard}>
         <div style={styles.sectionTitleRow}>
-          <User size={18} color="var(--color-primary)" />
-          <h3 style={styles.sectionTitle}>Account Details</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <User size={18} color="var(--color-primary)" />
+            <h3 style={styles.sectionTitle}>Account Details</h3>
+          </div>
           
           {!isEditing ? (
             <button 
@@ -129,11 +146,6 @@ export default function Dashboard() {
               <span style={styles.detailLabel}>Shipping Address</span>
               <strong style={styles.detailValue}>{currentUser?.address || 'No shipping address configured'}</strong>
             </div>
-
-            <div style={styles.detailBox}>
-              <span style={styles.detailLabel}>Payment Mode</span>
-              <strong style={styles.detailValue}>{currentUser?.paymentMode || 'Credit Card / UPI'}</strong>
-            </div>
           </div>
         ) : (
           /* Edit Form Mode */
@@ -188,18 +200,6 @@ export default function Dashboard() {
                   style={currentUser?.phone ? { opacity: 0.6, cursor: 'not-allowed', background: 'rgba(0,0,0,0.2)' } : {}}
                 />
               </div>
-
-              {/* Payment Mode */}
-              <div className="form-group">
-                <span className="form-label">Default Payment Mode</span>
-                <input
-                  type="text"
-                  value={paymentMode}
-                  onChange={(e) => setPaymentMode(e.target.value)}
-                  className="form-input"
-                  placeholder="e.g. UPI / Credit Card"
-                />
-              </div>
             </div>
 
             {/* Shipping Address */}
@@ -232,53 +232,6 @@ export default function Dashboard() {
               </button>
             </div>
           </form>
-        )}
-      </div>
-
-      {/* Orders List Section */}
-      <div className="glass-panel" style={styles.sectionCard}>
-        <div style={styles.sectionTitleRow}>
-          <ShoppingBag size={18} color="var(--color-primary)" />
-          <h3 style={styles.sectionTitle}>My Orders ({orders.length})</h3>
-        </div>
-
-        {orders.length === 0 ? (
-          <div style={styles.emptyOrders}>
-            <Package size={32} style={{ color: 'var(--text-muted)', marginBottom: '8px' }} />
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 12px 0' }}>No orders placed yet.</p>
-            <button 
-              className="btn btn-primary" 
-              style={{ fontSize: '13px', padding: '8px 18px' }}
-              onClick={() => navigateTo('catalog')}
-            >
-              Explore Products
-            </button>
-          </div>
-        ) : (
-          <div style={styles.ordersTableWrapper}>
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.tableHeaderRow}>
-                  <th style={styles.th}>Order ID</th>
-                  <th style={styles.th}>Date</th>
-                  <th style={styles.th}>Items Purchased</th>
-                  <th style={styles.th}>Total Billed</th>
-                  <th style={styles.th}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o) => (
-                  <tr key={o.orderId} style={styles.tr}>
-                    <td style={styles.td}><span style={{ color: 'var(--color-primary)', fontWeight: '700' }}>{o.orderId}</span></td>
-                    <td style={styles.td}><span style={{ color: 'var(--text-secondary)' }}>{o.date}</span></td>
-                    <td style={styles.td}><span>{o.items.reduce((s, i) => s + i.quantity, 0)} item(s)</span></td>
-                    <td style={styles.td}><span style={{ color: 'var(--color-success)', fontWeight: '700' }}>${o.pricing.total.toFixed(2)}</span></td>
-                    <td style={styles.td}><span className="badge badge-green" style={{ fontSize: '10px' }}>{o.status}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         )}
       </div>
     </div>
@@ -335,12 +288,33 @@ const styles = {
     fontSize: '28px',
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
-    margin: 0
+    margin: '4px 0 0 0'
+  },
+  metricFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '6px',
+    paddingTop: '8px',
+    borderTop: '1px solid var(--border-glass)'
   },
   metricSub: {
     fontSize: '11px',
     color: 'var(--text-muted)',
     margin: 0
+  },
+  navLinkBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--color-primary)',
+    fontSize: '12px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: 0,
+    fontFamily: 'var(--font-heading)'
   },
   sectionCard: {
     padding: '24px',
@@ -360,10 +334,7 @@ const styles = {
     fontWeight: '800',
     fontFamily: 'var(--font-heading)',
     color: 'var(--text-primary)',
-    margin: 0,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
+    margin: 0
   },
   editBtn: {
     display: 'flex',
@@ -421,41 +392,5 @@ const styles = {
     alignItems: 'center',
     gap: '4px',
     fontWeight: '600'
-  },
-  emptyOrders: {
-    textAlign: 'center',
-    padding: '30px 10px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  ordersTableWrapper: {
-    width: '100%',
-    overflowX: 'auto'
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    textAlign: 'left'
-  },
-  tableHeaderRow: {
-    borderBottom: '1px solid var(--border-glass)'
-  },
-  th: {
-    padding: '10px 10px',
-    fontSize: '11px',
-    fontWeight: '700',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    whiteSpace: 'nowrap'
-  },
-  tr: {
-    borderBottom: '1px solid var(--border-glass)'
-  },
-  td: {
-    padding: '12px 10px',
-    fontSize: '13px',
-    verticalAlign: 'middle'
   }
 };

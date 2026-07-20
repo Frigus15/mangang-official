@@ -12,6 +12,8 @@ import Catalog from './pages/Catalog';
 import ProductDetails from './pages/ProductDetails';
 import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
+import MyOrders from './pages/MyOrders';
+import Transactions from './pages/Transactions';
 import AdminPortal from './pages/AdminPortal';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -34,6 +36,10 @@ export default function App() {
         return <Checkout />;
       case 'dashboard':
         return <Dashboard />;
+      case 'orders':
+        return <MyOrders />;
+      case 'transactions':
+        return <Transactions />;
       case 'admin':
         return isLoggedIn && currentUser?.role === 'admin' ? <AdminPortal /> : <Home />;
       case 'terms':

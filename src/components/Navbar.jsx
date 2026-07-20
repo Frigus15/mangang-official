@@ -44,8 +44,7 @@ export default function Navbar({ onOpenCart }) {
       ];
 
   const handleNavClick = (pageId) => {
-    if (pageId === 'orders' || pageId === 'transactions' || pageId === 'account') {
-      setActiveDashboardTab(pageId);
+    if (pageId === 'account') {
       navigateTo('dashboard');
     } else {
       navigateTo(pageId);
@@ -279,7 +278,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* My Orders */}
                 <button
                   onClick={() => handleNavClick('orders')}
-                  style={getSidebarLinkStyle('dashboard', 'orders')}
+                  style={getSidebarLinkStyle('orders')}
                 >
                   <Package size={16} />
                   <span>My Orders</span>
@@ -288,7 +287,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* Recent Transactions */}
                 <button
                   onClick={() => handleNavClick('transactions')}
-                  style={getSidebarLinkStyle('dashboard', 'transactions')}
+                  style={getSidebarLinkStyle('transactions')}
                 >
                   <History size={16} />
                   <span>Recent Transactions</span>
@@ -297,7 +296,7 @@ export default function Navbar({ onOpenCart }) {
                 {/* My Account */}
                 <button
                   onClick={() => handleNavClick('account')}
-                  style={getSidebarLinkStyle('dashboard', 'account')}
+                  style={getSidebarLinkStyle('dashboard')}
                 >
                   <User size={16} />
                   <span>My Account</span>
