@@ -17,8 +17,11 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Connect MongoDB
-connectDB();
+// Ensure MongoDB Connection on Serverless Requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // ── ENSURE CLEAN DATABASE ───────────────────────────────────────────────────
 const initializeCleanDB = async () => {
