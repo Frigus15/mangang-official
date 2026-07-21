@@ -36,7 +36,10 @@ export default function ProductDetails() {
   const [revComment, setRevComment] = useState('');
   const [revRating, setRevRating] = useState(5);
 
-  const product = products.find((p) => p.id === selectedProductId);
+  const targetId = selectedProductId || (products && products.length > 0 ? (products[0].id || products[0]._id) : null);
+  const product = (products || []).find(
+    (p) => String(p.id) === String(targetId) || String(p._id) === String(targetId)
+  ) || (products && products.length > 0 ? products[0] : null);
 
   const productImages = product
     ? (product.images && product.images.length > 0 ? product.images : [product.image])

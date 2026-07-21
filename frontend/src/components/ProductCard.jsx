@@ -9,7 +9,7 @@ export default function ProductCard({ product }) {
   const hasStock = product.stock > 0;
 
   const handleCardClick = () => {
-    navigateTo('product-details', product.id);
+    navigateTo('product-details', product.id || product._id);
   };
 
   const handleWishlistToggle = (e) => {
