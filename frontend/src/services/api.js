@@ -19,9 +19,10 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      return await res.json();
+      const data = await res.json();
+      return data;
     } catch (err) {
-      return null;
+      return { success: false, error: err.message || 'Authentication server unreachable.' };
     }
   },
 
@@ -32,9 +33,10 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password, phone })
       });
-      return await res.json();
+      const data = await res.json();
+      return data;
     } catch (err) {
-      return null;
+      return { success: false, error: err.message || 'Registration server unreachable.' };
     }
   },
 

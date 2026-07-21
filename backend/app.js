@@ -19,8 +19,13 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Ensure MongoDB Connection on Serverless Requests
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('[DB Middleware Error]', err.message);
+    res.status(500).json({ error: 'Database connection failure: ' + err.message });
+  }
 });
 
 // ── ENSURE CLEAN DATABASE ───────────────────────────────────────────────────
