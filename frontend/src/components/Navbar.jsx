@@ -373,26 +373,57 @@ export default function Navbar({ onOpenCart }) {
       </div>
       )}
 
-      {/* Auth Modal Overlay */}
+      {/* Premium Auth Modal Overlay */}
       {authModalOpen && (
         <div style={styles.modalOverlay} onClick={() => !authLoading && setAuthModalOpen(false)}>
-          <div style={styles.modalContent} className="glass-panel" onClick={(e) => e.stopPropagation()}>
+          <div style={styles.modalContent} className="glass-panel animate-dropdown" onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <h3 style={styles.modalTitle}>
-                {authMode === 'login' ? 'Log In to Mangang' : 'Create Your Account'}
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Shield size={20} color="var(--color-primary)" />
+                <h3 style={styles.modalTitle}>
+                  {authMode === 'login' ? 'Account Login' : 'Create Account'}
+                </h3>
+              </div>
               {!authLoading && (
                 <button style={styles.closeBtn} onClick={() => setAuthModalOpen(false)}>
                   <X size={18} />
                 </button>
               )}
             </div>
+
+            {/* Pill Switcher */}
+            <div style={styles.pillSwitcher}>
+              <button
+                type="button"
+                style={{
+                  ...styles.pillBtn,
+                  background: authMode === 'login' ? 'var(--color-primary)' : 'transparent',
+                  color: authMode === 'login' ? '#ffffff' : 'var(--text-secondary)',
+                  fontWeight: authMode === 'login' ? '700' : '500'
+                }}
+                onClick={() => setAuthMode('login')}
+              >
+                Log In
+              </button>
+              <button
+                type="button"
+                style={{
+                  ...styles.pillBtn,
+                  background: authMode === 'signup' ? 'var(--color-primary)' : 'transparent',
+                  color: authMode === 'signup' ? '#ffffff' : 'var(--text-secondary)',
+                  fontWeight: authMode === 'signup' ? '700' : '500'
+                }}
+                onClick={() => setAuthMode('signup')}
+              >
+                Sign Up
+              </button>
+            </div>
             
             {authLoading ? (
               <div style={styles.modalLoading}>
                 <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
                 <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '500', textAlign: 'center' }}>
-                  {authMode === 'login' ? 'Logging in, please wait...' : 'Creating account, please wait...'}
+                  {authMode === 'login' ? 'Authenticating via MongoDB Atlas...' : 'Creating MongoDB User Account...'}
                 </p>
               </div>
             ) : (
@@ -401,63 +432,62 @@ export default function Navbar({ onOpenCart }) {
                   {authMode === 'signup' && (
                     <div className="form-group">
                       <span className="form-label">Full Name</span>
+                      <div style={styles.inputIconWrapper}>
+                        <User size={16} style={styles.inputIcon} />
+                        <input
+                          type="text"
+                          required
+                          placeholder="John Doe"
+                          value={authUsername}
+                          onChange={(e) => setAuthUsername(e.target.value)}
+                          className="form-input"
+                          style={styles.authInput}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="form-group">
+                    <span className="form-label">Email Address</span>
+                    <div style={styles.inputIconWrapper}>
+                      <User size={16} style={styles.inputIcon} />
                       <input
-                        type="text"
+                        type="email"
                         required
-                        placeholder="e.g. John Doe"
-                        value={authUsername}
-                        onChange={(e) => setAuthUsername(e.target.value)}
+                        placeholder="admin@gmail.com"
+                        value={authEmail}
+                        onChange={(e) => setAuthEmail(e.target.value)}
                         className="form-input"
                         style={styles.authInput}
                       />
                     </div>
-                  )}
-                  <div className="form-group">
-                    <span className="form-label">Email Address</span>
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={authEmail}
-                      onChange={(e) => setAuthEmail(e.target.value)}
-                      className="form-input"
-                      style={styles.authInput}
-                    />
                   </div>
+
                   <div className="form-group">
                     <span className="form-label">Password</span>
-                    <input
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={authPassword}
-                      onChange={(e) => setAuthPassword(e.target.value)}
-                      className="form-input"
-                      style={styles.authInput}
-                    />
+                    <div style={styles.inputIconWrapper}>
+                      <Shield size={16} style={styles.inputIcon} />
+                      <input
+                        type="password"
+                        required
+                        placeholder="••••••••"
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        className="form-input"
+                        style={styles.authInput}
+                      />
+                    </div>
                   </div>
                   
                   <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
-                    {authMode === 'login' ? 'Log In' : 'Sign Up'}
+                    <span>{authMode === 'login' ? 'Authorize & Log In' : 'Register Account'}</span>
                   </button>
                 </form>
 
-                <div style={styles.modalFooter}>
-                  {authMode === 'login' ? (
-                    <span>
-                      Don't have an account?{' '}
-                      <button style={styles.switchBtn} onClick={() => setAuthMode('signup')}>
-                        Sign Up
-                      </button>
-                    </span>
-                  ) : (
-                    <span>
-                      Already have an account?{' '}
-                      <button style={styles.switchBtn} onClick={() => setAuthMode('login')}>
-                        Log In
-                      </button>
-                    </span>
-                  )}
+                <div style={styles.mongoBadgeRow}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: '600' }}>
+                    ⚡ Secured & Verified via MongoDB Cloud
+                  </span>
                 </div>
               </>
             )}
@@ -707,23 +737,63 @@ const styles = {
     fontWeight: '800',
     color: 'var(--text-primary)'
   },
+  pillSwitcher: {
+    display: 'flex',
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid var(--border-glass)',
+    borderRadius: '12px',
+    padding: '4px',
+    gap: '4px'
+  },
+  pillBtn: {
+    flex: 1,
+    padding: '8px 12px',
+    borderRadius: '8px',
+    border: 'none',
+    fontSize: '13px',
+    cursor: 'pointer',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+  },
   authForm: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px'
+    gap: '14px'
+  },
+  inputIconWrapper: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  inputIcon: {
+    position: 'absolute',
+    left: '12px',
+    color: 'var(--color-primary)',
+    pointerEvents: 'none'
   },
   authInput: {
-    padding: '10px 14px',
-    fontSize: '14px',
-    background: 'rgba(0,0,0,0.2)',
+    padding: '10px 14px 10px 38px',
+    fontSize: '13.5px',
+    background: 'rgba(0,0,0,0.25)',
     borderColor: 'var(--border-glass)',
-    color: '#fff'
+    color: '#fff',
+    width: '100%'
   },
   authSubmitBtn: {
     padding: '12px',
     fontSize: '14px',
     width: '100%',
-    marginTop: '5px'
+    marginTop: '6px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    borderRadius: '10px',
+    fontWeight: '700'
+  },
+  mongoBadgeRow: {
+    textAlign: 'center',
+    paddingTop: '6px',
+    borderTop: '1px dashed var(--border-glass)'
   },
   modalFooter: {
     textAlign: 'center',

@@ -150,36 +150,51 @@ export const ShopContextProvider = ({ children }) => {
 
   const login = async (email, password) => {
     setAuthLoading(true);
-    const mongoRes = await api.login(email, password);
-    const user = (mongoRes && mongoRes.user) || users.find(u => u.email === email && u.password === password);
-    
-    if (!user) {
-      alert('Invalid credentials.');
+    try {
+      const mongoRes = await api.login(email, password);
+      if (!mongoRes || !mongoRes.success || !mongoRes.user) {
+        alert(mongoRes?.error || 'Invalid credentials. User authentication is verified strictly via MongoDB.');
+        setAuthLoading(false);
+        return false;
+      }
+      if (mongoRes.user.isBlocked) {
+        alert('Your account has been blocked by administrator.');
+        setAuthLoading(false);
+        return false;
+      }
+      setIsLoggedIn(true);
+      setCurrentUser(mongoRes.user);
+      localStorage.setItem('mangang_is_logged_in', 'true');
+      localStorage.setItem('mangang_user', JSON.stringify(mongoRes.user));
       setAuthLoading(false);
-      return;
+      return true;
+    } catch (err) {
+      alert('Connection error communicating with MongoDB authentication server.');
+      setAuthLoading(false);
+      return false;
     }
-    
-    setIsLoggedIn(true);
-    setCurrentUser(user);
-    localStorage.setItem('mangang_is_logged_in', 'true');
-    localStorage.setItem('mangang_user', JSON.stringify(user));
-    setAuthLoading(false);
   };
 
   const signup = async (username, email, password) => {
     setAuthLoading(true);
-    const mongoRes = await api.signup(username, email, password);
-    const newUser = (mongoRes && mongoRes.user) || { username, name: username, email, password };
-    
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem('mangang_users', JSON.stringify(updatedUsers));
-
-    setIsLoggedIn(true);
-    setCurrentUser(newUser);
-    localStorage.setItem('mangang_is_logged_in', 'true');
-    localStorage.setItem('mangang_user', JSON.stringify(newUser));
-    setAuthLoading(false);
+    try {
+      const mongoRes = await api.signup(username, email, password);
+      if (!mongoRes || !mongoRes.success || !mongoRes.user) {
+        alert(mongoRes?.error || 'Failed to create user account in MongoDB.');
+        setAuthLoading(false);
+        return false;
+      }
+      setIsLoggedIn(true);
+      setCurrentUser(mongoRes.user);
+      localStorage.setItem('mangang_is_logged_in', 'true');
+      localStorage.setItem('mangang_user', JSON.stringify(mongoRes.user));
+      setAuthLoading(false);
+      return true;
+    } catch (err) {
+      alert('Connection error communicating with MongoDB registration server.');
+      setAuthLoading(false);
+      return false;
+    }
   };
 
   const logout = () => {
