@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut, Eye, EyeOff } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
   const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser, authLoading } = useContext(ShopContext);
@@ -12,6 +12,8 @@ export default function Navbar({ onOpenCart }) {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -57,12 +59,13 @@ export default function Navbar({ onOpenCart }) {
     if (authMode === 'login') {
       login(authEmail, authPassword);
     } else {
-      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword);
+      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword, authPhone);
     }
     setAuthModalOpen(false);
     setAuthEmail('');
     setAuthPassword('');
     setAuthUsername('');
+    setAuthPhone('');
   };
 
   return (
@@ -399,18 +402,33 @@ export default function Navbar({ onOpenCart }) {
               <>
                 <form onSubmit={handleAuthSubmit} style={styles.authForm}>
                   {authMode === 'signup' && (
-                    <div className="form-group">
-                      <span className="form-label">Full Name</span>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. John Doe"
-                        value={authUsername}
-                        onChange={(e) => setAuthUsername(e.target.value)}
-                        className="form-input"
-                        style={styles.authInput}
-                      />
-                    </div>
+                    <>
+                      <div className="form-group">
+                        <span className="form-label">Full Name</span>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. John Doe"
+                          value={authUsername}
+                          onChange={(e) => setAuthUsername(e.target.value)}
+                          className="form-input"
+                          style={styles.authInput}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <span className="form-label">Phone Number</span>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="+91 9876543210"
+                          value={authPhone}
+                          onChange={(e) => setAuthPhone(e.target.value)}
+                          className="form-input"
+                          style={styles.authInput}
+                        />
+                      </div>
+                    </>
                   )}
                   <div className="form-group">
                     <span className="form-label">Email Address</span>
@@ -426,15 +444,25 @@ export default function Navbar({ onOpenCart }) {
                   </div>
                   <div className="form-group">
                     <span className="form-label">Password</span>
-                    <input
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={authPassword}
-                      onChange={(e) => setAuthPassword(e.target.value)}
-                      className="form-input"
-                      style={styles.authInput}
-                    />
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        placeholder="••••••••"
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        className="form-input"
+                        style={{ ...styles.authInput, width: '100%', paddingRight: '38px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={styles.eyeToggleBtn}
+                        title={showPassword ? 'Hide Password' : 'Show Password'}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
                   
                   <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
@@ -718,6 +746,18 @@ const styles = {
     background: 'rgba(0,0,0,0.2)',
     borderColor: 'var(--border-glass)',
     color: '#fff'
+  },
+  eyeToggleBtn: {
+    position: 'absolute',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4px'
   },
   authSubmitBtn: {
     padding: '12px',
