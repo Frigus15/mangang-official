@@ -73,13 +73,11 @@ export const ShopContextProvider = ({ children }) => {
     }
     return loadedUsers;
   });
-
   // Navigation State
   const [activePage, setActivePage] = useState('home');
   const [activeDashboardTab, setActiveDashboardTab] = useState('orders');
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [pageLoading, setPageLoading] = useState(false);
-  const [authLoading, setAuthLoading] = useState(false);
 
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
@@ -92,26 +90,15 @@ export const ShopContextProvider = ({ children }) => {
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [discountMessage, setDiscountMessage] = useState('');
 
-  // Authentication State
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('mangang_is_logged_in') === 'true';
-  });
-  const [currentUser, setCurrentUser] = useState(() => {
-    const local = localStorage.getItem('mangang_user');
-    if (!local) return null;
-    return JSON.parse(local);
-  });
-
   // ── Sync with MongoDB Express Backend ──────────────────────────────────
   useEffect(() => {
     const syncWithMongoDB = async () => {
       try {
-        const [mProducts, mCategories, mBanners, mOrders, mUsers] = await Promise.all([
+        const [mProducts, mCategories, mBanners, mOrders] = await Promise.all([
           api.getProducts(),
           api.getCategories(),
           api.getBanners(),
-          api.getOrders(),
-          api.getUsers()
+          api.getOrders()
         ]);
 
         if (mProducts && Array.isArray(mProducts)) {
@@ -125,9 +112,6 @@ export const ShopContextProvider = ({ children }) => {
         }
         if (mOrders && Array.isArray(mOrders)) {
           setOrders(mOrders);
-        }
-        if (mUsers && Array.isArray(mUsers)) {
-          setUsers(mUsers);
         }
       } catch (err) {
         console.log('[MongoDB Sync] Local state active.');
@@ -146,67 +130,6 @@ export const ShopContextProvider = ({ children }) => {
     }, 400);
   };
 
-  const login = async (email, password) => {
-    setAuthLoading(true);
-    try {
-      const mongoRes = await api.login(email, password);
-      if (!mongoRes || !mongoRes.success || !mongoRes.user) {
-        alert(mongoRes?.error || 'Invalid credentials. User authentication is verified strictly via MongoDB.');
-        setAuthLoading(false);
-        return false;
-      }
-      if (mongoRes.user.isBlocked) {
-        alert('Your account has been blocked by administrator.');
-        setAuthLoading(false);
-        return false;
-      }
-      setIsLoggedIn(true);
-      setCurrentUser(mongoRes.user);
-      localStorage.setItem('mangang_is_logged_in', 'true');
-      localStorage.setItem('mangang_user', JSON.stringify(mongoRes.user));
-      setAuthLoading(false);
-      return true;
-    } catch (err) {
-      alert('Connection error communicating with MongoDB authentication server.');
-      setAuthLoading(false);
-      return false;
-    }
-  };
-
-  const signup = async (username, email, password, phone) => {
-    setAuthLoading(true);
-    try {
-      const mongoRes = await api.signup(username, email, password, phone);
-      if (!mongoRes || !mongoRes.success || !mongoRes.user) {
-        alert(mongoRes?.error || 'Failed to create user account in MongoDB.');
-        setAuthLoading(false);
-        return false;
-      }
-      setIsLoggedIn(true);
-      setCurrentUser(mongoRes.user);
-      localStorage.setItem('mangang_is_logged_in', 'true');
-      localStorage.setItem('mangang_user', JSON.stringify(mongoRes.user));
-      setAuthLoading(false);
-      return true;
-    } catch (err) {
-      alert('Connection error communicating with MongoDB registration server.');
-      setAuthLoading(false);
-      return false;
-    }
-  };
-
-  const logout = () => {
-    setPageLoading(true);
-    setTimeout(() => {
-      setIsLoggedIn(false);
-      setCurrentUser(null);
-      localStorage.removeItem('mangang_is_logged_in');
-      localStorage.removeItem('mangang_user');
-      setActivePage('home');
-      setSelectedProductId(null);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setPageLoading(false);
-    }, 400);
   };
 
   const updateUserProfile = async (updatedFields, targetEmail = null) => {
@@ -438,15 +361,9 @@ export const ShopContextProvider = ({ children }) => {
         activePage,
         activeDashboardTab,
         setActiveDashboardTab,
-        isLoggedIn,
-        currentUser,
-        login,
-        signup,
-        logout,
         selectedProductId,
         navigateTo,
         pageLoading,
-        authLoading,
         products,
         bannerSlides,
         addBannerSlide,
@@ -482,10 +399,7 @@ export const ShopContextProvider = ({ children }) => {
         deleteProduct,
         categories,
         addCategory,
-        deleteCategory,
-        users,
-        updateUserProfile,
-        toggleBlockUser
+        deleteCategory
       }}
     >
       {children}
