@@ -12,7 +12,10 @@ const connectDB = async () => {
   }
 
   if (!cached.promise) {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://mangangofficialstorecs_db_user:mangangofficial@cluster0.l83xneu.mongodb.net/mangang_official?retryWrites=true&w=majority&appName=Cluster0';
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI environment variable is missing.');
+    }
     cached.promise = mongoose.connect(mongoUri, {
       bufferCommands: false,
       connectTimeoutMS: 5000,
