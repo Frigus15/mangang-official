@@ -379,7 +379,7 @@ export default function Navbar({ onOpenCart }) {
       {/* Auth Modal Overlay */}
       {authModalOpen && (
         <div style={styles.modalOverlay} onClick={() => !authLoading && setAuthModalOpen(false)}>
-          <div style={styles.modalContent} className="glass-panel" onClick={(e) => e.stopPropagation()}>
+          <div style={styles.modalContent} className="glass-panel auth-modal-animate" onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
               <h3 style={styles.modalTitle}>
                 {authMode === 'login' ? 'Log In to Mangang' : 'Create Your Account'}
@@ -400,7 +400,7 @@ export default function Navbar({ onOpenCart }) {
               </div>
             ) : (
               <>
-                <form onSubmit={handleAuthSubmit} style={styles.authForm}>
+                <form key={authMode} onSubmit={handleAuthSubmit} style={styles.authForm} className="auth-form-animate">
                   {authMode === 'signup' && (
                     <>
                       <div className="form-group">
