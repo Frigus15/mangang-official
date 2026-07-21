@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut, Eye, EyeOff } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
   const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser, authLoading } = useContext(ShopContext);
@@ -13,6 +13,7 @@ export default function Navbar({ onOpenCart }) {
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
   const [authPhone, setAuthPhone] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -488,14 +489,22 @@ export default function Navbar({ onOpenCart }) {
                     <div style={styles.inputIconWrapper}>
                       <Shield size={16} style={styles.inputIcon} />
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         required
                         placeholder="••••••••"
                         value={authPassword}
                         onChange={(e) => setAuthPassword(e.target.value)}
                         className="form-input"
-                        style={styles.authInput}
+                        style={{ ...styles.authInput, paddingRight: '38px' }}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={styles.eyeToggleBtn}
+                        title={showPassword ? "Hide Password" : "Show Password"}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
                   </div>
                   
@@ -783,6 +792,19 @@ const styles = {
     left: '12px',
     color: 'var(--color-primary)',
     pointerEvents: 'none'
+  },
+  eyeToggleBtn: {
+    position: 'absolute',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4px',
+    transition: 'color 0.2s ease'
   },
   authInput: {
     padding: '10px 14px 10px 38px',
