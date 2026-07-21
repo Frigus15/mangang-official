@@ -159,7 +159,8 @@ export default function Home() {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const trendingProducts = products.filter((p) => p.trending).slice(0, 3);
+  const trendingList = (products || []).filter((p) => p.trending);
+  const trendingProducts = trendingList.length > 0 ? trendingList : (products || []);
 
   // Render slides with a clone of the first slide appended to the end for seamless looping
   const displaySlides = bannerSlides && bannerSlides.length > 1
@@ -234,9 +235,6 @@ export default function Home() {
                 >
                   <div className="slot-image-container">
                     <img src={cat.image} alt={cat.name} className="slot-image" />
-                    <div className="slot-badge">
-                      <span>CATEGORY</span>
-                    </div>
                   </div>
                   <div className="slot-info">
                     <h4 className="slot-hero-name">{cat.name}</h4>
@@ -254,9 +252,6 @@ export default function Home() {
                 >
                   <div className="slot-image-container">
                     <img src={cat.image} alt={cat.name} className="slot-image" />
-                    <div className="slot-badge">
-                      <span>CATEGORY</span>
-                    </div>
                   </div>
                   <div className="slot-info">
                     <h4 className="slot-hero-name">{cat.name}</h4>

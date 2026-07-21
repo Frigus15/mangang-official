@@ -446,7 +446,7 @@ const styles = {
     objectFit: 'contain',
     padding: '4px',
     boxSizing: 'border-box',
-    background: '#f9fafb'
+    background: 'transparent'
   },
   sumInfo: {
     flex: 1,

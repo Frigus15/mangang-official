@@ -267,7 +267,7 @@ const styles = {
     objectFit: 'contain',
     padding: '8px',
     boxSizing: 'border-box',
-    background: '#f9fafb'
+    background: 'transparent'
   },
   itemInfo: {
     flex: 1,

@@ -387,7 +387,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#f9fafb',
+    background: 'transparent',
     border: '1px solid var(--border-glass)',
     borderRadius: 'var(--border-radius-md)',
     position: 'relative',

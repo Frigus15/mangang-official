@@ -645,7 +645,7 @@ a {
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 8px;
-  background: #f9fafb;
+  background: transparent;
 }
 
 .slot-image {

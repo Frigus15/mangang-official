@@ -142,7 +142,7 @@ const styles = {
     flexShrink: 0,
     overflow: 'hidden',
     position: 'relative',
-    background: '#f9fafb',
+    background: 'transparent',
     borderRadius: '10px'
   },
   image: {

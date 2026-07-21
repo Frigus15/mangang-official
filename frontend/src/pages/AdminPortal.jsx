@@ -149,7 +149,8 @@ export default function AdminPortal() {
       costPrice: cp,
       stock: Number(newStock),
       image: newImage || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-      description: newDesc
+      description: newDesc,
+      trending: true
     });
 
     setNewTitle(''); setNewPrice(''); setNewCostPrice(''); setNewStock(''); setNewImage(''); setNewDesc('');
