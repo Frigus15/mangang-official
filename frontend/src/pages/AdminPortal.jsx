@@ -75,37 +75,60 @@ export default function AdminPortal() {
     return accProfit + (orderNetRevenue - orderCostPrice);
   }, 0);
 
-  // ── File Upload Handlers ────────────────────────────────────────────
-  const handleProductImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
+  // ── Helper: Client-Side Image Compression (prevents Vercel 4.5MB payload crash) ──
+  const compressImage = (file, maxWidth = 1200, quality = 0.75) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        setNewImage(ev.target.result);
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to JPEG Base64
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  // ── File Upload Handlers with Compression ───────────────────────────
+  const handleProductImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const compressed = await compressImage(file, 800, 0.75);
+      setNewImage(compressed);
     }
   };
 
-  const handleCategoryImageUpload = (e) => {
+  const handleCategoryImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setNewCatImage(ev.target.result);
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file, 600, 0.75);
+      setNewCatImage(compressed);
     }
   };
 
-  const handleBannerFileUpload = (e) => {
+  const handleBannerFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setSlideImage(ev.target.result);
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file, 1200, 0.75);
+      setSlideImage(compressed);
     }
   };
 
