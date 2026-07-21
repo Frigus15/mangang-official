@@ -175,13 +175,16 @@ const styles = {
     borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    margin: 0,
+    padding: 0
   },
   image: {
     width: '100%',
     height: '100%',
-    objectFit: 'contain',
-    padding: '6px',
+    objectFit: 'cover',
+    padding: 0,
+    margin: 0,
     boxSizing: 'border-box',
     transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
   },

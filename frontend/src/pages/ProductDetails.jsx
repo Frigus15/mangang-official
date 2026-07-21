@@ -29,6 +29,8 @@ export default function ProductDetails() {
   const [selectedStorage, setSelectedStorage] = useState('');
   const [reviews, setReviews] = useState([]);
   
+  const [activeImage, setActiveImage] = useState('');
+  
   // Review form states
   const [revName, setRevName] = useState('');
   const [revComment, setRevComment] = useState('');
@@ -36,9 +38,16 @@ export default function ProductDetails() {
 
   const product = products.find((p) => p.id === selectedProductId);
 
+  const productImages = product
+    ? (product.images && product.images.length > 0 ? product.images : [product.image])
+    : [];
+
   // Initialize selected options & reviews
   useEffect(() => {
     if (product) {
+      const imgs = (product.images && product.images.length > 0) ? product.images : [product.image];
+      setActiveImage(imgs[0]);
+
       if (product.options.colors && product.options.colors.length > 0) {
         setSelectedColor(product.options.colors[0]);
       }
@@ -79,7 +88,7 @@ export default function ProductDetails() {
     const btn = document.getElementById('add-to-cart-btn');
     if (btn) {
       const originalText = btn.innerHTML;
-      btn.innerHTML = 'Added to Ecosystem!';
+      btn.innerHTML = 'Added to Cart!';
       btn.style.opacity = '0.9';
       setTimeout(() => {
         btn.innerHTML = originalText;
@@ -118,12 +127,39 @@ export default function ProductDetails() {
 
       {/* Main Details Sheet */}
       <section style={styles.mainGrid} className="responsive-grid-sm">
-        {/* Left Column: Media */}
-        <div style={styles.mediaCol} className="glass-panel">
-          <img src={product.image} alt={product.title} style={styles.image} />
-          {!hasStock && (
-            <div style={styles.soldOutOverlay}>
-              <span style={styles.soldOutText}>Stock Depleted</span>
+        {/* Left Column: Media Gallery */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={styles.mediaCol} className="glass-panel">
+            <img src={activeImage || product.image} alt={product.title} style={styles.image} />
+            {!hasStock && (
+              <div style={styles.soldOutOverlay}>
+                <span style={styles.soldOutText}>Stock Depleted</span>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnail Gallery Row */}
+          {productImages.length > 1 && (
+            <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {productImages.map((imgUrl, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(imgUrl)}
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '10px',
+                    border: activeImage === imgUrl ? '2px solid var(--color-primary)' : '1px solid var(--border-glass)',
+                    padding: '2px',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    flexShrink: 0
+                  }}
+                >
+                  <img src={imgUrl} alt={`Thumbnail ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                </button>
+              ))}
             </div>
           )}
         </div>

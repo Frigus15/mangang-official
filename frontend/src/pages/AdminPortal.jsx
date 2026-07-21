@@ -109,10 +109,15 @@ export default function AdminPortal() {
 
   // ── File Upload Handlers with Compression ───────────────────────────
   const handleProductImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const compressed = await compressImage(file, 800, 0.75);
-      setNewImage(compressed);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      const compressedList = await Promise.all(
+        files.map((file) => compressImage(file, 800, 0.75))
+      );
+      setNewImages((prev) => [...prev, ...compressedList]);
+      if (!newImage && compressedList.length > 0) {
+        setNewImage(compressedList[0]);
+      }
     }
   };
 
@@ -142,18 +147,22 @@ export default function AdminPortal() {
     const sp = Number(newPrice);
     const cp = Number(newCostPrice || (sp * 0.7));
 
+    const finalImages = newImages.length > 0 ? newImages : (newImage ? [newImage] : []);
+    const mainImg = finalImages[0] || newImage || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80';
+
     addNewProduct({
       title: newTitle,
       category: newCategory,
       price: sp,
       costPrice: cp,
       stock: Number(newStock),
-      image: newImage || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+      image: mainImg,
+      images: finalImages.length > 0 ? finalImages : [mainImg],
       description: newDesc,
       trending: true
     });
 
-    setNewTitle(''); setNewPrice(''); setNewCostPrice(''); setNewStock(''); setNewImage(''); setNewDesc('');
+    setNewTitle(''); setNewPrice(''); setNewCostPrice(''); setNewStock(''); setNewImage(''); setNewImages([]); setNewDesc('');
     setFormSuccess(true);
     setTimeout(() => setFormSuccess(false), 3000);
   };
@@ -630,9 +639,9 @@ export default function AdminPortal() {
                     <input type="number" required placeholder="20" value={newStock} onChange={e => setNewStock(e.target.value)} className="form-input" />
                   </div>
 
-                  {/* Product Image Device Upload */}
+                  {/* Product Image Device Upload (Multiple Pictures) */}
                   <div className="form-group">
-                    <span className="form-label">Upload Product Image from Device</span>
+                    <span className="form-label">Upload Product Images from Device (Multiple Pictures)</span>
                     <label 
                       style={{
                         display: 'flex',
@@ -650,13 +659,46 @@ export default function AdminPortal() {
                       }}
                     >
                       <Upload size={16} color="var(--color-primary)" />
-                      <span>{newImage ? 'Change Image File' : 'Select Image File'}</span>
-                      <input type="file" accept="image/*" onChange={handleProductImageUpload} style={{ display: 'none' }} />
+                      <span>{newImages.length > 0 ? `Add More Image Files (${newImages.length} selected)` : 'Select Image File(s)'}</span>
+                      <input type="file" accept="image/*" multiple onChange={handleProductImageUpload} style={{ display: 'none' }} />
                     </label>
-                    {newImage && (
-                      <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <img src={newImage} alt="Preview" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px' }} />
-                        <span style={{ fontSize: '12px', color: 'var(--color-success)' }}>Image selected!</span>
+                    
+                    {/* Multiple Image Thumbnails Preview */}
+                    {newImages.length > 0 && (
+                      <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {newImages.map((imgSrc, idx) => (
+                          <div key={idx} style={{ position: 'relative', width: '54px', height: '54px', borderRadius: '8px', overflow: 'hidden', border: idx === 0 ? '2px solid var(--color-primary)' : '1px solid var(--border-glass)' }}>
+                            <img src={imgSrc} alt={`Uploaded ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = newImages.filter((_, i) => i !== idx);
+                                setNewImages(updated);
+                                if (newImage === imgSrc) {
+                                  setNewImage(updated[0] || '');
+                                }
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: '2px',
+                                right: '2px',
+                                background: 'rgba(0,0,0,0.8)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '18px',
+                                height: '18px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer'
+                              }}
+                              title="Remove image"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
