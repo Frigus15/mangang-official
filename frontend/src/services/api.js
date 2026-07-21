@@ -1,11 +1,20 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api');
 
+const safeJsonResponse = async (res) => {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return { success: false, error: `Server error (${res.status}): ${text.slice(0, 80)}` };
+  }
+};
+
 export const api = {
   // Health check
   checkHealth: async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/health`);
-      return await res.json();
+      return await safeJsonResponse(res);
     } catch (err) {
       return null;
     }
@@ -19,8 +28,7 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
-      return data;
+      return await safeJsonResponse(res);
     } catch (err) {
       return { success: false, error: err.message || 'Authentication server unreachable.' };
     }
@@ -33,8 +41,7 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password, phone })
       });
-      const data = await res.json();
-      return data;
+      return await safeJsonResponse(res);
     } catch (err) {
       return { success: false, error: err.message || 'Registration server unreachable.' };
     }
