@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut, Eye, EyeOff } from 'lucide-react';
+import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
   const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser, authLoading } = useContext(ShopContext);
@@ -14,6 +14,7 @@ export default function Navbar({ onOpenCart }) {
   const [authUsername, setAuthUsername] = useState('');
   const [authPhone, setAuthPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [authFeedback, setAuthFeedback] = useState(null); // { type: 'success' | 'error', message: string }
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -54,18 +55,48 @@ export default function Navbar({ onOpenCart }) {
     setMobileMenuOpen(false);
   };
 
-  const handleAuthSubmit = (e) => {
+  const handleAuthSubmit = async (e) => {
     e.preventDefault();
-    if (authMode === 'login') {
-      login(authEmail, authPassword);
-    } else {
-      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword, authPhone);
+    setAuthFeedback(null);
+
+    if (!authEmail || !authPassword) {
+      setAuthFeedback({ type: 'error', message: 'Please enter both your email address and password.' });
+      return;
     }
-    setAuthModalOpen(false);
-    setAuthEmail('');
-    setAuthPassword('');
-    setAuthUsername('');
-    setAuthPhone('');
+
+    if (authMode === 'login') {
+      const res = await login(authEmail, authPassword);
+      if (res && res.success) {
+        setAuthFeedback({ type: 'success', message: 'Login successful! Redirecting...' });
+        setTimeout(() => {
+          setAuthModalOpen(false);
+          setAuthEmail('');
+          setAuthPassword('');
+          setAuthFeedback(null);
+        }, 1200);
+      } else {
+        setAuthFeedback({ type: 'error', message: res?.error || 'Invalid email address or password.' });
+      }
+    } else {
+      if (!authPhone) {
+        setAuthFeedback({ type: 'error', message: 'Please enter your phone number to sign up.' });
+        return;
+      }
+      const res = await signup(authUsername || authEmail.split('@')[0], authEmail, authPassword, authPhone);
+      if (res && res.success) {
+        setAuthFeedback({ type: 'success', message: 'Signup successful! Welcome to Mangang Store.' });
+        setTimeout(() => {
+          setAuthModalOpen(false);
+          setAuthEmail('');
+          setAuthPassword('');
+          setAuthUsername('');
+          setAuthPhone('');
+          setAuthFeedback(null);
+        }, 1200);
+      } else {
+        setAuthFeedback({ type: 'error', message: res?.error || 'Failed to create account.' });
+      }
+    }
   };
 
   return (
@@ -441,6 +472,21 @@ export default function Navbar({ onOpenCart }) {
               </div>
             ) : (
               <>
+                {authFeedback && (
+                  <div
+                    style={{
+                      ...styles.feedbackBanner,
+                      background: authFeedback.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      borderColor: authFeedback.type === 'success' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+                      color: authFeedback.type === 'success' ? '#10b981' : '#ef4444'
+                    }}
+                    className="animate-fade-in"
+                  >
+                    {authFeedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                    <span>{authFeedback.message}</span>
+                  </div>
+                )}
+
                 <form key={authMode} onSubmit={handleAuthSubmit} style={styles.authForm} className="auth-form-animate">
                   {authMode === 'signup' && (
                     <>
@@ -758,6 +804,17 @@ const styles = {
     justifyContent: 'center',
     padding: '30px 0',
     width: '100%'
+  },
+  feedbackBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '10px 14px',
+    borderRadius: '10px',
+    border: '1px solid',
+    fontSize: '13px',
+    fontWeight: '600',
+    marginBottom: '8px'
   },
   modalHeader: {
     display: 'flex',

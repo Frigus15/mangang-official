@@ -150,25 +150,22 @@ export const ShopContextProvider = ({ children }) => {
     try {
       const mongoRes = await api.login(email, password);
       if (!mongoRes || !mongoRes.success || !mongoRes.user) {
-        alert(mongoRes?.error || 'Invalid email or password.');
         setAuthLoading(false);
-        return false;
+        return { success: false, error: mongoRes?.error || 'Invalid email or password.' };
       }
       if (mongoRes.user.isBlocked) {
-        alert('Your account has been blocked by administrator.');
         setAuthLoading(false);
-        return false;
+        return { success: false, error: 'Your account has been blocked by administrator.' };
       }
       setIsLoggedIn(true);
       setCurrentUser(mongoRes.user);
       localStorage.setItem('mangang_is_logged_in', 'true');
       localStorage.setItem('mangang_user', JSON.stringify(mongoRes.user));
       setAuthLoading(false);
-      return true;
+      return { success: true, user: mongoRes.user };
     } catch (err) {
-      alert('Connection error communicating with authentication server.');
       setAuthLoading(false);
-      return false;
+      return { success: false, error: 'Connection error communicating with authentication server.' };
     }
   };
 
@@ -177,20 +174,18 @@ export const ShopContextProvider = ({ children }) => {
     try {
       const mongoRes = await api.signup(username, email, password, phone);
       if (!mongoRes || !mongoRes.success || !mongoRes.user) {
-        alert(mongoRes?.error || 'Failed to create user account in MongoDB.');
         setAuthLoading(false);
-        return false;
+        return { success: false, error: mongoRes?.error || 'Failed to create user account.' };
       }
       setIsLoggedIn(true);
       setCurrentUser(mongoRes.user);
       localStorage.setItem('mangang_is_logged_in', 'true');
       localStorage.setItem('mangang_user', JSON.stringify(mongoRes.user));
       setAuthLoading(false);
-      return true;
+      return { success: true, user: mongoRes.user };
     } catch (err) {
-      alert('Connection error communicating with registration server.');
       setAuthLoading(false);
-      return false;
+      return { success: false, error: 'Connection error communicating with registration server.' };
     }
   };
 
