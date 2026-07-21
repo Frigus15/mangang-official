@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut, Eye, EyeOff } from 'lucide-react';
+import { ShoppingCart, Heart, Cpu, User, Shield, Menu, X, Home, Compass, Search, Package, History, LogIn, UserPlus, LogOut } from 'lucide-react';
 
 export default function Navbar({ onOpenCart }) {
   const { activePage, navigateTo, cart, wishlist, searchQuery, setSearchQuery, setActiveDashboardTab, activeDashboardTab, isLoggedIn, logout, login, signup, currentUser, authLoading } = useContext(ShopContext);
@@ -12,8 +12,6 @@ export default function Navbar({ onOpenCart }) {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
-  const [authPhone, setAuthPhone] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -59,101 +57,114 @@ export default function Navbar({ onOpenCart }) {
     if (authMode === 'login') {
       login(authEmail, authPassword);
     } else {
-      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword, authPhone);
+      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword);
     }
     setAuthModalOpen(false);
     setAuthEmail('');
     setAuthPassword('');
     setAuthUsername('');
-    setAuthPhone('');
   };
 
   return (
-    <nav style={styles.nav} className="glass-nav">
-      <div style={styles.navContainer} className="container">
-        
-        {/* Full-width Search Bar when expanded on mobile */}
+    <nav className="glass-nav" style={styles.nav}>
+      <div className="container" style={styles.container}>
         {searchExpanded ? (
-          <div style={styles.fullSearchWrapper} className="animate-fade-in">
+          <div className="animate-search-expand" style={styles.fullSearchWrapper}>
             <div style={styles.fullSearchInputContainer}>
               <Search size={18} style={{ color: 'var(--color-primary)' }} />
               <input
                 type="text"
-                placeholder="Search products, brands & skins..."
+                placeholder="Search products, brands or categories..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (activePage !== 'catalog') {
+                    navigateTo('catalog');
+                  }
+                }}
                 style={styles.fullSearchInput}
                 autoFocus
               />
-              <button 
-                onClick={() => setSearchExpanded(false)} 
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSearchExpanded(false);
+                }}
                 style={styles.closeSearchBtn}
                 title="Close Search"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
           </div>
         ) : (
           <>
             {/* Logo */}
-            <div style={styles.logoGroup} onClick={() => handleNavClick('home')}>
-              <div style={styles.logoIcon}>
-                <Cpu size={22} style={{ color: '#ffffff' }} />
-              </div>
-              <div style={styles.logoTextGroup}>
+            <div onClick={() => handleNavClick('home')} style={styles.logo}>
+              <img src="/logo.jpg" alt="Mangang Official Logo" style={styles.logoImg} />
+              <div style={styles.logoTextWrapper}>
                 <span style={styles.logoText}>MANGANG</span>
                 <span style={styles.logoSubtext}>OFFICIAL STORE</span>
               </div>
             </div>
 
             {/* Desktop Navigation Links */}
-            <div style={styles.navLinks}>
-              {filteredNavItems.map((item) => {
-                const isActive = activePage === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavClick(item.id)}
-                    style={{
-                      ...styles.navLink,
-                      color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
-                      fontWeight: isActive ? '700' : '500',
-                      borderBottom: isActive ? '2px solid var(--color-primary)' : '2px solid transparent'
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
+            <div className="desktop-only-links" style={styles.navLinks}>
+              <button
+                onClick={() => handleNavClick('home')}
+                style={{
+                  ...styles.link,
+                  color: activePage === 'home' ? 'var(--color-primary)' : 'var(--text-primary)',
+                  borderBottomColor: activePage === 'home' ? 'var(--color-primary)' : 'transparent'
+                }}
+              >
+                Home
+              </button>
+
+              <button
+                onClick={() => handleNavClick('catalog')}
+                style={{
+                  ...styles.link,
+                  color: activePage === 'catalog' ? 'var(--color-primary)' : 'var(--text-primary)',
+                  borderBottomColor: activePage === 'catalog' ? 'var(--color-primary)' : 'transparent'
+                }}
+              >
+                Explore Shop
+              </button>
+
+              {isLoggedIn && (
+                <button
+                  onClick={() => handleNavClick('dashboard')}
+                  style={{
+                    ...styles.link,
+                    color: activePage === 'dashboard' ? 'var(--color-primary)' : 'var(--text-primary)',
+                    borderBottomColor: activePage === 'dashboard' ? 'var(--color-primary)' : 'transparent'
+                  }}
+                >
+                  My Portal
+                </button>
+              )}
+
+              {isLoggedIn && currentUser?.role === 'admin' && (
+                <button
+                  onClick={() => handleNavClick('admin')}
+                  style={{
+                    ...styles.link,
+                    color: activePage === 'admin' ? 'var(--color-primary)' : 'var(--text-primary)',
+                    borderBottomColor: activePage === 'admin' ? 'var(--color-primary)' : 'transparent'
+                  }}
+                >
+                  Control Hub
+                </button>
+              )}
             </div>
 
-            {/* Global Search Input (Desktop) */}
-            <div style={styles.searchContainer} className="desktop-search">
-              <div style={styles.searchInputWrapper}>
-                <Search size={16} style={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="Search products, categories..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={styles.searchInput}
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} style={styles.clearSearchBtn}>
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Header Right Actions */}
-            <div style={styles.actionsGroup}>
-              {/* Mobile Search Trigger Icon */}
+            {/* Action Icons */}
+            <div style={styles.actions}>
+              {/* Search button */}
               <button
                 onClick={() => setSearchExpanded(true)}
                 style={styles.actionBtn}
-                className="mobile-search-trigger"
                 title="Search"
               >
                 <Search size={18} style={{ color: 'var(--text-primary)' }} />
@@ -202,7 +213,7 @@ export default function Navbar({ onOpenCart }) {
                 </button>
               )}
 
-              {/* Mobile Menu Toggle */}
+              {/* Side Menu Button — hidden on desktop, shown on mobile */}
               {activePage !== 'admin' && (
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -218,39 +229,35 @@ export default function Navbar({ onOpenCart }) {
         )}
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer — hidden in admin mode */}
       {activePage !== 'admin' && (
       <div 
         className={`mobile-drawer-overlay ${mobileMenuOpen ? 'active' : ''}`} 
         onClick={() => setMobileMenuOpen(false)}
       >
-        <div 
-          className="mobile-drawer-panel"
+        <div
+          className={`mobile-sidebar glass-panel ${mobileMenuOpen ? 'active' : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
+          {/* Sidebar Header */}
           <div style={styles.sidebarHeader}>
-            <div style={styles.logoGroup} onClick={() => handleNavClick('home')}>
-              <div style={styles.logoIcon}>
-                <Cpu size={20} style={{ color: '#ffffff' }} />
-              </div>
-              <div style={styles.logoTextGroup}>
+            <div style={styles.sidebarLogo}>
+              <img src="/logo.jpg" alt="Mangang Official Logo" style={styles.logoImg} />
+              <div style={styles.logoTextWrapper}>
                 <span style={styles.logoText}>MANGANG</span>
-                <span style={styles.logoSubtext}>OFFICIAL</span>
+                <span style={styles.logoSubtext}>OFFICIAL STORE</span>
               </div>
             </div>
-            <button 
-              onClick={() => setMobileMenuOpen(false)}
-              style={styles.closeBtn}
-            >
+            <button style={styles.closeBtn} onClick={() => setMobileMenuOpen(false)}>
               <X size={20} />
             </button>
           </div>
 
-          {/* Sidebar Menu Items */}
-          <div style={styles.sidebarNav}>
+          {/* Sidebar Navigation Links */}
+          <div style={styles.sidebarLinksContainer}>
             {isLoggedIn ? (
               <>
+                {/* Home */}
                 <button
                   onClick={() => handleNavClick('home')}
                   style={getSidebarLinkStyle('home')}
@@ -259,6 +266,7 @@ export default function Navbar({ onOpenCart }) {
                   <span>Home</span>
                 </button>
 
+                {/* Explore Shop */}
                 <button
                   onClick={() => handleNavClick('catalog')}
                   style={getSidebarLinkStyle('catalog')}
@@ -267,42 +275,50 @@ export default function Navbar({ onOpenCart }) {
                   <span>Explore Shop</span>
                 </button>
 
+                {/* My Orders */}
                 <button
-                  onClick={() => { handleNavClick('dashboard'); setActiveDashboardTab('orders'); }}
-                  style={getSidebarLinkStyle('dashboard', 'orders')}
+                  onClick={() => handleNavClick('orders')}
+                  style={getSidebarLinkStyle('orders')}
                 >
                   <Package size={16} />
                   <span>My Orders</span>
                 </button>
 
+                {/* Recent Transactions */}
                 <button
-                  onClick={() => { handleNavClick('dashboard'); setActiveDashboardTab('transactions'); }}
-                  style={getSidebarLinkStyle('dashboard', 'transactions')}
+                  onClick={() => handleNavClick('transactions')}
+                  style={getSidebarLinkStyle('transactions')}
                 >
                   <History size={16} />
-                  <span>Payment History</span>
+                  <span>Recent Transactions</span>
                 </button>
 
+                {/* My Account */}
+                <button
+                  onClick={() => handleNavClick('account')}
+                  style={getSidebarLinkStyle('dashboard')}
+                >
+                  <User size={16} />
+                  <span>My Account</span>
+                </button>
+
+                {/* Control Hub */}
                 {currentUser?.role === 'admin' && (
                   <button
                     onClick={() => handleNavClick('admin')}
-                    style={{
-                      ...getSidebarLinkStyle('admin'),
-                      marginTop: '10px',
-                      border: '1px solid var(--border-glass)'
-                    }}
+                    style={getSidebarLinkStyle('admin')}
                   >
-                    <Shield size={16} style={{ color: 'var(--color-primary)' }} />
-                    <span style={{ fontWeight: '700' }}>Control Hub (Admin)</span>
+                    <Shield size={16} />
+                    <span>Admin</span>
                   </button>
                 )}
 
+                {/* Logout */}
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
                   style={{
                     ...styles.sidebarLink,
-                    color: 'var(--color-danger)',
-                    marginTop: '15px'
+                    color: 'var(--color-danger)'
                   }}
                 >
                   <LogOut size={16} />
@@ -311,6 +327,7 @@ export default function Navbar({ onOpenCart }) {
               </>
             ) : (
               <>
+                {/* Home */}
                 <button
                   onClick={() => handleNavClick('home')}
                   style={getSidebarLinkStyle('home')}
@@ -319,14 +336,7 @@ export default function Navbar({ onOpenCart }) {
                   <span>Home</span>
                 </button>
 
-                <button
-                  onClick={() => handleNavClick('catalog')}
-                  style={getSidebarLinkStyle('catalog')}
-                >
-                  <Compass size={16} />
-                  <span>Explore Shop</span>
-                </button>
-
+                {/* Login */}
                 <button
                   onClick={() => {
                     setAuthMode('login');
@@ -339,6 +349,7 @@ export default function Navbar({ onOpenCart }) {
                   <span>Login</span>
                 </button>
 
+                {/* Sign Up */}
                 <button
                   onClick={() => {
                     setAuthMode('signup');
@@ -354,9 +365,9 @@ export default function Navbar({ onOpenCart }) {
             )}
           </div>
 
-          {/* Sidebar Footer */}
+          {/* Sidebar Footer info */}
           <div style={styles.sidebarFooter}>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>MANGANG STORE V1.0</span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>MANGANG TELEMETRY V1.0</span>
           </div>
         </div>
       </div>
@@ -365,139 +376,89 @@ export default function Navbar({ onOpenCart }) {
       {/* Auth Modal Overlay */}
       {authModalOpen && (
         <div style={styles.modalOverlay} onClick={() => !authLoading && setAuthModalOpen(false)}>
-          <div style={styles.modalContent} className="glass-panel animate-dropdown" onClick={(e) => e.stopPropagation()}>
+          <div style={styles.modalContent} className="glass-panel" onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Shield size={20} color="var(--color-primary)" />
-                <h3 style={styles.modalTitle}>
-                  {authMode === 'login' ? 'Account Login' : 'Create Account'}
-                </h3>
-              </div>
+              <h3 style={styles.modalTitle}>
+                {authMode === 'login' ? 'Log In to Mangang' : 'Create Your Account'}
+              </h3>
               {!authLoading && (
                 <button style={styles.closeBtn} onClick={() => setAuthModalOpen(false)}>
                   <X size={18} />
                 </button>
               )}
             </div>
-
-            {/* Pill Switcher */}
-            <div style={styles.pillSwitcher}>
-              <button
-                type="button"
-                style={{
-                  ...styles.pillBtn,
-                  background: authMode === 'login' ? 'var(--color-primary)' : 'transparent',
-                  color: authMode === 'login' ? '#ffffff' : 'var(--text-secondary)',
-                  fontWeight: authMode === 'login' ? '700' : '500'
-                }}
-                onClick={() => setAuthMode('login')}
-              >
-                Log In
-              </button>
-              <button
-                type="button"
-                style={{
-                  ...styles.pillBtn,
-                  background: authMode === 'signup' ? 'var(--color-primary)' : 'transparent',
-                  color: authMode === 'signup' ? '#ffffff' : 'var(--text-secondary)',
-                  fontWeight: authMode === 'signup' ? '700' : '500'
-                }}
-                onClick={() => setAuthMode('signup')}
-              >
-                Sign Up
-              </button>
-            </div>
             
             {authLoading ? (
               <div style={styles.modalLoading}>
                 <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
                 <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '500', textAlign: 'center' }}>
-                  {authMode === 'login' ? 'Authenticating via MongoDB...' : 'Creating MongoDB User Account...'}
+                  {authMode === 'login' ? 'Logging in, please wait...' : 'Creating account, please wait...'}
                 </p>
               </div>
             ) : (
               <>
                 <form onSubmit={handleAuthSubmit} style={styles.authForm}>
                   {authMode === 'signup' && (
-                    <>
-                      <div className="form-group">
-                        <span className="form-label">Full Name</span>
-                        <div style={styles.inputIconWrapper}>
-                          <User size={16} style={styles.inputIcon} />
-                          <input
-                            type="text"
-                            required
-                            placeholder="John Doe"
-                            value={authUsername}
-                            onChange={(e) => setAuthUsername(e.target.value)}
-                            className="form-input"
-                            style={styles.authInput}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <span className="form-label">Phone Number</span>
-                        <div style={styles.inputIconWrapper}>
-                          <User size={16} style={styles.inputIcon} />
-                          <input
-                            type="tel"
-                            required
-                            placeholder="+91 9876543210"
-                            value={authPhone}
-                            onChange={(e) => setAuthPhone(e.target.value)}
-                            className="form-input"
-                            style={styles.authInput}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="form-group">
-                    <span className="form-label">Email Address</span>
-                    <div style={styles.inputIconWrapper}>
-                      <User size={16} style={styles.inputIcon} />
+                    <div className="form-group">
+                      <span className="form-label">Full Name</span>
                       <input
-                        type="email"
+                        type="text"
                         required
-                        placeholder="your-email@domain.com"
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
+                        placeholder="e.g. John Doe"
+                        value={authUsername}
+                        onChange={(e) => setAuthUsername(e.target.value)}
                         className="form-input"
                         style={styles.authInput}
                       />
                     </div>
+                  )}
+                  <div className="form-group">
+                    <span className="form-label">Email Address</span>
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@example.com"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      className="form-input"
+                      style={styles.authInput}
+                    />
                   </div>
-
                   <div className="form-group">
                     <span className="form-label">Password</span>
-                    <div style={styles.inputIconWrapper}>
-                      <Shield size={16} style={styles.inputIcon} />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        required
-                        placeholder="••••••••"
-                        value={authPassword}
-                        onChange={(e) => setAuthPassword(e.target.value)}
-                        className="form-input"
-                        style={{ ...styles.authInput, paddingRight: '38px' }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        style={styles.eyeToggleBtn}
-                        title={showPassword ? "Hide Password" : "Show Password"}
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      className="form-input"
+                      style={styles.authInput}
+                    />
                   </div>
                   
                   <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
-                    <span>{authMode === 'login' ? 'Authorize & Log In' : 'Register Account'}</span>
+                    {authMode === 'login' ? 'Log In' : 'Sign Up'}
                   </button>
                 </form>
+
+                <div style={styles.modalFooter}>
+                  {authMode === 'login' ? (
+                    <span>
+                      Don't have an account?{' '}
+                      <button style={styles.switchBtn} onClick={() => setAuthMode('signup')}>
+                        Sign Up
+                      </button>
+                    </span>
+                  ) : (
+                    <span>
+                      Already have an account?{' '}
+                      <button style={styles.switchBtn} onClick={() => setAuthMode('login')}>
+                        Log In
+                      </button>
+                    </span>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -520,117 +481,98 @@ const styles = {
     display: 'flex',
     alignItems: 'center'
   },
-  navContainer: {
+  container: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%',
-    height: '100%'
+    alignItems: 'center',
+    width: '100%'
   },
-  logoGroup: {
+  logo: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    cursor: 'pointer'
+    gap: '10px',
+    cursor: 'pointer',
+    userSelect: 'none'
   },
-  logoIcon: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '10px',
-    background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)'
+  logoImg: {
+    height: '36px',
+    width: 'auto',
+    borderRadius: '4px',
+    border: '1px solid rgba(255,255,255,0.08)'
   },
-  logoTextGroup: {
+  logoTextWrapper: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    textAlign: 'left',
+    gap: '0px'
   },
   logoText: {
     fontFamily: 'var(--font-heading)',
-    fontSize: '18px',
-    fontWeight: '800',
+    fontWeight: 800,
+    fontSize: '17px',
     letterSpacing: '0.05em',
-    color: '#ffffff',
-    lineHeight: '1.1'
+    color: 'var(--text-primary)',
+    lineHeight: '1'
   },
   logoSubtext: {
-    fontSize: '9px',
-    fontWeight: '700',
-    letterSpacing: '0.15em',
+    fontFamily: 'var(--font-heading)',
+    fontWeight: 700,
+    fontSize: '8px',
+    letterSpacing: '0.06em',
     color: 'var(--color-primary)',
     lineHeight: '1'
   },
   navLinks: {
     display: 'flex',
-    gap: '24px',
+    gap: '20px',
+    height: '100%',
     alignItems: 'center'
   },
-  navLink: {
+  link: {
     background: 'none',
     border: 'none',
+    borderBottom: '2px solid transparent',
+    padding: '4px 0',
+    fontFamily: 'var(--font-heading)',
+    fontWeight: 600,
     fontSize: '14px',
     cursor: 'pointer',
-    padding: '8px 4px',
-    transition: 'all 0.2s ease'
-  },
-  searchContainer: {
-    flex: 1,
-    maxWidth: '350px',
-    margin: '0 20px',
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  searchInputWrapper: {
-    position: 'relative',
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: '12px',
-    color: 'var(--text-secondary)',
-    pointerEvents: 'none'
-  },
-  searchInput: {
-    width: '100%',
-    padding: '8px 32px 8px 36px',
-    fontSize: '13px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid var(--border-glass)',
-    borderRadius: '20px',
-    color: '#ffffff',
+    transition: 'all 0.3s ease',
     outline: 'none'
   },
-  clearSearchBtn: {
-    position: 'absolute',
-    right: '10px',
-    background: 'none',
-    border: 'none',
-    color: 'var(--text-secondary)',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  actionsGroup: {
+  actions: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px'
   },
   actionBtn: {
     position: 'relative',
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
-    background: 'rgba(255, 255, 255, 0.04)',
+    background: 'rgba(0,0,0,0.03)',
     border: '1px solid var(--border-glass)',
+    width: '34px',
+    height: '34px',
+    borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
     transition: 'all 0.2s ease'
+  },
+  badgeCyan: {
+    position: 'absolute',
+    top: '-4px',
+    right: '-4px',
+    background: 'var(--color-primary)',
+    color: '#ffffff',
+    fontSize: '10px',
+    fontWeight: '800',
+    borderRadius: '50%',
+    width: '18px',
+    height: '18px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '1px solid var(--bg-dark-base)'
   },
   badgeDanger: {
     position: 'absolute',
@@ -640,71 +582,82 @@ const styles = {
     color: '#fff',
     fontSize: '10px',
     fontWeight: '800',
-    borderRadius: '10px',
-    padding: '2px 6px',
-    lineHeight: '1'
-  },
-  badgeCyan: {
-    position: 'absolute',
-    top: '-4px',
-    right: '-4px',
-    background: 'var(--color-primary)',
-    color: '#fff',
-    fontSize: '10px',
-    fontWeight: '800',
-    borderRadius: '10px',
-    padding: '2px 6px',
-    lineHeight: '1'
-  },
-  mobileMenuToggle: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid var(--border-glass)',
-    color: '#ffffff',
-    display: 'none',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer'
-  },
-  sidebarHeader: {
+    borderRadius: '50%',
+    width: '18px',
+    height: '18px',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
+    border: '1px solid var(--bg-dark-base)'
+  },
+  iconCyan: {
+    color: 'var(--color-primary)'
+  },
+  mobileMenuToggle: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-primary)',
+    cursor: 'pointer',
+    display: 'none',
+    marginLeft: '8px'
+  },
+
+  sidebarHeader: {
+    display: 'flex',
     justifyContent: 'space-between',
-    paddingBottom: '20px',
-    borderBottom: '1px solid var(--border-glass)'
+    alignItems: 'center',
+    borderBottom: '1px solid var(--border-glass)',
+    paddingBottom: '15px',
+    marginBottom: '25px'
+  },
+  sidebarLogo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
   },
   closeBtn: {
     background: 'none',
     border: 'none',
     color: 'var(--text-secondary)',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '4px'
   },
-  sidebarNav: {
+  sidebarLinksContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    marginTop: '20px'
+    gap: '12px',
+    flex: 1
   },
   sidebarLink: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
     padding: '12px 16px',
-    borderRadius: '12px',
+    background: 'transparent',
     border: '1px solid transparent',
-    fontSize: '14px',
-    background: 'none',
+    borderRadius: '8px',
     cursor: 'pointer',
-    width: '100%',
-    textAlign: 'left'
+    textAlign: 'left',
+    fontFamily: 'var(--font-heading)',
+    fontWeight: 600,
+    fontSize: '15px',
+    color: 'var(--text-primary)',
+    transition: 'all 0.2s ease'
   },
   sidebarFooter: {
     borderTop: '1px solid var(--border-glass)',
     paddingTop: '15px',
     marginTop: 'auto',
     textAlign: 'center'
+  },
+  searchContainer: {
+    flex: 1,
+    maxWidth: '400px',
+    margin: '0 30px',
+    display: 'flex',
+    justifyContent: 'center'
   },
   modalOverlay: {
     position: 'fixed',
@@ -754,71 +707,37 @@ const styles = {
     fontWeight: '800',
     color: 'var(--text-primary)'
   },
-  pillSwitcher: {
-    display: 'flex',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid var(--border-glass)',
-    borderRadius: '12px',
-    padding: '4px',
-    gap: '4px'
-  },
-  pillBtn: {
-    flex: 1,
-    padding: '8px 12px',
-    borderRadius: '8px',
-    border: 'none',
-    fontSize: '13px',
-    cursor: 'pointer',
-    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-  },
   authForm: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '14px'
-  },
-  inputIconWrapper: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  inputIcon: {
-    position: 'absolute',
-    left: '12px',
-    color: 'var(--color-primary)',
-    pointerEvents: 'none'
-  },
-  eyeToggleBtn: {
-    position: 'absolute',
-    right: '10px',
-    background: 'none',
-    border: 'none',
-    color: 'var(--text-secondary)',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '4px',
-    transition: 'color 0.2s ease'
+    gap: '15px'
   },
   authInput: {
-    padding: '10px 14px 10px 38px',
-    fontSize: '13.5px',
-    background: 'rgba(0,0,0,0.25)',
+    padding: '10px 14px',
+    fontSize: '14px',
+    background: 'rgba(0,0,0,0.2)',
     borderColor: 'var(--border-glass)',
-    color: '#fff',
-    width: '100%'
+    color: '#fff'
   },
   authSubmitBtn: {
     padding: '12px',
     fontSize: '14px',
     width: '100%',
-    marginTop: '6px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    borderRadius: '10px',
-    fontWeight: '700'
+    marginTop: '5px'
+  },
+  modalFooter: {
+    textAlign: 'center',
+    fontSize: '13px',
+    color: 'var(--text-secondary)'
+  },
+  switchBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--color-primary)',
+    fontWeight: '700',
+    cursor: 'pointer',
+    padding: 0,
+    textDecoration: 'underline'
   },
   fullSearchWrapper: {
     width: '100%',
@@ -855,6 +774,23 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '2px'
+    padding: '2px',
+    transition: 'color 0.2s'
   }
 };
+
+// Add CSS rules for hiding items on mobile using CSS inject or style injection
+if (typeof document !== 'undefined') {
+  const styleEl = document.createElement('style');
+  styleEl.innerHTML = `
+    @media (max-width: 768px) {
+      .glass-nav button[style*="borderBottomColor"] {
+        display: none !important;
+      }
+      .glass-nav button[style*="mobileMenuToggle"] {
+        display: flex !important;
+      }
+    }
+  `;
+  document.head.appendChild(styleEl);
+}
