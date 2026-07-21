@@ -18,6 +18,7 @@ import AdminPortal from './pages/AdminPortal';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
+import NotFound from './pages/NotFound';
 
 export default function App() {
   const { activePage, isLoggedIn, currentUser, pageLoading } = useContext(ShopContext);
@@ -48,8 +49,11 @@ export default function App() {
         return <PrivacyPolicy />;
       case 'refund-policy':
         return <RefundPolicy />;
+      case 'not-found':
+      case '404':
+        return <NotFound />;
       default:
-        return <Home />;
+        return <NotFound />;
     }
   };
 
