@@ -99,9 +99,7 @@ export const ShopContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => {
     const local = localStorage.getItem('mangang_user');
     if (!local) return null;
-    const user = JSON.parse(local);
-    if (user.email === 'admin@gmail.com' || user.email === 'admin@mangang.com') return { ...user, role: 'admin' };
-    return user;
+    return JSON.parse(local);
   });
 
   // ── Sync with MongoDB Express Backend ──────────────────────────────────
@@ -175,10 +173,10 @@ export const ShopContextProvider = ({ children }) => {
     }
   };
 
-  const signup = async (username, email, password) => {
+  const signup = async (username, email, password, phone) => {
     setAuthLoading(true);
     try {
-      const mongoRes = await api.signup(username, email, password);
+      const mongoRes = await api.signup(username, email, password, phone);
       if (!mongoRes || !mongoRes.success || !mongoRes.user) {
         alert(mongoRes?.error || 'Failed to create user account in MongoDB.');
         setAuthLoading(false);

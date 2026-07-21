@@ -25,12 +25,12 @@ export const api = {
     }
   },
 
-  signup: async (username, email, password) => {
+  signup: async (username, email, password, phone) => {
     try {
       const res = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email, password, phone })
       });
       return await res.json();
     } catch (err) {

@@ -20,30 +20,15 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Connect MongoDB
 connectDB();
 
-// ── ENSURE ADMIN ACCOUNT & CLEAN DUMMY DATA ────────────────────────────────
+// ── ENSURE CLEAN DATABASE ───────────────────────────────────────────────────
 const initializeCleanDB = async () => {
   try {
-    // 1. Clear dummy products, categories, banners if they match dummy items
     const dummyTitleExists = await Product.findOne({ title: 'Mangang Vision Pro VR' });
     if (dummyTitleExists) {
       await Product.deleteMany({});
       await Category.deleteMany({});
       await Banner.deleteMany({});
       console.log('[DB Clean] Removed all dummy products, categories, and banners from MongoDB.');
-    }
-
-    // 2. Ensure default Admin User exists
-    const adminExists = await User.findOne({ email: 'admin@gmail.com' });
-    if (!adminExists) {
-      await User.create({
-        username: 'Admin Manager',
-        name: 'Admin Manager',
-        email: 'admin@gmail.com',
-        password: 'admin',
-        role: 'admin',
-        isBlocked: false
-      });
-      console.log('[Auth] Admin account admin@gmail.com initialized.');
     }
   } catch (err) {
     console.error('[DB Setup Error]', err.message);
@@ -66,7 +51,7 @@ app.post('/api/admin/clean-db', async (req, res) => {
     await Category.deleteMany({});
     await Banner.deleteMany({});
     await Order.deleteMany({});
-    await User.deleteMany({ email: { $ne: 'admin@gmail.com' } });
+    await User.deleteMany({ role: { $ne: 'admin' } });
     res.json({ success: true, message: 'All dummy data successfully cleared from MongoDB.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -89,12 +74,12 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, phone } = req.body;
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ error: 'Email already registered.' });
     }
-    const newUser = await User.create({ username, name: username, email, password });
+    const newUser = await User.create({ username, name: username, email, password, phone: phone || '' });
     res.json({ success: true, user: newUser });
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -12,6 +12,7 @@ export default function Navbar({ onOpenCart }) {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -57,12 +58,13 @@ export default function Navbar({ onOpenCart }) {
     if (authMode === 'login') {
       login(authEmail, authPassword);
     } else {
-      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword);
+      signup(authUsername || authEmail.split('@')[0], authEmail, authPassword, authPhone);
     }
     setAuthModalOpen(false);
     setAuthEmail('');
     setAuthPassword('');
     setAuthUsername('');
+    setAuthPhone('');
   };
 
   return (
@@ -430,21 +432,39 @@ export default function Navbar({ onOpenCart }) {
               <>
                 <form onSubmit={handleAuthSubmit} style={styles.authForm}>
                   {authMode === 'signup' && (
-                    <div className="form-group">
-                      <span className="form-label">Full Name</span>
-                      <div style={styles.inputIconWrapper}>
-                        <User size={16} style={styles.inputIcon} />
-                        <input
-                          type="text"
-                          required
-                          placeholder="John Doe"
-                          value={authUsername}
-                          onChange={(e) => setAuthUsername(e.target.value)}
-                          className="form-input"
-                          style={styles.authInput}
-                        />
+                    <>
+                      <div className="form-group">
+                        <span className="form-label">Full Name</span>
+                        <div style={styles.inputIconWrapper}>
+                          <User size={16} style={styles.inputIcon} />
+                          <input
+                            type="text"
+                            required
+                            placeholder="John Doe"
+                            value={authUsername}
+                            onChange={(e) => setAuthUsername(e.target.value)}
+                            className="form-input"
+                            style={styles.authInput}
+                          />
+                        </div>
                       </div>
-                    </div>
+
+                      <div className="form-group">
+                        <span className="form-label">Phone Number</span>
+                        <div style={styles.inputIconWrapper}>
+                          <User size={16} style={styles.inputIcon} />
+                          <input
+                            type="tel"
+                            required
+                            placeholder="+91 9876543210"
+                            value={authPhone}
+                            onChange={(e) => setAuthPhone(e.target.value)}
+                            className="form-input"
+                            style={styles.authInput}
+                          />
+                        </div>
+                      </div>
+                    </>
                   )}
 
                   <div className="form-group">
@@ -454,7 +474,7 @@ export default function Navbar({ onOpenCart }) {
                       <input
                         type="email"
                         required
-                        placeholder="admin@gmail.com"
+                        placeholder="your-email@domain.com"
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                         className="form-input"
@@ -483,12 +503,6 @@ export default function Navbar({ onOpenCart }) {
                     <span>{authMode === 'login' ? 'Authorize & Log In' : 'Register Account'}</span>
                   </button>
                 </form>
-
-                <div style={styles.mongoBadgeRow}>
-                  <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: '600' }}>
-                    ⚡ Secured & Verified via MongoDB Cloud
-                  </span>
-                </div>
               </>
             )}
           </div>
