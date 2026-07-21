@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
 // Models
+const User = require('./models/User');
 const Product = require('./models/Product');
 const Category = require('./models/Category');
 const Order = require('./models/Order');
@@ -51,6 +52,74 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Mangang MongoDB API Server Online', timestamp: new Date() });
 });
 
+// ── AUTH / USER ROUTES ──
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user || user.password !== password) {
+      return res.status(400).json({ error: 'Invalid email or password.' });
+    }
+    if (user.isBlocked) {
+      return res.status(403).json({ error: 'Account blocked by admin.' });
+    }
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Server login error' });
+  }
+});
+
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { username, email, password, phone } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const exists = await User.findOne({ email: cleanEmail });
+    if (exists) {
+      return res.status(400).json({ error: 'This email is already registered.' });
+    }
+    const finalUsername = (username && username.trim()) || cleanEmail.split('@')[0];
+    const newUser = await User.create({
+      username: finalUsername,
+      name: finalUsername,
+      email: cleanEmail,
+      password: password,
+      phone: phone || ''
+    });
+    res.json({ success: true, user: newUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Server signup error' });
+  }
+});
+
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/users/block', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin wipe database route
 app.post('/api/admin/clean-db', async (req, res) => {
   try {
@@ -58,6 +127,7 @@ app.post('/api/admin/clean-db', async (req, res) => {
     await Category.deleteMany({});
     await Banner.deleteMany({});
     await Order.deleteMany({});
+    await User.deleteMany({ role: { $ne: 'admin' } });
     res.json({ success: true, message: 'All store data successfully cleared from MongoDB.' });
   } catch (err) {
     res.status(500).json({ error: err.message });

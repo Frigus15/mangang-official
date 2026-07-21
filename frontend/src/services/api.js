@@ -20,6 +20,55 @@ export const api = {
     }
   },
 
+  // Auth & User API
+  login: async (email, password) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      return await safeJsonResponse(res);
+    } catch (err) {
+      return { success: false, error: err.message || 'Authentication server unreachable.' };
+    }
+  },
+
+  signup: async (username, email, password, phone) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, phone })
+      });
+      return await safeJsonResponse(res);
+    } catch (err) {
+      return { success: false, error: err.message || 'Registration server unreachable.' };
+    }
+  },
+
+  getUsers: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users`);
+      return await safeJsonResponse(res);
+    } catch (err) {
+      return null;
+    }
+  },
+
+  toggleBlockUser: async (email) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/block`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      return await safeJsonResponse(res);
+    } catch (err) {
+      return null;
+    }
+  },
+
   // Products
   getProducts: async () => {
     try {

@@ -20,7 +20,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 
 export default function App() {
-  const { activePage, pageLoading } = useContext(ShopContext);
+  const { activePage, isLoggedIn, currentUser, pageLoading } = useContext(ShopContext);
   const [cartOpen, setCartOpen] = useState(false);
 
   // Page Switcher
@@ -41,7 +41,7 @@ export default function App() {
       case 'transactions':
         return <Transactions />;
       case 'admin':
-        return <AdminPortal />;
+        return isLoggedIn && currentUser?.role === 'admin' ? <AdminPortal /> : <Home />;
       case 'terms':
         return <TermsAndConditions />;
       case 'privacy-policy':
