@@ -67,7 +67,7 @@ export default function CartDrawer({ isOpen, onClose }) {
             </div>
           ) : (
             cart.map((item) => (
-              <div key={item.cartId} style={styles.cartItem}>
+              <div key={item.cartId} style={styles.cartItem} className="animate-fade-in">
                 <img src={item.product.image} alt={item.product.title} style={styles.itemImage} />
                 <div style={styles.itemInfo}>
                   <div style={styles.itemTitleRow}>
@@ -75,8 +75,9 @@ export default function CartDrawer({ isOpen, onClose }) {
                     <button
                       style={styles.trashBtn}
                       onClick={() => removeFromCart(item.cartId)}
+                      title="Remove item"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={15} />
                     </button>
                   </div>
                   
@@ -120,7 +121,7 @@ export default function CartDrawer({ isOpen, onClose }) {
             {/* Promo Code Form */}
             <form onSubmit={handleApplyPromo} style={styles.promoForm}>
               <div style={styles.promoInputWrapper}>
-                <Tag size={16} style={styles.promoIcon} />
+                <Tag size={15} style={styles.promoIcon} />
                 <input
                   type="text"
                   placeholder="Promo Code (MANGANG20)"
@@ -176,7 +177,7 @@ export default function CartDrawer({ isOpen, onClose }) {
             <button
               onClick={handleCheckoutClick}
               className="btn btn-primary"
-              style={{ width: '100%', marginTop: '15px' }}
+              style={{ width: '100%', marginTop: '12px', padding: '12px', fontSize: '14px', borderRadius: '10px' }}
             >
               Proceed to Checkout
             </button>
@@ -194,16 +195,15 @@ const styles = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    background: 'rgba(3, 5, 10, 0.7)',
-    backdropFilter: 'blur(8px)',
+    background: 'rgba(3, 5, 10, 0.75)',
+    backdropFilter: 'blur(10px)',
     zIndex: 2000,
     display: 'flex',
-    justifyContent: 'flex-end',
-    animation: 'fadeIn 0.2s ease-out'
+    justifyContent: 'flex-end'
   },
   drawer: {
     width: '100%',
-    maxWidth: '460px',
+    maxWidth: '440px',
     height: '100%',
     borderRadius: '0',
     borderTop: 'none',
@@ -212,19 +212,23 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    background: 'rgba(11, 15, 25, 0.96)',
+    backdropFilter: 'blur(25px)',
+    borderLeft: '1px solid var(--border-glass)',
+    boxShadow: '-10px 0 40px rgba(0,0,0,0.6)',
     overflow: 'hidden'
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '24px',
+    padding: '18px 20px',
     borderBottom: '1px solid var(--border-glass)'
   },
   title: {
-    fontSize: '20px',
-    fontWeight: '700'
+    fontSize: '18px',
+    fontWeight: '800',
+    color: 'var(--text-primary)'
   },
   closeBtn: {
     background: 'none',
@@ -239,10 +243,10 @@ const styles = {
   itemsContainer: {
     flex: 1,
     overflowY: 'auto',
-    padding: '24px',
+    padding: '16px 20px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px'
+    gap: '12px'
   },
   emptyCart: {
     display: 'flex',
@@ -253,19 +257,19 @@ const styles = {
   },
   cartItem: {
     display: 'flex',
-    gap: '16px',
-    background: '#ffffff',
+    gap: '14px',
+    background: 'rgba(17, 24, 39, 0.7)',
     border: '1px solid var(--border-glass)',
     borderRadius: '12px',
     padding: '12px',
-    transition: 'border-color 0.2s'
+    transition: 'all 0.2s ease'
   },
   itemImage: {
-    width: '80px',
-    height: '80px',
+    width: '72px',
+    height: '72px',
     borderRadius: '8px',
     objectFit: 'contain',
-    padding: '8px',
+    padding: '4px',
     boxSizing: 'border-box',
     background: 'transparent'
   },
@@ -281,13 +285,13 @@ const styles = {
     alignItems: 'flex-start'
   },
   itemTitle: {
-    fontSize: '15px',
-    fontWeight: '600',
+    fontSize: '14.5px',
+    fontWeight: '700',
     color: 'var(--text-primary)',
     textAlign: 'left'
   },
   itemOptionsText: {
-    fontSize: '12px',
+    fontSize: '11.5px',
     color: 'var(--text-secondary)',
     textAlign: 'left',
     marginTop: '2px'
@@ -295,21 +299,22 @@ const styles = {
   trashBtn: {
     background: 'none',
     border: 'none',
-    color: 'var(--text-muted)',
+    color: 'var(--color-danger)',
     cursor: 'pointer',
     padding: '2px',
-    transition: 'color 0.2s'
+    transition: 'opacity 0.2s',
+    opacity: 0.8
   },
   qtyRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: '10px'
+    marginTop: '8px'
   },
   qtyControls: {
     display: 'flex',
     alignItems: 'center',
-    background: 'rgba(0,0,0,0.03)',
+    background: 'rgba(0,0,0,0.3)',
     border: '1px solid var(--border-glass)',
     borderRadius: '6px',
     padding: '2px'
@@ -318,33 +323,35 @@ const styles = {
     background: 'none',
     border: 'none',
     color: 'var(--text-primary)',
-    width: '24px',
-    height: '24px',
+    width: '22px',
+    height: '22px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer'
   },
   qtyValue: {
-    fontSize: '13px',
-    fontWeight: '600',
-    minWidth: '24px',
-    textAlign: 'center'
+    fontSize: '12.5px',
+    fontWeight: '700',
+    minWidth: '22px',
+    textAlign: 'center',
+    color: '#ffffff'
   },
   itemPrice: {
     fontSize: '15px',
-    fontWeight: '700',
+    fontWeight: '800',
     color: 'var(--color-primary)'
   },
   footer: {
-    padding: '24px',
+    padding: '16px 20px',
     borderTop: '1px solid var(--border-glass)',
-    background: '#ffffff'
+    background: 'rgba(11, 15, 25, 0.96)',
+    backdropFilter: 'blur(20px)'
   },
   promoForm: {
     display: 'flex',
-    gap: '10px',
-    marginBottom: '8px'
+    gap: '8px',
+    marginBottom: '6px'
   },
   promoInputWrapper: {
     position: 'relative',
@@ -355,33 +362,34 @@ const styles = {
     left: '12px',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: 'var(--text-muted)'
+    color: 'var(--color-primary)'
   },
   promoInput: {
     width: '100%',
-    padding: '10px 12px 10px 36px',
-    background: '#ffffff',
+    padding: '8px 12px 8px 36px',
+    background: 'rgba(0, 0, 0, 0.3)',
     border: '1px solid var(--border-glass)',
-    borderRadius: '6px',
-    color: 'var(--text-primary)',
-    fontSize: '13px'
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '12.5px'
   },
   promoBtn: {
-    padding: '10px 16px',
-    fontSize: '13px'
+    padding: '8px 14px',
+    fontSize: '12.5px',
+    borderRadius: '8px'
   },
   breakdown: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    marginTop: '15px',
+    gap: '6px',
+    marginTop: '10px',
     borderTop: '1px dashed var(--border-glass)',
-    paddingTop: '15px'
+    paddingTop: '10px'
   },
   priceRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    fontSize: '13px',
+    fontSize: '12.5px',
     color: 'var(--text-secondary)'
   },
   totalRow: {
@@ -389,15 +397,16 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTop: '1px solid var(--border-glass)',
-    paddingTop: '10px',
-    marginTop: '5px',
+    paddingTop: '8px',
+    marginTop: '4px',
     fontWeight: '700',
-    fontSize: '16px',
+    fontSize: '15px',
     color: 'var(--text-primary)'
   },
   totalVal: {
     color: 'var(--color-primary)',
-    fontSize: '20px',
+    fontSize: '18px',
+    fontWeight: '800',
     fontFamily: 'var(--font-heading)'
   }
 };

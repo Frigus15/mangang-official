@@ -967,18 +967,24 @@ const styles = {
   }
 };
 
-// Add CSS rules for hiding items on mobile using CSS inject or style injection
+// Add CSS rules for mobile navigation layout
 if (typeof document !== 'undefined') {
   const styleEl = document.createElement('style');
+  styleEl.id = 'navbar-mobile-responsive-styles';
   styleEl.innerHTML = `
     @media (max-width: 768px) {
-      .glass-nav button[style*="borderBottomColor"] {
+      .desktop-only-links {
         display: none !important;
       }
-      .glass-nav button[style*="mobileMenuToggle"] {
+      .desktop-logout-trigger {
+        display: none !important;
+      }
+      .mobile-menu-trigger {
         display: flex !important;
       }
     }
   `;
-  document.head.appendChild(styleEl);
+  if (!document.getElementById('navbar-mobile-responsive-styles')) {
+    document.head.appendChild(styleEl);
+  }
 }

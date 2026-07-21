@@ -35,6 +35,24 @@ export default function ProductCard({ product }) {
     addToCart(product, 1, defaultOptions);
   };
 
+  const handleBuyNow = (e) => {
+    e.stopPropagation();
+    if (!hasStock) return;
+    
+    const defaultOptions = {};
+    if (product.options) {
+      if (product.options.colors && product.options.colors.length > 0) {
+        defaultOptions.color = product.options.colors[0];
+      }
+      if (product.options.storage && product.options.storage.length > 0) {
+        defaultOptions.storage = product.options.storage[0];
+      }
+    }
+
+    addToCart(product, 1, defaultOptions);
+    navigateTo('checkout');
+  };
+
   const originalPrice = Math.round(product.price * 1.3);
   const profitPercent = 30; // 30% profit markup
   const deliveryTime = "Delivered in 2-3 Days";
@@ -42,7 +60,7 @@ export default function ProductCard({ product }) {
   return (
     <div
       onClick={handleCardClick}
-      className="glass-panel"
+      className="glass-panel glass-panel-hover"
       style={styles.card}
     >
       {/* Wishlist button */}
@@ -50,9 +68,9 @@ export default function ProductCard({ product }) {
         onClick={handleWishlistToggle}
         style={{
           ...styles.wishlistBtn,
-          background: isWishlisted ? 'rgba(239, 68, 68, 0.1)' : '#ffffff',
+          background: isWishlisted ? 'rgba(239, 68, 68, 0.1)' : 'rgba(11, 15, 25, 0.6)',
           borderColor: isWishlisted ? 'var(--color-danger)' : 'var(--border-glass)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}
       >
         <Heart
@@ -96,13 +114,23 @@ export default function ProductCard({ product }) {
             disabled={!hasStock}
             style={{
               ...styles.quickAddBtn,
-              background: hasStock ? 'var(--color-primary)' : 'rgba(0,0,0,0.05)',
-              color: hasStock ? '#ffffff' : 'var(--text-muted)',
+              background: hasStock ? 'rgba(99, 102, 241, 0.12)' : 'rgba(0,0,0,0.05)',
+              color: hasStock ? 'var(--color-primary)' : 'var(--text-muted)',
+              border: hasStock ? '1px solid rgba(99, 102, 241, 0.35)' : '1px solid transparent',
               cursor: hasStock ? 'pointer' : 'not-allowed'
             }}
           >
             {hasStock ? 'Add to Cart' : 'Out of Stock'}
           </button>
+
+          {hasStock && (
+            <button
+              onClick={handleBuyNow}
+              style={styles.buyNowBtn}
+            >
+              Buy Now
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -116,17 +144,18 @@ const styles = {
     alignItems: 'center',
     overflow: 'hidden',
     position: 'relative',
-    padding: '16px',
+    padding: '20px',
     cursor: 'pointer',
     height: '100%',
-    gap: '16px'
+    gap: '20px',
+    borderRadius: '16px'
   },
   wishlistBtn: {
     position: 'absolute',
     top: '12px',
     right: '12px',
-    width: '28px',
-    height: '28px',
+    width: '30px',
+    height: '30px',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -137,19 +166,22 @@ const styles = {
     transition: 'all 0.2s ease'
   },
   imageContainer: {
-    width: '140px',
-    height: '140px',
+    width: '165px',
+    height: '165px',
     flexShrink: 0,
     overflow: 'hidden',
     position: 'relative',
     background: 'transparent',
-    borderRadius: '10px'
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   image: {
     width: '100%',
     height: '100%',
     objectFit: 'contain',
-    padding: '8px',
+    padding: '6px',
     boxSizing: 'border-box',
     transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
   },
@@ -182,20 +214,20 @@ const styles = {
     minWidth: 0
   },
   title: {
-    fontSize: '17px',
-    fontWeight: '700',
-    marginBottom: '4px',
+    fontSize: '18px',
+    fontWeight: '800',
+    marginBottom: '6px',
     color: 'var(--text-primary)',
     lineHeight: '1.2',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    paddingRight: '24px' // leave space for absolute wishlist button
+    paddingRight: '24px'
   },
   desc: {
     fontSize: '13px',
     color: 'var(--text-secondary)',
-    marginBottom: '8px',
+    marginBottom: '10px',
     lineHeight: '1.4',
     display: '-webkit-box',
     WebkitLineClamp: '2',
@@ -210,12 +242,12 @@ const styles = {
     flexWrap: 'wrap'
   },
   originalPrice: {
-    fontSize: '12px',
+    fontSize: '13px',
     color: 'var(--text-muted)',
     textDecoration: 'line-through'
   },
   price: {
-    fontSize: '16px',
+    fontSize: '18px',
     fontWeight: '800',
     color: 'var(--color-primary)',
     fontFamily: 'var(--font-heading)'
@@ -224,31 +256,45 @@ const styles = {
     fontSize: '11px',
     fontWeight: '700',
     color: '#10b981',
-    background: 'rgba(16, 185, 129, 0.1)',
-    padding: '2px 6px',
-    borderRadius: '4px'
+    background: 'rgba(16, 185, 129, 0.12)',
+    padding: '2px 8px',
+    borderRadius: '6px'
   },
   deliveryTime: {
-    fontSize: '11px',
+    fontSize: '11.5px',
     color: 'var(--text-muted)',
-    marginBottom: '10px',
+    marginBottom: '12px',
     display: 'flex',
     alignItems: 'center'
   },
   actionRow: {
     display: 'flex',
-    width: '100%'
+    gap: '10px',
+    width: '100%',
+    marginTop: 'auto'
   },
   quickAddBtn: {
     flex: 1,
-    padding: '8px 16px',
-    fontSize: '12px',
+    padding: '9px 12px',
+    fontSize: '12.5px',
     fontWeight: '700',
-    borderRadius: '6px',
-    border: 'none',
+    borderRadius: '8px',
     transition: 'all 0.2s ease',
+    textAlign: 'center'
+  },
+  buyNowBtn: {
+    flex: 1,
+    padding: '9px 12px',
+    fontSize: '12.5px',
+    fontWeight: '800',
+    borderRadius: '8px',
+    border: 'none',
+    background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+    color: '#ffffff',
+    cursor: 'pointer',
     textAlign: 'center',
-    boxShadow: '0 1px 4px rgba(11, 93, 52, 0.15)'
+    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+    transition: 'all 0.2s ease'
   }
 };
 

@@ -19,6 +19,8 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 
+import Toast from './components/Toast';
+
 export default function App() {
   const { activePage, isLoggedIn, currentUser, pageLoading } = useContext(ShopContext);
   const [cartOpen, setCartOpen] = useState(false);
@@ -55,6 +57,9 @@ export default function App() {
 
   return (
     <div style={styles.appWrapper}>
+      {/* Toast Notification Banner */}
+      <Toast />
+
       {/* Navigation Bar — hidden in admin mode until user clicks Back to Basic */}
       {activePage !== 'admin' && <Navbar onOpenCart={() => setCartOpen(true)} />}
 

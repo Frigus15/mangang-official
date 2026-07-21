@@ -307,9 +307,16 @@ export const ShopContextProvider = ({ children }) => {
     setBannerSlides((prev) => prev.filter((s) => s.id !== slideId && s._id !== slideId));
   };
 
+  // Toast Notification State
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (text) => {
+    setToastMessage({ text, id: Date.now() });
+  };
+
   const addToCart = (product, quantity = 1, options = {}) => {
     if (currentUser?.isBlocked) {
-      alert('Your account has been blocked by administrator. You cannot make any purchases.');
+      showToast('Your account has been blocked by administrator.');
       return;
     }
     setCart((prevCart) => {
@@ -325,6 +332,7 @@ export const ShopContextProvider = ({ children }) => {
         return [...prevCart, { cartId, product, quantity, options }];
       }
     });
+    showToast('Item added to cart!');
   };
 
   const removeFromCart = (cartId) => {
@@ -479,7 +487,9 @@ export const ShopContextProvider = ({ children }) => {
         deleteCategory,
         users,
         updateUserProfile,
-        toggleBlockUser
+        toggleBlockUser,
+        toastMessage,
+        showToast
       }}
     >
       {children}
