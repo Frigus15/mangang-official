@@ -230,13 +230,25 @@ export default function Navbar({ onOpenCart }) {
 
               {/* Profile / Auth Button */}
               {isLoggedIn ? (
-                <button
-                  onClick={() => handleNavClick('dashboard')}
-                  style={styles.actionBtn}
-                  title={currentUser?.username || currentUser?.email || 'User Account'}
-                >
-                  <User size={18} style={{ color: 'var(--color-primary)' }} />
-                </button>
+                <>
+                  <button
+                    onClick={() => handleNavClick('dashboard')}
+                    style={styles.actionBtn}
+                    title={currentUser?.username || currentUser?.email || 'User Account'}
+                  >
+                    <User size={18} style={{ color: 'var(--color-primary)' }} />
+                  </button>
+
+                  <button
+                    onClick={logout}
+                    style={styles.desktopLogoutBtn}
+                    className="desktop-logout-trigger"
+                    title="Log Out"
+                  >
+                    <LogOut size={16} style={{ color: 'var(--color-danger)' }} />
+                    <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-danger)' }}>Log Out</span>
+                  </button>
+                </>
               ) : (
                 <button
                   onClick={() => { setAuthMode('login'); setAuthModalOpen(true); }}
@@ -653,6 +665,17 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  },
+  desktopLogoutBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: '8px',
+    background: 'rgba(239, 68, 68, 0.08)',
+    border: '1px solid rgba(239, 68, 68, 0.25)',
     cursor: 'pointer',
     transition: 'all 0.2s ease'
   },
