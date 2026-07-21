@@ -7,11 +7,7 @@ const connectDB = async () => {
     return;
   }
   try {
-    const mongoUri = process.env.MONGODB_URI;
-    if (!mongoUri) {
-      console.error('[MongoDB Error] MONGODB_URI environment variable is missing.');
-      return;
-    }
+    const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://mangangofficialstorecs_db_user:mangangofficial@cluster0.l83xneu.mongodb.net/mangang_official?retryWrites=true&w=majority&appName=Cluster0';
     const conn = await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 5000
     });

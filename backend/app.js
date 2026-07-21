@@ -78,14 +78,26 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, email, password, phone } = req.body;
-    const exists = await User.findOne({ email });
-    if (exists) {
-      return res.status(400).json({ error: 'Email already registered.' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
     }
-    const newUser = await User.create({ username, name: username, email, password, phone: phone || '' });
+    const cleanEmail = email.trim().toLowerCase();
+    const exists = await User.findOne({ email: cleanEmail });
+    if (exists) {
+      return res.status(400).json({ error: 'This email is already registered.' });
+    }
+    const finalUsername = (username && username.trim()) || cleanEmail.split('@')[0];
+    const newUser = await User.create({
+      username: finalUsername,
+      name: finalUsername,
+      email: cleanEmail,
+      password: password,
+      phone: phone || ''
+    });
     res.json({ success: true, user: newUser });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('[Signup Error]', err);
+    res.status(500).json({ error: err.message || 'Server error creating user in MongoDB.' });
   }
 });
 
