@@ -376,26 +376,67 @@ export default function Navbar({ onOpenCart }) {
       </div>
       )}
 
-      {/* Auth Modal Overlay */}
+      {/* Premium Auth Modal Overlay */}
       {authModalOpen && (
         <div style={styles.modalOverlay} onClick={() => !authLoading && setAuthModalOpen(false)}>
-          <div style={styles.modalContent} className="glass-panel auth-modal-animate" onClick={(e) => e.stopPropagation()}>
+          <div style={styles.modalCard} className="glass-panel auth-modal-animate" onClick={(e) => e.stopPropagation()}>
+            {/* Header with Icon Badge */}
             <div style={styles.modalHeader}>
-              <h3 style={styles.modalTitle}>
-                {authMode === 'login' ? 'Log In to Mangang' : 'Create Your Account'}
-              </h3>
+              <div style={styles.headerTitleGroup}>
+                <div style={styles.headerIconBadge}>
+                  <Shield size={20} color="var(--color-primary)" />
+                </div>
+                <div>
+                  <h3 style={styles.modalTitle}>
+                    {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
+                  </h3>
+                  <p style={styles.modalSubtitle}>
+                    {authMode === 'login' ? 'Enter credentials to access your portal' : 'Join Mangang Official Store'}
+                  </p>
+                </div>
+              </div>
               {!authLoading && (
                 <button style={styles.closeBtn} onClick={() => setAuthModalOpen(false)}>
                   <X size={18} />
                 </button>
               )}
             </div>
-            
+
+            {/* Interactive Pill Switcher */}
+            <div style={styles.pillSwitcher}>
+              <button
+                type="button"
+                style={{
+                  ...styles.pillBtn,
+                  background: authMode === 'login' ? 'var(--color-primary)' : 'transparent',
+                  color: authMode === 'login' ? '#ffffff' : 'var(--text-secondary)',
+                  fontWeight: authMode === 'login' ? '700' : '500',
+                  boxShadow: authMode === 'login' ? '0 4px 12px rgba(99, 102, 241, 0.35)' : 'none'
+                }}
+                onClick={() => setAuthMode('login')}
+              >
+                Log In
+              </button>
+              <button
+                type="button"
+                style={{
+                  ...styles.pillBtn,
+                  background: authMode === 'signup' ? 'var(--color-primary)' : 'transparent',
+                  color: authMode === 'signup' ? '#ffffff' : 'var(--text-secondary)',
+                  fontWeight: authMode === 'signup' ? '700' : '500',
+                  boxShadow: authMode === 'signup' ? '0 4px 12px rgba(99, 102, 241, 0.35)' : 'none'
+                }}
+                onClick={() => setAuthMode('signup')}
+              >
+                Sign Up
+              </button>
+            </div>
+
             {authLoading ? (
               <div style={styles.modalLoading}>
                 <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
                 <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '500', textAlign: 'center' }}>
-                  {authMode === 'login' ? 'Logging in, please wait...' : 'Creating account, please wait...'}
+                  {authMode === 'login' ? 'Authenticating via MongoDB...' : 'Creating MongoDB User Account...'}
                 </p>
               </div>
             ) : (
@@ -405,46 +446,58 @@ export default function Navbar({ onOpenCart }) {
                     <>
                       <div className="form-group">
                         <span className="form-label">Full Name</span>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. John Doe"
-                          value={authUsername}
-                          onChange={(e) => setAuthUsername(e.target.value)}
-                          className="form-input"
-                          style={styles.authInput}
-                        />
+                        <div style={styles.inputIconWrapper}>
+                          <User size={16} style={styles.inputIcon} />
+                          <input
+                            type="text"
+                            required
+                            placeholder="John Doe"
+                            value={authUsername}
+                            onChange={(e) => setAuthUsername(e.target.value)}
+                            className="form-input"
+                            style={styles.authInput}
+                          />
+                        </div>
                       </div>
 
                       <div className="form-group">
                         <span className="form-label">Phone Number</span>
-                        <input
-                          type="tel"
-                          required
-                          placeholder="+91 9876543210"
-                          value={authPhone}
-                          onChange={(e) => setAuthPhone(e.target.value)}
-                          className="form-input"
-                          style={styles.authInput}
-                        />
+                        <div style={styles.inputIconWrapper}>
+                          <User size={16} style={styles.inputIcon} />
+                          <input
+                            type="tel"
+                            required
+                            placeholder="+91 9876543210"
+                            value={authPhone}
+                            onChange={(e) => setAuthPhone(e.target.value)}
+                            className="form-input"
+                            style={styles.authInput}
+                          />
+                        </div>
                       </div>
                     </>
                   )}
+
                   <div className="form-group">
                     <span className="form-label">Email Address</span>
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={authEmail}
-                      onChange={(e) => setAuthEmail(e.target.value)}
-                      className="form-input"
-                      style={styles.authInput}
-                    />
+                    <div style={styles.inputIconWrapper}>
+                      <User size={16} style={styles.inputIcon} />
+                      <input
+                        type="email"
+                        required
+                        placeholder="your-email@domain.com"
+                        value={authEmail}
+                        onChange={(e) => setAuthEmail(e.target.value)}
+                        className="form-input"
+                        style={styles.authInput}
+                      />
+                    </div>
                   </div>
+
                   <div className="form-group">
                     <span className="form-label">Password</span>
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <div style={styles.inputIconWrapper}>
+                      <Shield size={16} style={styles.inputIcon} />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         required
@@ -452,7 +505,7 @@ export default function Navbar({ onOpenCart }) {
                         value={authPassword}
                         onChange={(e) => setAuthPassword(e.target.value)}
                         className="form-input"
-                        style={{ ...styles.authInput, width: '100%', paddingRight: '38px' }}
+                        style={{ ...styles.authInput, paddingRight: '38px' }}
                       />
                       <button
                         type="button"
@@ -466,27 +519,9 @@ export default function Navbar({ onOpenCart }) {
                   </div>
                   
                   <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
-                    {authMode === 'login' ? 'Log In' : 'Sign Up'}
+                    <span>{authMode === 'login' ? 'Authorize & Log In' : 'Register Account'}</span>
                   </button>
                 </form>
-
-                <div style={styles.modalFooter}>
-                  {authMode === 'login' ? (
-                    <span>
-                      Don't have an account?{' '}
-                      <button style={styles.switchBtn} onClick={() => setAuthMode('signup')}>
-                        Sign Up
-                      </button>
-                    </span>
-                  ) : (
-                    <span>
-                      Already have an account?{' '}
-                      <button style={styles.switchBtn} onClick={() => setAuthMode('login')}>
-                        Log In
-                      </button>
-                    </span>
-                  )}
-                </div>
               </>
             )}
           </div>
@@ -702,17 +737,19 @@ const styles = {
     padding: '20px',
     boxSizing: 'border-box'
   },
-  modalContent: {
+  modalCard: {
     width: '100%',
-    maxWidth: '400px',
-    padding: '30px',
+    maxWidth: '410px',
+    padding: '28px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '18px',
     boxSizing: 'border-box',
-    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.18)',
-    borderRadius: '16px',
-    border: '1px solid rgba(255, 255, 255, 0.08)'
+    background: 'rgba(11, 15, 25, 0.92)',
+    backdropFilter: 'blur(25px)',
+    borderRadius: '20px',
+    border: '1px solid rgba(99, 102, 241, 0.25)',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.15)'
   },
   modalLoading: {
     display: 'flex',
@@ -727,25 +764,75 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottom: '1px solid var(--border-glass)',
-    paddingBottom: '12px'
+    paddingBottom: '14px'
+  },
+  headerTitleGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  },
+  headerIconBadge: {
+    width: '38px',
+    height: '38px',
+    borderRadius: '10px',
+    background: 'rgba(99, 102, 241, 0.12)',
+    border: '1px solid rgba(99, 102, 241, 0.3)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   modalTitle: {
     fontFamily: 'var(--font-heading)',
     fontSize: '18px',
     fontWeight: '800',
-    color: 'var(--text-primary)'
+    color: 'var(--text-primary)',
+    lineHeight: '1.2'
+  },
+  modalSubtitle: {
+    fontSize: '12px',
+    color: 'var(--text-secondary)',
+    marginTop: '2px'
+  },
+  pillSwitcher: {
+    display: 'flex',
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid var(--border-glass)',
+    borderRadius: '12px',
+    padding: '4px',
+    gap: '4px'
+  },
+  pillBtn: {
+    flex: 1,
+    padding: '8px 12px',
+    borderRadius: '8px',
+    border: 'none',
+    fontSize: '13px',
+    cursor: 'pointer',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   authForm: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px'
+    gap: '14px'
+  },
+  inputIconWrapper: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  inputIcon: {
+    position: 'absolute',
+    left: '12px',
+    color: 'var(--color-primary)',
+    pointerEvents: 'none'
   },
   authInput: {
-    padding: '10px 14px',
-    fontSize: '14px',
-    background: 'rgba(0,0,0,0.2)',
+    padding: '10px 14px 10px 38px',
+    fontSize: '13.5px',
+    background: 'rgba(0,0,0,0.25)',
     borderColor: 'var(--border-glass)',
-    color: '#fff'
+    color: '#fff',
+    width: '100%'
   },
   eyeToggleBtn: {
     position: 'absolute',
@@ -763,21 +850,13 @@ const styles = {
     padding: '12px',
     fontSize: '14px',
     width: '100%',
-    marginTop: '5px'
-  },
-  modalFooter: {
-    textAlign: 'center',
-    fontSize: '13px',
-    color: 'var(--text-secondary)'
-  },
-  switchBtn: {
-    background: 'none',
-    border: 'none',
-    color: 'var(--color-primary)',
-    fontWeight: '700',
-    cursor: 'pointer',
-    padding: 0,
-    textDecoration: 'underline'
+    marginTop: '6px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    borderRadius: '10px',
+    fontWeight: '700'
   },
   fullSearchWrapper: {
     width: '100%',
