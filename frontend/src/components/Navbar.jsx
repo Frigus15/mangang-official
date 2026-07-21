@@ -463,77 +463,34 @@ export default function Navbar({ onOpenCart }) {
               </button>
             </div>
 
-            {authLoading ? (
-              <div style={styles.modalLoading}>
-                <div className="telemetry-spinner" style={{ margin: '0 auto' }}></div>
-                <p style={{ marginTop: '20px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '500', textAlign: 'center' }}>
-                  {authMode === 'login' ? 'Authenticating via MongoDB...' : 'Creating MongoDB User Account...'}
-                </p>
+            {authFeedback && (
+              <div
+                style={{
+                  ...styles.feedbackBanner,
+                  background: authFeedback.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                  borderColor: authFeedback.type === 'success' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+                  color: authFeedback.type === 'success' ? '#10b981' : '#ef4444'
+                }}
+                className="animate-fade-in"
+              >
+                {authFeedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{authFeedback.message}</span>
               </div>
-            ) : (
-              <>
-                {authFeedback && (
-                  <div
-                    style={{
-                      ...styles.feedbackBanner,
-                      background: authFeedback.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                      borderColor: authFeedback.type === 'success' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)',
-                      color: authFeedback.type === 'success' ? '#10b981' : '#ef4444'
-                    }}
-                    className="animate-fade-in"
-                  >
-                    {authFeedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                    <span>{authFeedback.message}</span>
-                  </div>
-                )}
+            )}
 
-                <form key={authMode} onSubmit={handleAuthSubmit} style={styles.authForm} className="auth-form-animate">
-                  {authMode === 'signup' && (
-                    <>
-                      <div className="form-group">
-                        <span className="form-label">Full Name</span>
-                        <div style={styles.inputIconWrapper}>
-                          <User size={16} style={styles.inputIcon} />
-                          <input
-                            type="text"
-                            required
-                            placeholder="John Doe"
-                            value={authUsername}
-                            onChange={(e) => setAuthUsername(e.target.value)}
-                            className="form-input"
-                            style={styles.authInput}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <span className="form-label">Phone Number</span>
-                        <div style={styles.inputIconWrapper}>
-                          <User size={16} style={styles.inputIcon} />
-                          <input
-                            type="tel"
-                            required
-                            placeholder="+91 9876543210"
-                            value={authPhone}
-                            onChange={(e) => setAuthPhone(e.target.value)}
-                            className="form-input"
-                            style={styles.authInput}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-
+            <form key={authMode} onSubmit={handleAuthSubmit} style={styles.authForm} className="auth-form-animate">
+              {authMode === 'signup' && (
+                <>
                   <div className="form-group">
-                    <span className="form-label">Email Address</span>
+                    <span className="form-label">Full Name</span>
                     <div style={styles.inputIconWrapper}>
                       <User size={16} style={styles.inputIcon} />
                       <input
-                        type="email"
+                        type="text"
                         required
-                        placeholder="your-email@domain.com"
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
+                        placeholder="John Doe"
+                        value={authUsername}
+                        onChange={(e) => setAuthUsername(e.target.value)}
                         className="form-input"
                         style={styles.authInput}
                       />
@@ -541,35 +498,67 @@ export default function Navbar({ onOpenCart }) {
                   </div>
 
                   <div className="form-group">
-                    <span className="form-label">Password</span>
+                    <span className="form-label">Phone Number</span>
                     <div style={styles.inputIconWrapper}>
-                      <Shield size={16} style={styles.inputIcon} />
+                      <User size={16} style={styles.inputIcon} />
                       <input
-                        type={showPassword ? 'text' : 'password'}
+                        type="tel"
                         required
-                        placeholder="••••••••"
-                        value={authPassword}
-                        onChange={(e) => setAuthPassword(e.target.value)}
+                        placeholder="+91 9876543210"
+                        value={authPhone}
+                        onChange={(e) => setAuthPhone(e.target.value)}
                         className="form-input"
-                        style={{ ...styles.authInput, paddingRight: '38px' }}
+                        style={styles.authInput}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        style={styles.eyeToggleBtn}
-                        title={showPassword ? 'Hide Password' : 'Show Password'}
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
                     </div>
                   </div>
-                  
-                  <button type="submit" className="btn btn-primary" style={styles.authSubmitBtn}>
-                    <span>{authMode === 'login' ? 'Authorize & Log In' : 'Register Account'}</span>
+                </>
+              )}
+
+              <div className="form-group">
+                <span className="form-label">Email Address</span>
+                <div style={styles.inputIconWrapper}>
+                  <User size={16} style={styles.inputIcon} />
+                  <input
+                    type="email"
+                    required
+                    placeholder="your-email@domain.com"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    className="form-input"
+                    style={styles.authInput}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <span className="form-label">Password</span>
+                <div style={styles.inputIconWrapper}>
+                  <Shield size={16} style={styles.inputIcon} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="••••••••"
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    className="form-input"
+                    style={{ ...styles.authInput, paddingRight: '38px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={styles.eyeToggleBtn}
+                    title={showPassword ? 'Hide Password' : 'Show Password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
-                </form>
-              </>
-            )}
+                </div>
+              </div>
+              
+              <button type="submit" disabled={authLoading} className="btn btn-primary" style={styles.authSubmitBtn}>
+                <span>{authLoading ? 'Processing...' : authMode === 'login' ? 'Authorize & Log In' : 'Register Account'}</span>
+              </button>
+            </form>
           </div>
         </div>
       )}
