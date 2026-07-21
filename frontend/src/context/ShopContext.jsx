@@ -3,128 +3,50 @@ import { api } from '../services/api';
 
 export const ShopContext = createContext();
 
-// Seed default products in INR (₹)
-const DEFAULT_PRODUCTS = [
-  {
-    id: 'prod-1',
-    title: 'Mangang Vision Pro VR',
-    category: 'Wearables',
-    price: 69999,
-    costPrice: 45000,
-    rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=600&q=80',
-    description: 'Next-generation standalone VR headset offering absolute immersion with micro-OLED 4K displays and spatial audio.',
-    options: {
-      colors: ['Space Gray', 'Neon Cyan', 'Cyber Purple'],
-      storage: ['256GB', '512GB']
-    },
-    stock: 12,
-    trending: true
-  },
-  {
-    id: 'prod-2',
-    title: 'Mangang Wave-9 ANC',
-    category: 'Audio',
-    price: 19999,
-    costPrice: 12000,
-    rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-    description: 'Professional wireless noise-canceling headphones with 40mm beryllium drivers and 60-hour battery life.',
-    options: {
-      colors: ['Carbon Black', 'Platinum Silver', 'Electric Indigo'],
-      storage: ['Standard Edition']
-    },
-    stock: 25,
-    trending: true
-  },
-  {
-    id: 'prod-3',
-    title: 'Mangang Chronos Smartwatch',
-    category: 'Wearables',
-    price: 14999,
-    costPrice: 9000,
-    rating: 4.7,
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
-    description: 'Titanium-body sports smartwatch with continuous ECG, SpO2 sensing, and sapphire AMOLED screen.',
-    options: {
-      colors: ['Titanium Steel', 'Volt Orange', 'Obsidian Black'],
-      storage: ['Standard Size']
-    },
-    stock: 18,
-    trending: false
-  },
-  {
-    id: 'prod-4',
-    title: 'Mangang Key-V1 Mechanical',
-    category: 'Computers',
-    price: 8999,
-    costPrice: 5500,
-    rating: 4.6,
-    image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
-    description: 'Hot-swappable optical mechanical keyboard with pre-lubed silent switches and RGB lighting.',
-    options: {
-      colors: ['Classic Dark', 'Retro Cyan', 'Synth Violet'],
-      storage: ['Linear Switches', 'Tactile Switches']
-    },
-    stock: 15,
-    trending: false
-  },
-  {
-    id: 'prod-5',
-    title: 'Mangang Aura AI Speaker',
-    category: 'Smart Home',
-    price: 5999,
-    costPrice: 3500,
-    rating: 4.5,
-    image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=600&q=80',
-    description: 'Voice-controlled smart hub speaker delivering 360-degree high-fidelity audio and reactive LED aura.',
-    options: {
-      colors: ['Charcoal Black', 'Aurora White'],
-      storage: ['Standard Model']
-    },
-    stock: 30,
-    trending: true
-  }
-];
-
-const DEFAULT_CATEGORIES = [
-  { id: 'cat-1', name: 'Audio', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cat-2', name: 'Wearables', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cat-3', name: 'Computers', image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cat-4', name: 'Smart Home', image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80' }
-];
-
-const DEFAULT_SLIDES = [
-  {
-    id: 'slide-1',
-    title: 'MANGANG VISION PRO',
-    subtitle: 'Immerse yourself in spatial reality with micro-OLED 4K resolution and zero-latency eye tracking.',
-    image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1200&q=80',
-    productId: 'prod-1'
-  },
-  {
-    id: 'slide-2',
-    title: 'MANGANG WAVE-9 ANC',
-    subtitle: 'Professional sound quality with hybrid Active Noise Cancelling and 60-hour battery life.',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
-    productId: 'prod-2'
-  }
-];
-
 export const ShopContextProvider = ({ children }) => {
   const [products, setProducts] = useState(() => {
     const local = localStorage.getItem('mangang_products');
-    return local ? JSON.parse(local) : DEFAULT_PRODUCTS;
+    if (!local) return [];
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.some(p => p.title === 'Mangang Vision Pro VR')) {
+        localStorage.removeItem('mangang_products');
+        return [];
+      }
+      return parsed;
+    } catch {
+      return [];
+    }
   });
 
   const [categories, setCategories] = useState(() => {
     const local = localStorage.getItem('mangang_categories');
-    return local ? JSON.parse(local) : DEFAULT_CATEGORIES;
+    if (!local) return [];
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.some(c => c.name === 'Audio' && c.id === 'cat-1')) {
+        localStorage.removeItem('mangang_categories');
+        return [];
+      }
+      return parsed;
+    } catch {
+      return [];
+    }
   });
 
   const [bannerSlides, setBannerSlides] = useState(() => {
     const local = localStorage.getItem('mangang_slides');
-    return local ? JSON.parse(local) : DEFAULT_SLIDES;
+    if (!local) return [];
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.some(s => s.title === 'MANGANG VISION PRO')) {
+        localStorage.removeItem('mangang_slides');
+        return [];
+      }
+      return parsed;
+    } catch {
+      return [];
+    }
   });
 
   const [cart, setCart] = useState(() => {
@@ -194,19 +116,19 @@ export const ShopContextProvider = ({ children }) => {
           api.getUsers()
         ]);
 
-        if (mProducts && Array.isArray(mProducts) && mProducts.length > 0) {
+        if (mProducts && Array.isArray(mProducts)) {
           setProducts(mProducts.map(p => ({ ...p, id: p._id || p.id })));
         }
-        if (mCategories && Array.isArray(mCategories) && mCategories.length > 0) {
+        if (mCategories && Array.isArray(mCategories)) {
           setCategories(mCategories.map(c => ({ ...c, id: c._id || c.id })));
         }
-        if (mBanners && Array.isArray(mBanners) && mBanners.length > 0) {
+        if (mBanners && Array.isArray(mBanners)) {
           setBannerSlides(mBanners.map(b => ({ ...b, id: b._id || b.id })));
         }
-        if (mOrders && Array.isArray(mOrders) && mOrders.length > 0) {
+        if (mOrders && Array.isArray(mOrders)) {
           setOrders(mOrders);
         }
-        if (mUsers && Array.isArray(mUsers) && mUsers.length > 0) {
+        if (mUsers && Array.isArray(mUsers)) {
           setUsers(mUsers);
         }
       } catch (err) {
@@ -337,7 +259,7 @@ export const ShopContextProvider = ({ children }) => {
     const cp = Number(productData.costPrice || (sp * 0.7));
     const formattedProduct = {
       title: productData.title,
-      category: productData.category || 'Audio',
+      category: productData.category || 'General',
       price: sp,
       costPrice: cp,
       stock: Number(productData.stock || 10),

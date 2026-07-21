@@ -20,10 +20,19 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Connect MongoDB
 connectDB();
 
-// ── SEED INITIAL DATA IF EMPTY ─────────────────────────────────────────────
-const seedInitialData = async () => {
+// ── ENSURE ADMIN ACCOUNT & CLEAN DUMMY DATA ────────────────────────────────
+const initializeCleanDB = async () => {
   try {
-    // Seed Admin User
+    // 1. Clear dummy products, categories, banners if they match dummy items
+    const dummyTitleExists = await Product.findOne({ title: 'Mangang Vision Pro VR' });
+    if (dummyTitleExists) {
+      await Product.deleteMany({});
+      await Category.deleteMany({});
+      await Banner.deleteMany({});
+      console.log('[DB Clean] Removed all dummy products, categories, and banners from MongoDB.');
+    }
+
+    // 2. Ensure default Admin User exists
     const adminExists = await User.findOne({ email: 'admin@gmail.com' });
     if (!adminExists) {
       await User.create({
@@ -34,116 +43,34 @@ const seedInitialData = async () => {
         role: 'admin',
         isBlocked: false
       });
-    }
-
-    // Seed Categories
-    const categoryCount = await Category.countDocuments();
-    if (categoryCount === 0) {
-      await Category.insertMany([
-        { name: 'Audio', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80' },
-        { name: 'Wearables', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80' },
-        { name: 'Computers', image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80' },
-        { name: 'Smart Home', image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80' }
-      ]);
-    }
-
-    // Seed Products
-    const productCount = await Product.countDocuments();
-    if (productCount === 0) {
-      await Product.insertMany([
-        {
-          title: 'Mangang Vision Pro VR',
-          category: 'Wearables',
-          price: 69999,
-          costPrice: 45000,
-          stock: 12,
-          rating: 4.8,
-          image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=600&q=80',
-          description: 'Next-generation standalone VR headset offering absolute immersion with micro-OLED 4K displays.',
-          options: { colors: ['Space Gray', 'Neon Cyan'], storage: ['256GB', '512GB'] },
-          trending: true
-        },
-        {
-          title: 'Mangang Wave-9 ANC',
-          category: 'Audio',
-          price: 19999,
-          costPrice: 12000,
-          stock: 25,
-          rating: 4.9,
-          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-          description: 'Professional wireless noise-canceling headphones with 40mm beryllium drivers and 60-hour battery life.',
-          options: { colors: ['Carbon Black', 'Platinum Silver'], storage: ['Standard'] },
-          trending: true
-        },
-        {
-          title: 'Mangang Chronos Smartwatch',
-          category: 'Wearables',
-          price: 14999,
-          costPrice: 9000,
-          stock: 18,
-          rating: 4.7,
-          image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
-          description: 'Titanium-body sports smartwatch with continuous ECG, SpO2 sensing, and sapphire AMOLED screen.',
-          options: { colors: ['Titanium Steel', 'Obsidian Black'], storage: ['Standard'] },
-          trending: false
-        },
-        {
-          title: 'Mangang Key-V1 Mechanical',
-          category: 'Computers',
-          price: 8999,
-          costPrice: 5500,
-          stock: 15,
-          rating: 4.6,
-          image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
-          description: 'Hot-swappable optical mechanical keyboard with pre-lubed silent switches and RGB lighting.',
-          options: { colors: ['Classic Dark', 'Retro Cyan'], storage: ['Linear', 'Tactile'] },
-          trending: false
-        },
-        {
-          title: 'Mangang Aura AI Speaker',
-          category: 'Smart Home',
-          price: 5999,
-          costPrice: 3500,
-          stock: 30,
-          rating: 4.5,
-          image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=600&q=80',
-          description: 'Voice-controlled smart hub speaker delivering 360-degree high-fidelity audio.',
-          options: { colors: ['Charcoal Black', 'Aurora White'], storage: ['Standard'] },
-          trending: true
-        }
-      ]);
-    }
-
-    // Seed Banners
-    const bannerCount = await Banner.countDocuments();
-    if (bannerCount === 0) {
-      await Banner.insertMany([
-        {
-          title: 'MANGANG VISION PRO',
-          subtitle: 'Immerse yourself in spatial reality with micro-OLED 4K resolution.',
-          image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1200&q=80',
-          productId: 'prod-1'
-        },
-        {
-          title: 'MANGANG WAVE-9 ANC',
-          subtitle: 'Professional sound quality with hybrid ANC and 60-hour battery life.',
-          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
-          productId: 'prod-2'
-        }
-      ]);
+      console.log('[Auth] Admin account admin@gmail.com initialized.');
     }
   } catch (err) {
-    console.error('[Seed Error]', err.message);
+    console.error('[DB Setup Error]', err.message);
   }
 };
 
-setTimeout(seedInitialData, 2000);
+setTimeout(initializeCleanDB, 1500);
 
 // ── API ROUTES ──────────────────────────────────────────────────────────────
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Mangang MongoDB API Server Online', timestamp: new Date() });
+});
+
+// Admin wipe database route
+app.post('/api/admin/clean-db', async (req, res) => {
+  try {
+    await Product.deleteMany({});
+    await Category.deleteMany({});
+    await Banner.deleteMany({});
+    await Order.deleteMany({});
+    await User.deleteMany({ email: { $ne: 'admin@gmail.com' } });
+    res.json({ success: true, message: 'All dummy data successfully cleared from MongoDB.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ── AUTH / USER ROUTES ──

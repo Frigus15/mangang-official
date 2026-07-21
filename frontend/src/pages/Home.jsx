@@ -3,40 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import ProductCard from '../components/ProductCard';
 import { ArrowRight, Zap, Target, Award, Sparkles } from 'lucide-react';
 
-const MLBB_SKINS = [
-  {
-    id: 'skin-franco',
-    heroName: 'Franco',
-    skinName: 'King of Hell',
-    badgeSub: '',
-    image: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&w=300&q=80',
-    category: 'Audio'
-  },
-  {
-    id: 'skin-fanny',
-    heroName: 'Fanny',
-    skinName: 'Galactic Starh...',
-    badgeSub: '',
-    image: 'https://images.unsplash.com/photo-1614036417651-efe5912149d8?auto=format&fit=crop&w=300&q=80',
-    category: 'Wearables'
-  },
-  {
-    id: 'skin-gord',
-    heroName: 'Gord',
-    skinName: 'Conqueror',
-    badgeSub: '',
-    image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=300&q=80',
-    category: 'Computers'
-  },
-  {
-    id: 'skin-layla',
-    heroName: 'Layla',
-    skinName: 'The Beacon',
-    badgeSub: 'Nexus Sea',
-    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=300&q=80',
-    category: 'Smart Home'
-  }
-];
+
 
 export default function Home() {
   const { products, navigateTo, setSelectedCategory, bannerSlides, categories } = useContext(ShopContext);
