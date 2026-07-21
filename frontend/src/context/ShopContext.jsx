@@ -75,11 +75,31 @@ export const ShopContextProvider = ({ children }) => {
   });
 
   // Navigation State
-  const [activePage, setActivePage] = useState('home');
+  const getInitialPageFromUrl = () => {
+    if (typeof window === 'undefined') return 'home';
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    if (!path || path === '') return 'home';
+
+    const validPages = ['home', 'catalog', 'product-details', 'checkout', 'dashboard', 'orders', 'transactions', 'admin', 'terms', 'privacy-policy', 'refund-policy'];
+    if (validPages.includes(path)) return path;
+    return 'not-found';
+  };
+
+  const [activePage, setActivePage] = useState(getInitialPageFromUrl);
   const [activeDashboardTab, setActiveDashboardTab] = useState('orders');
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [pageLoading, setPageLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+
+  // Sync browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const page = getInitialPageFromUrl();
+      setActivePage(page);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
@@ -141,6 +161,10 @@ export const ShopContextProvider = ({ children }) => {
     setTimeout(() => {
       setActivePage(page);
       setSelectedProductId(productId);
+      const urlPath = page === 'home' ? '/' : `/${page}`;
+      if (typeof window !== 'undefined' && window.location.pathname !== urlPath) {
+        window.history.pushState({}, '', urlPath);
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setPageLoading(false);
     }, 400);
