@@ -45,20 +45,24 @@ export default function ProductDetails() {
     ? (product.images && product.images.length > 0 ? product.images : [product.image])
     : [];
 
+  const colorsList = product?.options?.colors || [];
+  const storageList = product?.options?.storage || [];
+
   // Initialize selected options & reviews
   useEffect(() => {
     if (product) {
-      const imgs = (product.images && product.images.length > 0) ? product.images : [product.image];
-      setActiveImage(imgs[0]);
+      const imgs = (product.images && product.images.length > 0) ? product.images : (product.image ? [product.image] : []);
+      setActiveImage(imgs[0] || '');
 
-      if (product.options.colors && product.options.colors.length > 0) {
-        setSelectedColor(product.options.colors[0]);
+      if (colorsList.length > 0) {
+        setSelectedColor(colorsList[0]);
       }
-      if (product.options.storage && product.options.storage.length > 0) {
-        setSelectedStorage(product.options.storage[0]);
+      if (storageList.length > 0) {
+        setSelectedStorage(storageList[0]);
       }
       
-      const seedReviews = DUMMY_REVIEWS[product.id] || [
+      const pId = product.id || product._id;
+      const seedReviews = DUMMY_REVIEWS[pId] || [
         { name: 'Anonymous', rating: 5, date: '1 month ago', comment: 'Excellent electronic gadget. Works perfectly as described.' }
       ];
       setReviews(seedReviews);
@@ -116,7 +120,8 @@ export default function ProductDetails() {
     }
   };
 
-  const hasStock = product.stock > 0;
+  const hasStock = (product.stock || 0) > 0;
+  const displayPrice = (Number(product.price) || 0).toLocaleString();
 
   return (
     <div style={styles.container} className="animate-fade-in">
@@ -173,13 +178,13 @@ export default function ProductDetails() {
             <span className="badge badge-cyan">{product.category}</span>
             <div style={styles.rating}>
               <Star size={14} style={styles.starIcon} />
-              <span style={styles.ratingVal}>{product.rating}</span>
+              <span style={styles.ratingVal}>{product.rating || 5.0}</span>
               <span style={styles.ratingCount}>({reviews.length} reviews)</span>
             </div>
           </div>
 
           <h1 style={styles.title}>{product.title}</h1>
-          <p style={styles.price}>₹{product.price.toLocaleString()}</p>
+          <p style={styles.price}>₹{displayPrice}</p>
           <p style={styles.description}>{product.description}</p>
 
           {/* Key bullets */}
@@ -196,11 +201,11 @@ export default function ProductDetails() {
           {/* Options Configurator */}
           <div style={styles.configurator}>
             {/* Colors Option */}
-            {product.options.colors && product.options.colors.length > 0 && (
+            {colorsList.length > 0 && (
               <div style={styles.optionGroup}>
                 <span style={styles.optionLabel}>Chassis Color:</span>
                 <div style={styles.optionButtons}>
-                  {product.options.colors.map((color) => (
+                  {colorsList.map((color) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
@@ -219,11 +224,11 @@ export default function ProductDetails() {
             )}
 
             {/* Storage/Spec Option */}
-            {product.options.storage && product.options.storage.length > 0 && product.options.storage[0] !== 'Standard Edition' && product.options.storage[0] !== 'Standard Size' && product.options.storage[0] !== 'Standard Model' && (
+            {storageList.length > 0 && storageList[0] !== 'Standard Edition' && storageList[0] !== 'Standard Size' && storageList[0] !== 'Standard Model' && (
               <div style={styles.optionGroup}>
                 <span style={styles.optionLabel}>Specification Size:</span>
                 <div style={styles.optionButtons}>
-                  {product.options.storage.map((spec) => (
+                  {storageList.map((spec) => (
                     <button
                       key={spec}
                       onClick={() => setSelectedStorage(spec)}

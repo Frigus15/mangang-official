@@ -159,6 +159,7 @@ export default function AdminPortal() {
       image: mainImg,
       images: finalImages.length > 0 ? finalImages : [mainImg],
       description: newDesc,
+      options: { colors: [], storage: ['Standard Edition'] },
       trending: true
     });
 
