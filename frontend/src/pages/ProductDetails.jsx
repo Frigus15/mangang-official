@@ -55,10 +55,16 @@ export default function ProductDetails() {
       setActiveImage(imgs[0] || '');
 
       if (colorsList.length > 0) {
-        setSelectedColor(colorsList[0]);
+        const raw = colorsList[0];
+        setSelectedColor(typeof raw === 'object' ? (raw.name || raw.label || raw.color || JSON.stringify(raw)) : String(raw));
+      } else {
+        setSelectedColor('');
       }
       if (storageList.length > 0) {
-        setSelectedStorage(storageList[0]);
+        const raw = storageList[0];
+        setSelectedStorage(typeof raw === 'object' ? (raw.name || raw.label || raw.storage || JSON.stringify(raw)) : String(raw));
+      } else {
+        setSelectedStorage('');
       }
       
       const pId = product.id || product._id;

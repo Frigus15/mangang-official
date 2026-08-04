@@ -84,8 +84,8 @@ export default function CartDrawer({ isOpen, onClose }) {
                   {/* Option values if selected */}
                   {(item.options.color || item.options.storage) && (
                     <div style={styles.itemOptionsText}>
-                      {item.options.color && <span>Color: {item.options.color}</span>}
-                      {item.options.storage && <span> | Spec: {item.options.storage}</span>}
+                      {item.options.color && <span>Color: {typeof item.options.color === 'object' ? (item.options.color.name || item.options.color.label || JSON.stringify(item.options.color)) : String(item.options.color)}</span>}
+                      {item.options.storage && <span> | Spec: {typeof item.options.storage === 'object' ? (item.options.storage.name || item.options.storage.label || JSON.stringify(item.options.storage)) : String(item.options.storage)}</span>}
                     </div>
                   )}
 

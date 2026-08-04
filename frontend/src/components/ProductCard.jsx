@@ -25,10 +25,12 @@ export default function ProductCard({ product }) {
     const defaultOptions = {};
     if (product.options) {
       if (product.options.colors && product.options.colors.length > 0) {
-        defaultOptions.color = product.options.colors[0];
+        const raw = product.options.colors[0];
+        defaultOptions.color = typeof raw === 'object' ? (raw.name || raw.label || raw.color || JSON.stringify(raw)) : String(raw);
       }
       if (product.options.storage && product.options.storage.length > 0) {
-        defaultOptions.storage = product.options.storage[0];
+        const raw = product.options.storage[0];
+        defaultOptions.storage = typeof raw === 'object' ? (raw.name || raw.label || raw.storage || JSON.stringify(raw)) : String(raw);
       }
     }
 
@@ -42,10 +44,12 @@ export default function ProductCard({ product }) {
     const defaultOptions = {};
     if (product.options) {
       if (product.options.colors && product.options.colors.length > 0) {
-        defaultOptions.color = product.options.colors[0];
+        const raw = product.options.colors[0];
+        defaultOptions.color = typeof raw === 'object' ? (raw.name || raw.label || raw.color || JSON.stringify(raw)) : String(raw);
       }
       if (product.options.storage && product.options.storage.length > 0) {
-        defaultOptions.storage = product.options.storage[0];
+        const raw = product.options.storage[0];
+        defaultOptions.storage = typeof raw === 'object' ? (raw.name || raw.label || raw.storage || JSON.stringify(raw)) : String(raw);
       }
     }
 

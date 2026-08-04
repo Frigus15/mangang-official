@@ -47,7 +47,7 @@ export default function MyOrders() {
                       <span style={styles.itemTitle}>{item.product.title}</span>
                       {item.options && (item.options.color || item.options.storage) && (
                         <span style={styles.itemOptionsText}>
-                          [{item.options.color || ''} {item.options.storage || ''}]
+                          [{typeof item.options.color === 'object' ? (item.options.color.name || JSON.stringify(item.options.color)) : String(item.options.color || '')} {typeof item.options.storage === 'object' ? (item.options.storage.name || JSON.stringify(item.options.storage)) : String(item.options.storage || '')}]
                         </span>
                       )}
                     </div>
