@@ -38,7 +38,7 @@ export default function ProductDetails() {
 
   const targetId = selectedProductId || (products && products.length > 0 ? (products[0].id || products[0]._id) : null);
   const product = (products || []).find(
-    (p) => String(p.id) === String(targetId) || String(p._id) === String(targetId)
+    (p) => p && (String(p.id) === String(targetId) || String(p._id) === String(targetId) || String(p.id) === String(selectedProductId) || String(p._id) === String(selectedProductId))
   ) || (products && products.length > 0 ? products[0] : null);
 
   const productImages = product
