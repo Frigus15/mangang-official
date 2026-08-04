@@ -188,13 +188,16 @@ export default function ProductDetails() {
           <p style={styles.description}>{product.description}</p>
 
           {/* Key bullets */}
-          {product.features && product.features.length > 0 && (
+          {product.features && Array.isArray(product.features) && product.features.length > 0 && (
             <ul style={styles.featuresList}>
-              {product.features.map((feat, idx) => (
-                <li key={idx} style={styles.featureItem}>
-                  <span style={styles.bulletCyan}>✦</span> {feat}
-                </li>
-              ))}
+              {product.features.map((feat, idx) => {
+                const featText = typeof feat === 'object' ? (feat.text || feat.name || JSON.stringify(feat)) : String(feat);
+                return (
+                  <li key={idx} style={styles.featureItem}>
+                    <span style={styles.bulletCyan}>✦</span> {featText}
+                  </li>
+                );
+              })}
             </ul>
           )}
 
@@ -205,20 +208,23 @@ export default function ProductDetails() {
               <div style={styles.optionGroup}>
                 <span style={styles.optionLabel}>Chassis Color:</span>
                 <div style={styles.optionButtons}>
-                  {colorsList.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      style={{
-                        ...styles.optionBtn,
-                        borderColor: selectedColor === color ? 'var(--color-primary)' : 'var(--border-glass)',
-                        background: selectedColor === color ? 'rgba(11, 93, 52, 0.08)' : 'transparent',
-                        color: selectedColor === color ? 'var(--color-primary)' : 'var(--text-primary)'
-                      }}
-                    >
-                      {color}
-                    </button>
-                  ))}
+                  {colorsList.map((color, idx) => {
+                    const label = typeof color === 'object' ? (color.name || color.label || color.color || JSON.stringify(color)) : String(color);
+                    return (
+                      <button
+                        key={`${label}-${idx}`}
+                        onClick={() => setSelectedColor(label)}
+                        style={{
+                          ...styles.optionBtn,
+                          borderColor: selectedColor === label ? 'var(--color-primary)' : 'var(--border-glass)',
+                          background: selectedColor === label ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                          color: selectedColor === label ? 'var(--color-primary)' : 'var(--text-primary)'
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -228,20 +234,23 @@ export default function ProductDetails() {
               <div style={styles.optionGroup}>
                 <span style={styles.optionLabel}>Specification Size:</span>
                 <div style={styles.optionButtons}>
-                  {storageList.map((spec) => (
-                    <button
-                      key={spec}
-                      onClick={() => setSelectedStorage(spec)}
-                      style={{
-                        ...styles.optionBtn,
-                        borderColor: selectedStorage === spec ? 'var(--color-primary)' : 'var(--border-glass)',
-                        background: selectedStorage === spec ? 'rgba(11, 93, 52, 0.08)' : 'transparent',
-                        color: selectedStorage === spec ? 'var(--color-primary)' : 'var(--text-primary)'
-                      }}
-                    >
-                      {spec}
-                    </button>
-                  ))}
+                  {storageList.map((spec, idx) => {
+                    const label = typeof spec === 'object' ? (spec.name || spec.label || spec.storage || JSON.stringify(spec)) : String(spec);
+                    return (
+                      <button
+                        key={`${label}-${idx}`}
+                        onClick={() => setSelectedStorage(label)}
+                        style={{
+                          ...styles.optionBtn,
+                          borderColor: selectedStorage === label ? 'var(--color-primary)' : 'var(--border-glass)',
+                          background: selectedStorage === label ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                          color: selectedStorage === label ? 'var(--color-primary)' : 'var(--text-primary)'
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -314,12 +323,15 @@ export default function ProductDetails() {
                 'Rating': `${product.rating || 5.0} / 5.0 Stars`,
                 'Warranty': '2-Year Official Manufacturer Warranty',
                 'Shipping': 'Delivered in 2-3 Business Days'
-              }).map(([key, val]) => (
-                <tr key={key}>
-                  <td className="label">{key}</td>
-                  <td className="value">{val}</td>
-                </tr>
-              ))}
+              }).map(([key, val]) => {
+                const displayVal = typeof val === 'object' ? (val.value || val.val || val.text || JSON.stringify(val)) : String(val);
+                return (
+                  <tr key={key}>
+                    <td className="label">{key}</td>
+                    <td className="value">{displayVal}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
