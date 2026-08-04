@@ -185,7 +185,22 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/categories', async (req, res) => {
   try {
     const { name, image } = req.body;
-    const category = await Category.create({ name, image });
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Category name is required' });
+    }
+    const cleanName = name.trim();
+    const defaultImg = image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=400&q=80';
+
+    const escapedName = cleanName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    let category = await Category.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
+    if (category) {
+      if (image) {
+        category.image = image;
+        await category.save();
+      }
+    } else {
+      category = await Category.create({ name: cleanName, image: defaultImg });
+    }
     res.json({ success: true, category });
   } catch (err) {
     res.status(500).json({ error: err.message });

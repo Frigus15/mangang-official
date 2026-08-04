@@ -250,10 +250,23 @@ export const ShopContextProvider = ({ children }) => {
   useEffect(() => { localStorage.setItem('mangang_slides', JSON.stringify(bannerSlides)); }, [bannerSlides]);
 
   const addCategory = async (name, image) => {
+    const cleanName = (name || '').trim();
+    if (!cleanName) return;
     const imgUrl = image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=400&q=80';
-    const res = await api.addCategory(name, imgUrl);
-    const newCat = (res && res.category) ? { ...res.category, id: res.category._id } : { id: `cat-${Date.now()}`, name, image: imgUrl };
-    setCategories((prev) => [...prev, newCat]);
+    const res = await api.addCategory(cleanName, imgUrl);
+    const newCat = (res && res.category)
+      ? { ...res.category, id: res.category._id || res.category.id }
+      : { id: `cat-${Date.now()}`, name: cleanName, image: imgUrl };
+
+    setCategories((prev) => {
+      const existsIdx = prev.findIndex(c => (typeof c === 'object' ? c.name : c).toLowerCase() === cleanName.toLowerCase());
+      if (existsIdx > -1) {
+        const updated = [...prev];
+        updated[existsIdx] = newCat;
+        return updated;
+      }
+      return [...prev, newCat];
+    });
   };
 
   const deleteCategory = async (catId) => {
