@@ -28,23 +28,6 @@ app.use(async (req, res, next) => {
   }
 });
 
-// ── ENSURE CLEAN DATABASE ───────────────────────────────────────────────────
-const initializeCleanDB = async () => {
-  try {
-    const dummyTitleExists = await Product.findOne({ title: 'Mangang Vision Pro VR' });
-    if (dummyTitleExists) {
-      await Product.deleteMany({});
-      await Category.deleteMany({});
-      await Banner.deleteMany({});
-      console.log('[DB Clean] Removed all dummy products, categories, and banners from MongoDB.');
-    }
-  } catch (err) {
-    console.error('[DB Setup Error]', err.message);
-  }
-};
-
-setTimeout(initializeCleanDB, 1500);
-
 // ── API ROUTES ──────────────────────────────────────────────────────────────
 
 // Health check

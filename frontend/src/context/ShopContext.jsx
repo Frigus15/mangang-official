@@ -3,49 +3,145 @@ import { api } from '../services/api';
 
 export const ShopContext = createContext();
 
+const DEFAULT_PRODUCTS = [
+  {
+    id: 'prod-1',
+    title: 'Mangang Vision Pro VR',
+    category: 'VR & AR',
+    price: 89999,
+    costPrice: 65000,
+    stock: 12,
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=600&q=80',
+    description: 'Next-generation spatial computing headset with dual 4K micro-OLED displays and precision eye & hand tracking.',
+    options: {
+      colors: ['Space Gray', 'Starlight White'],
+      storage: ['256GB', '512GB', '1TB']
+    },
+    trending: true
+  },
+  {
+    id: 'prod-2',
+    title: 'AirPods Pro 2nd Gen (USB-C)',
+    category: 'Audio',
+    price: 19990,
+    costPrice: 14000,
+    stock: 25,
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=600&q=80',
+    description: 'Active Noise Cancellation with Adaptive Audio, Transparency mode, and Personalized Spatial Audio.',
+    options: {
+      colors: ['Glossy White'],
+      storage: ['MagSafe USB-C Case']
+    },
+    trending: true
+  },
+  {
+    id: 'prod-3',
+    title: 'Mangang CyberWatch Ultra',
+    category: 'Wearables',
+    price: 34990,
+    costPrice: 24000,
+    stock: 18,
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80',
+    description: 'Titanium chassis smart watch with dual-frequency GPS, 100m water resistance, and 60-hour battery life.',
+    options: {
+      colors: ['Titanium Gray', 'Oceanic Orange', 'Midnight Black'],
+      storage: ['49mm Sapphire Crystal']
+    },
+    trending: true
+  },
+  {
+    id: 'prod-4',
+    title: 'Mangang Gasket Mechanical Keyboard',
+    category: 'Computing',
+    price: 12490,
+    costPrice: 8500,
+    stock: 15,
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
+    description: 'Custom gasket mount hot-swappable wireless keyboard with PBT keycaps and South-facing RGB LEDs.',
+    options: {
+      colors: ['Retro Beige', 'Cyber Neon', 'Matte Black'],
+      storage: ['Linear Yellow Switches', 'Tactile Brown Switches']
+    },
+    trending: true
+  },
+  {
+    id: 'prod-5',
+    title: 'Mangang Pulse Bluetooth Speaker',
+    category: 'Smart Home',
+    price: 8990,
+    costPrice: 5800,
+    stock: 30,
+    rating: 4.6,
+    image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=600&q=80',
+    description: '360-degree immersive sound with ambient reactive LED lighting and IP67 dust and water resistance.',
+    options: {
+      colors: ['Matte Black', 'Deep Indigo', 'Forest Green'],
+      storage: ['Standard Edition']
+    },
+    trending: false
+  }
+];
+
+const DEFAULT_CATEGORIES = [
+  { id: 'cat-1', name: 'Audio', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-2', name: 'Wearables', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-3', name: 'VR & AR', image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-4', name: 'Computing', image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80' },
+  { id: 'cat-5', name: 'Smart Home', image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80' }
+];
+
+const DEFAULT_BANNER_SLIDES = [
+  {
+    id: 'slide-1',
+    title: 'MANGANG VISION PRO',
+    subtitle: 'Next-Generation Spatial Computing',
+    image: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1400&q=80',
+    productId: 'prod-1'
+  },
+  {
+    id: 'slide-2',
+    title: 'AUDIOPHILE SOUNDSCAPE',
+    subtitle: 'Active Noise Cancellation & Spatial Audio',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1400&q=80',
+    productId: 'prod-2'
+  }
+];
+
 export const ShopContextProvider = ({ children }) => {
   const [products, setProducts] = useState(() => {
     const local = localStorage.getItem('mangang_products');
-    if (!local) return [];
+    if (!local) return DEFAULT_PRODUCTS;
     try {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.some(p => p.title === 'Mangang Vision Pro VR')) {
-        localStorage.removeItem('mangang_products');
-        return [];
-      }
-      return parsed;
+      return (Array.isArray(parsed) && parsed.length > 0) ? parsed : DEFAULT_PRODUCTS;
     } catch {
-      return [];
+      return DEFAULT_PRODUCTS;
     }
   });
 
   const [categories, setCategories] = useState(() => {
     const local = localStorage.getItem('mangang_categories');
-    if (!local) return [];
+    if (!local) return DEFAULT_CATEGORIES;
     try {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.some(c => c.name === 'Audio' && c.id === 'cat-1')) {
-        localStorage.removeItem('mangang_categories');
-        return [];
-      }
-      return parsed;
+      return (Array.isArray(parsed) && parsed.length > 0) ? parsed : DEFAULT_CATEGORIES;
     } catch {
-      return [];
+      return DEFAULT_CATEGORIES;
     }
   });
 
   const [bannerSlides, setBannerSlides] = useState(() => {
     const local = localStorage.getItem('mangang_slides');
-    if (!local) return [];
+    if (!local) return DEFAULT_BANNER_SLIDES;
     try {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.some(s => s.title === 'MANGANG VISION PRO')) {
-        localStorage.removeItem('mangang_slides');
-        return [];
-      }
-      return parsed;
+      return (Array.isArray(parsed) && parsed.length > 0) ? parsed : DEFAULT_BANNER_SLIDES;
     } catch {
-      return [];
+      return DEFAULT_BANNER_SLIDES;
     }
   });
 
