@@ -21,6 +21,55 @@ import RefundPolicy from './pages/RefundPolicy';
 
 import Toast from './components/Toast';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[React Error Boundary]', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '60px 24px', textAlign: 'center', maxWidth: '600px', margin: '40px auto' }} className="glass-panel">
+          <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '12px' }}>Something went wrong</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px' }}>
+            We encountered an unexpected view error. You can return home or reset your session.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.href = '/';
+              }}
+            >
+              Return Home
+            </button>
+            <button
+              className="btn btn-outline"
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+            >
+              Reset Session
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const { activePage, isLoggedIn, currentUser, pageLoading } = useContext(ShopContext);
   const [cartOpen, setCartOpen] = useState(false);
@@ -68,13 +117,15 @@ export default function App() {
 
       {/* Main Content Area — admin gets full width, no container constraint */}
       <main style={styles.mainContent}>
-        {activePage === 'admin' ? (
-          renderActivePage()
-        ) : (
-          <div className="container">
-            {renderActivePage()}
-          </div>
-        )}
+        <ErrorBoundary>
+          {activePage === 'admin' ? (
+            renderActivePage()
+          ) : (
+            <div className="container">
+              {renderActivePage()}
+            </div>
+          )}
+        </ErrorBoundary>
       </main>
 
       {/* Footer — hidden in admin mode */}
