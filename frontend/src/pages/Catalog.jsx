@@ -36,18 +36,27 @@ export default function Catalog() {
     setSortOption('featured');
   };
 
-  const filteredProducts = products
+  const filteredProducts = (products || [])
     .filter((product) => {
-      const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-      const matchesPrice = product.price <= priceRange;
+      if (!product) return false;
+      const titleStr = String(product.title || '').toLowerCase();
+      const descStr = String(product.description || '').toLowerCase();
+      const queryStr = String(searchQuery || '').toLowerCase();
+
+      const matchesSearch = titleStr.includes(queryStr) || descStr.includes(queryStr);
+      const matchesCategory = selectedCategory === 'All' || String(product.category || '').trim().toLowerCase() === String(selectedCategory || '').trim().toLowerCase();
+      const matchesPrice = (Number(product.price) || 0) <= priceRange;
       return matchesSearch && matchesCategory && matchesPrice;
     })
     .sort((a, b) => {
-      if (sortOption === 'price-low') return a.price - b.price;
-      if (sortOption === 'price-high') return b.price - a.price;
-      if (sortOption === 'rating') return b.rating - a.rating;
+      const priceA = Number(a?.price) || 0;
+      const priceB = Number(b?.price) || 0;
+      const ratingA = Number(a?.rating) || 0;
+      const ratingB = Number(b?.rating) || 0;
+
+      if (sortOption === 'price-low') return priceA - priceB;
+      if (sortOption === 'price-high') return priceB - priceA;
+      if (sortOption === 'rating') return ratingB - ratingA;
       return 0;
     });
 

@@ -210,7 +210,24 @@ export const ShopContextProvider = ({ children }) => {
         ]);
 
         if (mProducts && Array.isArray(mProducts) && mProducts.length > 0) {
-          setProducts(mProducts.map(p => ({ ...p, id: p._id || p.id })));
+          const sanitized = mProducts.map(p => ({
+            ...p,
+            id: String(p._id || p.id),
+            title: p.title || 'Untitled Product',
+            category: p.category || 'General',
+            price: Number(p.price) || 0,
+            costPrice: Number(p.costPrice) || 0,
+            stock: Number(p.stock) || 0,
+            rating: Number(p.rating) || 5.0,
+            image: p.image || (Array.isArray(p.images) && p.images[0]) || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+            images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80'],
+            description: p.description || '',
+            options: {
+              colors: Array.isArray(p.options?.colors) ? p.options.colors : ['Default'],
+              storage: Array.isArray(p.options?.storage) ? p.options.storage : ['Standard']
+            }
+          }));
+          setProducts(sanitized);
         }
         if (mCategories && Array.isArray(mCategories) && mCategories.length > 0) {
           setCategories(mCategories.map(c => ({ ...c, id: c._id || c.id })));

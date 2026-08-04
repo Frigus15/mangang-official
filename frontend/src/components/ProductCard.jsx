@@ -88,7 +88,7 @@ export default function ProductCard({ product }) {
 
       {/* Image container */}
       <div style={styles.imageContainer}>
-        <img src={product.image} alt={product.title} style={styles.image} />
+        <img src={product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80'} alt={product.title || 'Product'} style={styles.image} />
         {!hasStock && (
           <div style={styles.soldOutOverlay}>
             <span style={styles.soldOutText}>Sold Out</span>
@@ -98,12 +98,12 @@ export default function ProductCard({ product }) {
 
       {/* Card Content */}
       <div style={styles.content}>
-        <h3 style={styles.title} title={product.title}>{product.title}</h3>
-        <p style={styles.desc}>{product.description}</p>
+        <h3 style={styles.title} title={product.title || ''}>{product.title || 'Untitled Product'}</h3>
+        <p style={styles.desc}>{product.description || ''}</p>
 
         <div style={styles.priceRow}>
           <span style={styles.originalPrice}>₹{originalPrice.toLocaleString()}</span>
-          <span style={styles.price}>₹{product.price.toLocaleString()}</span>
+          <span style={styles.price}>₹{(Number(product.price) || 0).toLocaleString()}</span>
           <span style={styles.profitPercent}>{profitPercent}% Off</span>
         </div>
 
