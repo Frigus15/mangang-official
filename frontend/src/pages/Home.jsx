@@ -113,6 +113,13 @@ export default function Home() {
     };
   }, []);
 
+  // Ensure activeSlideIdx remains in valid bounds whenever bannerSlides changes
+  useEffect(() => {
+    if (!bannerSlides || bannerSlides.length === 0 || activeSlideIdx >= bannerSlides.length) {
+      setActiveSlideIdx(0);
+    }
+  }, [bannerSlides, activeSlideIdx]);
+
   // Autoplay timer for slide changes
   useEffect(() => {
     if (!bannerSlides || bannerSlides.length <= 1) return;

@@ -113,13 +113,13 @@ export const ShopContextProvider = ({ children }) => {
           api.getUsers()
         ]);
 
-        if (mProducts && Array.isArray(mProducts)) {
+        if (mProducts && Array.isArray(mProducts) && mProducts.length > 0) {
           setProducts(mProducts.map(p => ({ ...p, id: p._id || p.id })));
         }
-        if (mCategories && Array.isArray(mCategories)) {
+        if (mCategories && Array.isArray(mCategories) && mCategories.length > 0) {
           setCategories(mCategories.map(c => ({ ...c, id: c._id || c.id })));
         }
-        if (mBanners && Array.isArray(mBanners)) {
+        if (mBanners && Array.isArray(mBanners) && mBanners.length > 0) {
           setBannerSlides(mBanners.map(b => ({ ...b, id: b._id || b.id })));
         }
         if (mOrders && Array.isArray(mOrders)) {
